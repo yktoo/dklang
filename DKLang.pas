@@ -1,5 +1,5 @@
 ///**********************************************************************************************************************
-///  $Id: DKLang.pas,v 1.19 2004-09-25 18:49:36 dale Exp $
+///  $Id: DKLang.pas,v 1.20 2004-09-27 10:15:18 dale Exp $
 ///----------------------------------------------------------------------------------------------------------------------
 ///  DKLang Localization Package
 ///  Copyright 2002-2004 DK Software, http://www.dk-soft.org/
@@ -1119,7 +1119,7 @@ var
     procedure WriteParams;
     var i: Integer;
     begin
-      for i := 0 to FParams.Count-1 do StreamWriteLine(Stream, '%s=%s', [FParams.Names[i], FParams.ValueFromIndex[i]]);
+      for i := 0 to FParams.Count-1 do StreamWriteLine(Stream, FParams[i]);
        // Insert an empty line
       if FParams.Count>0 then StreamWriteLine(Stream, '');
     end;

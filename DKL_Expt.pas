@@ -1,5 +1,5 @@
 ///*********************************************************************************************************************
-///  $Id: DKL_Expt.pas,v 1.10 2004-09-25 18:49:36 dale Exp $
+///  $Id: DKL_Expt.pas,v 1.11 2004-09-27 10:15:18 dale Exp $
 ///---------------------------------------------------------------------------------------------------------------------
 ///  DKLang Localization Package
 ///  Copyright 2002-2004 DK Software, http://www.dk-soft.org
@@ -40,6 +40,30 @@ implementation //===============================================================
 uses
   SysUtils, Windows, Registry, Menus, Graphics, Dialogs, DesignIntf, TypInfo, Forms, RTLConsts, 
   DKLang, DKL_ConstEditor;
+
+  {$IFNDEF VER150}
+
+     // The below functions were introduced only in Delphi 7
+
+    function GetActiveProjectGroup: IOTAProjectGroup;
+    var
+      ModuleServices: IOTAModuleServices;
+      i: Integer;
+    begin
+      ModuleServices := BorlandIDEServices as IOTAModuleServices;
+      for i := 0 to ModuleServices.ModuleCount-1 do
+        if Supports(ModuleServices.Modules[i], IOTAProjectGroup, Result) then Exit;
+      Result := nil;
+    end;
+
+    function GetActiveProject: IOTAProject;
+    var ProjectGroup: IOTAProjectGroup;
+    begin
+      ProjectGroup := GetActiveProjectGroup;
+      if ProjectGroup=nil then Result := nil else Result := ProjectGroup.ActiveProject;
+    end;
+    
+  {$ENDIF}
 
    // Returns the current active project, if any; raises an exception otherwise
   function GetActualProject: IOTAProject;

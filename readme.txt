@@ -1,4 +1,4 @@
-$Id: readme.txt,v 1.3 2004-09-26 15:46:04 dale Exp $
+$Id: readme.txt,v 1.4 2004-09-27 10:15:18 dale Exp $
 ------------------------------------------------------------------------------------------------------------------------
 
 
@@ -82,9 +82,9 @@ ISSUES/DRAWBACKS
   analyzing all the form (visual) ancestors, which is a somewhat hard task.
 - You cannot properly handle the forms open in the IDE as standalone files. DKLang
   package requires that you have an active project open.
-- I'm using Delphi 7 for all my projects so the package was designed for Delphi 7. But
-  I believe it will work under Delphi 6, and very likely under Delphi 5. You may use
-  the supplied package files, or derive the corresponding package files from them.
+- The packages were designed for Delphi 6 and 7. But it's very likely it will run on
+  Delphi 5. You may use the supplied package files, or derive the corresponding package
+  files from them.
 
 
 INSTALLATION
@@ -92,13 +92,14 @@ INSTALLATION
 
 1. Unpack the package files into a directory.
 2. Start Delphi IDE.
-3. Open Packages\dklang7.dpk and click Compile.
-4. Open Packages\dcldklang7.dpk, click Compile, then click Install.
+3. Open Packages\dklangN.dpk (where N is your Delphi version) and click Compile.
+4. Open Packages\dcldklangN.dpk (where N is your Delphi version), click Compile, then
+   click Install.
 5. Close the files (don't save the changes if any).
 6. Add the path to DKLang.pas to IDE library path.
 
-Notice that both compiled packages (dklang7.bpl and dcldklang7.bpl) must reside in a
-directory listed in system PATH (usually packages are compiled to ...\Delphi7\Projects\Bpl).
+Notice that both compiled packages (dklangN.bpl and dcldklangN.bpl) must reside in a
+directory listed in system PATH (usually packages are compiled to ...\DelphiN\Projects\Bpl).
 
 
 PACKAGE CONTENTS
@@ -114,17 +115,8 @@ MPL-1.1.txt                     Mozilla Public License, Version 1.1
 readme.txt                      This file
 + TranEditor
   DKTranEd.exe                  DKLang Translation Editor application
-  + Language
-    Russian.lng                 DKLang Translation Editor Russian interface localization 
+  + Language\*.*                DKLang Translation Editor interface localizations
 + Examples
-  + Simple                      A simple package usage example
-  + Constants                   A demo of localizable constants usage
-+ Packages                      Package files
-  dcldklang7.cfg
-  dcldklang7.dof
-  dcldklang7.dpk
-  dcldklang7.res
-  dklang7.cfg
-  dklang7.dof
-  dklang7.dpk
-  dklang7.res
+  + Simple\*.*                  A simple package usage example
+  + Constants\*.*               A demo of localizable constants usage
++ Packages\*.*                  Package files

@@ -1,5 +1,5 @@
 ///*********************************************************************************************************************
-///  $Id: DKL_ConstEditor.pas,v 1.5 2004-09-25 18:49:36 dale Exp $
+///  $Id: DKL_ConstEditor.pas,v 1.6 2004-09-27 10:15:18 dale Exp $
 ///---------------------------------------------------------------------------------------------------------------------
 ///  DKLang Localization Package
 ///  Copyright 2002-2004 DK Software, http://www.dk-soft.org
@@ -92,7 +92,7 @@ implementation
      // Copy the constans from the editor back into FConsts
     FConsts.Clear;
     FConsts.AutoSaveLangSource := cbSaveToLangSource.Checked;
-    for i := 0 to vleMain.Strings.Count-1 do FConsts.Add(vleMain.Strings.Names[i], DecodeControlChars(vleMain.Strings.ValueFromIndex[i]), []);
+    for i := 1 to vleMain.Strings.Count do FConsts.Add(vleMain.Cells[0, i], DecodeControlChars(vleMain.Cells[1, i]), []);
     ModalResult := mrOK;
   end;
 
