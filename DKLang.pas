@@ -1,5 +1,5 @@
 ///**********************************************************************************************************************
-///  $Id: DKLang.pas,v 1.21 2004-10-11 11:42:35 dale Exp $
+///  $Id: DKLang.pas,v 1.22 2004-11-14 14:11:30 dale Exp $
 ///----------------------------------------------------------------------------------------------------------------------
 ///  DKLang Localization Package
 ///  Copyright 2002-2004 DK Software, http://www.dk-soft.org/
@@ -2143,11 +2143,11 @@ var
   begin
     FSynchronizer.BeginRead;
     try
-       // Apply translation to the controllers
-      for i := 0 to FLangControllers.Count-1 do ApplyTranToController(Translations, FLangControllers[i]);
-       // Apply the language to constants
+       // First apply the language to constants as they may be used in controllers' OnLanguageChanged event handlers
       if Translations=nil then Consts := nil else Consts := Translations.Constants;
       FConstants.TranslateFrom(Consts);
+       // Apply translation to the controllers
+      for i := 0 to FLangControllers.Count-1 do ApplyTranToController(Translations, FLangControllers[i]);
     finally
       FSynchronizer.EndRead;
     end;
