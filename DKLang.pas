@@ -512,6 +512,7 @@ const
 
    // Component translations parameter names
   SDKLang_TranParam_LangID             = 'LANGID';
+  SDKLang_TranParam_SourceLangID       = 'SourceLANGID';
   SDKLang_TranParam_Author             = 'Author';
   SDKLang_TranParam_Generator          = 'Generator';
   SDKLang_TranParam_LastModified       = 'LastModified';
@@ -519,6 +520,8 @@ const
 
    // Default language source file extension
   SDKLang_LangSourceExtension          = 'dklang';
+
+  ILangID_USEnglish                    = $0409;
 
 var
    // Set to True by DKLang expert to indicate the design time execution
@@ -530,8 +533,6 @@ resourcestring
   SDKLangErrMsg_DuplicateConstName     = 'Duplicate constant name ("%s")';
   SDKLangErrMsg_ConstantNotFound       = 'Constant "%s" not found';
   SDKLangErrMsg_LangManagerCalledAtDT  = 'Call to LangManager() is allowed at runtime only';
-
-  SDTLTErrMsg_UnknownDTTMFileExtension = 'Unknown DTTM project file extension: %s';
 
 implementation
 uses TypInfo, Math;
@@ -1897,7 +1898,7 @@ var
     FConstants         := TDKLang_Constants.Create;
     FLangControllers   := TList.Create;
     FLangResources     := TDKLang_LangResources.Create;
-    FDefaultLanguageID := $0409;
+    FDefaultLanguageID := ILangID_USEnglish;
     FLanguageID        := FDefaultLanguageID;
      // Load the constants from the executable's resources
     FConstants.LoadFromResource(HInstance, SDKLang_ConstResourceName);
