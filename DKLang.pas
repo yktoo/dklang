@@ -534,11 +534,6 @@ const
 
   ILangID_USEnglish                    = $0409;
 
-   // Default property ignore list
-  asDefaultIgnoredProps: Array[0..1] of String = (
-    'Name',
-    'SecondaryShortCuts');
-
 var
    // Set to True by DKLang expert to indicate the design time execution
   IsDesignTime: Boolean = False;
@@ -1290,15 +1285,15 @@ var
     procedure UpdateProps;
 
        // Checks only property type and presence in IgnoreList. Doesn't consider property value emptyness
-      function IsPropIgnored(pInfo: PPropInfo): Boolean;
+      function IsPropIgnored(const sPropFullName: String; pInfo: PPropInfo): Boolean;
       begin
         Result :=
            // Test type kind
           not (pInfo.PropType^.Kind in [tkClass, tkString, tkLString, tkWString]) or
            // Test property name
-          (IgnoreList.IndexOf(pInfo.Name)>=0) or
+          (IgnoreList.IndexOf(sPropFullName)>=0) or
            // Test full component/property path
-          (IgnoreList.IndexOf(sCompPathPrefix+pInfo.Name)>=0);
+          (IgnoreList.IndexOf(sCompPathPrefix+sPropFullName)>=0);
       end;
 
       procedure SetVal(const sName, sVal: String);
@@ -1315,23 +1310,28 @@ var
 
        // Processes the specified property and adds it to PrpEntries if it appears suitable
       procedure ProcessProp(const sPrefix: String; Instance: TObject; pInfo: PPropInfo);
+      const asSep: Array[Boolean] of String[1] = ('', '.');
       var
         i: Integer;
         o: TObject;
         sFullName: String;
       begin
-        if IsPropIgnored(pInfo) then Exit;
-        sFullName := sPrefix+pInfo.Name;
+        sFullName := sPrefix+asSep[sPrefix<>'']+pInfo.Name;
+        if ((Instance is TComponent) and (pInfo.Name='Name')) or IsPropIgnored(sFullName, pInfo) then Exit;
         case pInfo.PropType^.Kind of
           tkClass:
             if Assigned(pInfo.GetProc) and Assigned(pInfo.SetProc) and IsStoredProp(Instance, pInfo) then begin
               o := GetObjectProp(Instance, pInfo);
               if o<>nil then
                  // TStrings property
-                if o is TStrings then SetVal(sFullName, TStrings(o).Text)
+                if o is TStrings then
+                  SetVal(sFullName, TStrings(o).Text)
                  // TCollection property
                 else if o is TCollection then
-                  for i := 0 to TCollection(o).Count-1 do ProcessObject(sFullName+Format('[%d].', [i]), TCollection(o).Items[i]);
+                  for i := 0 to TCollection(o).Count-1 do ProcessObject(sFullName+Format('[%d]', [i]), TCollection(o).Items[i])
+                 // TPersistent property. Avoid processing TComponent references which may lead to circular loop
+                else if (o is TPersistent) and not (o is TComponent) then
+                  ProcessObject(sFullName, o);
             end;
           tkString,
             tkLString: if IsStoredProp(Instance, pInfo) then SetVal(sFullName, GetStrProp(Instance, pInfo));
@@ -1771,14 +1771,12 @@ var
    //===================================================================================================================
 
   constructor TDKLanguageController.Create(AOwner: TComponent);
-  var i: Integer;
   begin
     inherited Create(AOwner);
      // Initialize IgnoreList
     FIgnoreList    := TStringList.Create;
     TStringList(FIgnoreList).Duplicates := dupIgnore;
     TStringList(FIgnoreList).Sorted     := True;
-    for i := 0 to High(asDefaultIgnoredProps) do FIgnoreList.Add(asDefaultIgnoredProps[i]);
      // Initialize other props
     FRootCompEntry := TDKLang_CompEntry.Create(nil);
     FOptions       := DKLang_DefaultControllerOptions;
@@ -1812,16 +1810,8 @@ var
   end;
 
   function TDKLanguageController.IsIgnoreListStored: Boolean;
-  var i: Integer;
   begin
-     // Check whether IgnoreList reproduces contents of asDefaultIgnoredProps[]
-    Result := (FIgnoreList.Count<>Length(asDefaultIgnoredProps));
-    if not Result then
-      for i := 0 to High(asDefaultIgnoredProps) do
-        if FIgnoreList.IndexOf(asDefaultIgnoredProps[i])<0 then begin
-          Result := True;
-          Break;
-        end;
+    Result := FIgnoreList.Count>0;
   end;
 
   procedure TDKLanguageController.LangData_Load(Stream: TStream);
