@@ -359,6 +359,7 @@ type
     FOnLanguageChanged: TNotifyEvent;
     FIgnoreList: TStrings;
     FOnLanguageChanging: TNotifyEvent;
+    FStoreList: TStrings;
      // Methods for LangData custom property support
     procedure LangData_Load(Stream: TStream);
     procedure LangData_Store(Stream: TStream);
@@ -376,7 +377,9 @@ type
     procedure UpdateComponents;
      // Prop handlers
     function  IsIgnoreListStored: Boolean;
+    function  IsStoreListStored: Boolean;
     procedure SetIgnoreList(Value: TStrings);
+    procedure SetStoreList(Value: TStrings);
   protected
     procedure DefineProperties(Filer: TFiler); override;
     procedure Notification(AComponent: TComponent; Operation: TOperation); override;
@@ -396,6 +399,8 @@ type
     property IgnoreList: TStrings read FIgnoreList write SetIgnoreList stored IsIgnoreListStored;
      // -- Language controller options
     property Options: TDKLanguageControllerOptions read FOptions write FOptions default DKLang_DefaultControllerOptions;
+     // -- List of forcibly stored properties
+    property StoreList: TStrings read FStoreList write SetStoreList stored IsStoreListStored;
      // Events
      // -- Fires when language is changed through the LangManager
     property OnLanguageChanging: TNotifyEvent read FOnLanguageChanging write FOnLanguageChanging;
@@ -1817,9 +1822,13 @@ var
   begin
     inherited Create(AOwner);
      // Initialize IgnoreList
-    FIgnoreList    := TStringList.Create;
+    FIgnoreList := TStringList.Create;
     TStringList(FIgnoreList).Duplicates := dupIgnore;
     TStringList(FIgnoreList).Sorted     := True;
+     // Initialize StoreList
+    FStoreList := TStringList.Create;
+    TStringList(FStoreList).Duplicates := dupIgnore;
+    TStringList(FStoreList).Sorted     := True;
      // Initialize other props
     FRootCompEntry := TDKLang_CompEntry.Create(nil);
     FOptions       := DKLang_DefaultControllerOptions;
@@ -1844,6 +1853,7 @@ var
     if not (csDesigning in ComponentState) then LangManager.RemoveLangController(Self);
     FRootCompEntry.Free;
     FIgnoreList.Free;
+    FStoreList.Free;
     inherited Destroy;
   end;
 
@@ -1872,6 +1882,11 @@ var
   function TDKLanguageController.IsIgnoreListStored: Boolean;
   begin
     Result := FIgnoreList.Count>0;
+  end;
+
+  function TDKLanguageController.IsStoreListStored: Boolean;
+  begin
+    Result := FStoreList.Count>0;
   end;
 
   procedure TDKLanguageController.LangData_Load(Stream: TStream);
@@ -1925,6 +1940,11 @@ var
   procedure TDKLanguageController.SetIgnoreList(Value: TStrings);
   begin
     FIgnoreList.Assign(Value);
+  end;
+
+  procedure TDKLanguageController.SetStoreList(Value: TStrings);
+  begin
+    FStoreList.Assign(Value);
   end;
 
   procedure TDKLanguageController.UpdateComponents;
