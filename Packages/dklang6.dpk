@@ -22,7 +22,7 @@ package dklang6;
 {$WRITEABLECONST OFF}
 {$MINENUMSIZE 1}
 {$IMAGEBASE $25100000}
-{$DESCRIPTION 'DKLang Localization Package v2.1'}
+{$DESCRIPTION 'DKLang Localization Package v2.2'}
 {$RUNONLY}
 {$IMPLICITBUILD OFF}
 

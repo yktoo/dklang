@@ -1,6 +1,8 @@
-$Id: readme.txt,v 1.4 2004-09-27 10:15:18 dale Exp $
+$Id: readme.txt,v 1.5 2004-11-27 10:29:44 dale Exp $
 ------------------------------------------------------------------------------------------------------------------------
 
+DKLang Localization Package
+Version 2.2
 
 LEGAL INFO
 ------------------------------------------------------------------------------------------------------------------------
@@ -21,6 +23,66 @@ GENERAL DESCRIPTION
 
 DKLang Localization Package is a set of classes intended to simplify the localization
 of applications written in Delphi.
+
+What are the benefits of DKLang compared to Borland's ITE (Integrated Translation
+Environment)?
+
+* First, DKLang is completely free while ITE is only supplied with Delphi Enterprise
+  Edition. Moreover, DKLang is open-source so you always can see 'how the wind blows'.
+* Second, DKLang is very lightweight and runtime-optimized. You always get predictable
+  results as the implemented technology is obvious and transparent.
+* Third, DKLang allows language switching at any time while ITE relies on a resource DLL
+  with predefined extension when loading the program and you cannot change the language
+  further.
+* Fourth, Application using DKLang can consist of the only executable which includes any
+  number of languages in its resource; it allows you to decide yourself which language
+  should be included 'statically' and which ones are linked when program runs. In
+  contrast, ITE always requires that a DLL with predefined extension for each language
+  resides in the program directory: this means you should redistribute all the language
+  DLLs with each copy of the program.
+* And finally, language files are plain-text files so one can edit them with any text
+  editor. ITE uses only compiled resource DLLs prepared with using special Tranlsation
+  Manager.
+
+
+PACKAGE FEATURES
+------------------------------------------------------------------------------------------------------------------------
+
+* Ease of use. Put a TDKLanguageController on the form, save the project (this will
+  automatically create a language source file) and add a couple of lines to program code:
+  you get a functional multilanguage application! See the provided demos to know the
+  details.
+* Full integration with Delphi VCL component library. A possibility of automated change
+  tracking in structure or properties of forms, frames, data modules etc., and owned
+  components. 
+* Storing property values for String (AnsiString), ShortString and WideString properties
+  (no Unicode support is implemented though). Storing property values of class TStrings,
+  TCollection item properties and property values of TPersistent descendants. Only the
+  properties recognized by Delphi streaming mechanism as stored are processed. For the
+  time being no support implemented for VFI (visual form inheritance) and custom-defined
+  properties (ones specified with DefineProperties() call). 
+* A possibility for defining a set of string constants for a project. A constant is
+  referred to by its name (binary name search is implemented). 
+* Storing translations in plain-text files, which can be edited with any text editor.
+  However, there's a much more convenient tool available for creating the translations:
+  the DKLang Translation Editor. 
+* Synchronous language switching in all displayed forms by changing the current language
+  of global TDKLanguageManager instance. 
+* Events fired in a non-visual component just before and after the language change. 
+* A possibility for ignoring any properties, as well as a list of forcibly stored
+  properties recognized as not stored. Both lists are formed using name masks (eg,
+  *.Font.Name). 
+* Automated saving the localization data for the whole project into a so-called language
+  source file (a file having .dklang extension). 
+* A possibility of using the localization mechanism when no visual forms instantiated (for
+  localizing constants only). A possibility of building the project with DKLang runtime
+  package. 
+* A thread-safe design allowing for proper functioning in multithreaded environment. This
+  allows non-blocking data read access with a number of threads at once. 
+
+
+TECHNOLOGY AND BACKGROUND
+------------------------------------------------------------------------------------------------------------------------
 
 The package introduces a non-visual VCL component called TDKLanguageController, which
 is to be placed on each form you wish to localize. Language controller automatically
@@ -68,6 +130,7 @@ NB: DO NOT edit .dklang files directly since the contents of these files is
     Nevertheless, you can add your custom comments (each line starting with a
     semicolon) at the top of the file. The package leaves such comments intact.
 
+
 ISSUES/DRAWBACKS
 ------------------------------------------------------------------------------------------------------------------------
 
@@ -82,9 +145,9 @@ ISSUES/DRAWBACKS
   analyzing all the form (visual) ancestors, which is a somewhat hard task.
 - You cannot properly handle the forms open in the IDE as standalone files. DKLang
   package requires that you have an active project open.
-- The packages were designed for Delphi 6 and 7. But it's very likely it will run on
-  Delphi 5. You may use the supplied package files, or derive the corresponding package
-  files from them.
+- The packages were designed for Delphi 6, 7 and 2005 (with latest updates applied). But
+  it's very likely it will run on Delphi 5. You may use the supplied package files, or
+  derive the corresponding package files from them.
 
 
 INSTALLATION
@@ -92,14 +155,17 @@ INSTALLATION
 
 1. Unpack the package files into a directory.
 2. Start Delphi IDE.
-3. Open Packages\dklangN.dpk (where N is your Delphi version) and click Compile.
+3. Open Packages\dklangN.dpk (where N is your Delphi version: 6 for Delphi 6, 7 for Delphi
+   7, 9 for Delphi 2005) and click Compile.
 4. Open Packages\dcldklangN.dpk (where N is your Delphi version), click Compile, then
    click Install.
 5. Close the files (don't save the changes if any).
 6. Add the path to DKLang.pas to IDE library path.
 
 Notice that both compiled packages (dklangN.bpl and dcldklangN.bpl) must reside in a
-directory listed in system PATH (usually packages are compiled to ...\DelphiN\Projects\Bpl).
+directory listed in system PATH (usually packages are compiled to
+...\Borland\DelphiN\Projects\Bpl (Delphi 6 and 7) or 
+<personal folder>\Borland Studio Projects\Bpl (Delphi 8+)).
 
 
 PACKAGE CONTENTS
@@ -120,3 +186,15 @@ readme.txt                      This file
   + Simple\*.*                  A simple package usage example
   + Constants\*.*               A demo of localizable constants usage
 + Packages\*.*                  Package files
+
+REVISION HISTORY
+------------------------------------------------------------------------------------------------------------------------
+
+DKLang 2.2 [Nov 27, 2004]
+  [+] Added support for Delphi 2005.
+  [+] Changed the order of applying a language: first constants are updated, then
+      controllers. This allows to read correct constants' values in controllers'
+      OnLanguageChanged event handlers.
+
+DKLang 2.1 [Sep 26, 2004]
+  The first public release (all prior versions were only for individual use)

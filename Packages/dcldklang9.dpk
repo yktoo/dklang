@@ -1,4 +1,4 @@
-package dcldklang7;
+package dcldklang9;
 
 {$R *.res}
 {$ALIGN 8}
@@ -29,7 +29,7 @@ package dcldklang7;
 requires
   rtl,
   designide,
-  dklang7,
+  dklang9,
   vcl;
 
 contains
