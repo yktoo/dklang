@@ -1357,7 +1357,7 @@ var
          // Test whether property is to be ignored
         if ((Instance is TComponent) and (pInfo.Name='Name')) or
            not (pInfo.PropType^.Kind in [tkClass, tkString, tkLString, tkWString]) or
-           IgnoreTest.Matches(sFullName) then Exit;
+           IgnoreTest.Matches(sCompPathPrefix+sFullName) then Exit;
          // Obtain and store property value  
         case pInfo.PropType^.Kind of
           tkClass:
@@ -1436,8 +1436,7 @@ var
     end;
 
   begin
-    sCompPathPrefix := ComponentNamePath[False];
-    if sCompPathPrefix<>'' then sCompPathPrefix := sCompPathPrefix+'.';
+    sCompPathPrefix := ComponentNamePath[False]+'.'; // Root prop names will start with '.'
      // Update property entries
     UpdateProps;
      // Update component entries

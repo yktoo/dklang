@@ -27,7 +27,7 @@ resourcestring
   SDKLExptMsg_LCsUpdated             = '%d language controllers has updated the project language source.';
 
   SDKLExptMenuItem_EditConstants     = 'Edit pro&ject constants...';
-  SDKLExptMenuItem_UpdateLangSource  = 'Update projec&t language source';
+  SDKLExptMenuItem_UpdateLangSource  = 'Update project lan&guage source';
 
 implementation //=======================================================================================================
 uses
