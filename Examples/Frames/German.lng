@@ -1,0 +1,18 @@
+TargetApplication=DKLang_Frames_Demo
+Author=Dmitry Kann
+SourceLANGID=1033
+LANGID=1031
+Generator=DKLang Translation Editor v2.4
+LastModified=2005-01-23 11:54:52
+
+[fMain]
+00000001=Optionen
+00000003=Abbrechen
+00000004=OK
+00000005=&Sprache der Benutzeroberfläche:
+
+[frFontSettings]
+00000001=Auswählten...
+00000002=Das ist ein Beispieltext
+
+[$CONSTANTS]
