@@ -1,0 +1,8 @@
+*.~*
+*.dcu
+*.ddp
+*.dsk
+Entries
+Entries.*
+Repository
+Root
