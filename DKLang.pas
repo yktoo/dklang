@@ -17,8 +17,9 @@ type
     ['{41861692-AF49-4973-BDA1-0B1375407D29}']
      // Is called just before storing begins. Must return True to allow the storing or False otherwise
     function  CanStore: Boolean;
-     // Must append the language source lines (Strings) with its own data
-    procedure StoreLangSource(Strings: TStrings);
+     // Must append the language source lines (Strings) with its own data. If bSkipUntranslated=True, should skip the
+     //   untranslated entries (for translation editing purposes)
+    procedure StoreLangSource(Strings: TStrings; bSkipUntranslated: Boolean);
      // Prop handlers
     function  GetSectionName: String;
      // Props
@@ -30,10 +31,16 @@ type
    // A single component property value translation, referred to by ID
    //-------------------------------------------------------------------------------------------------------------------
 
+   // Property value translation state 
+  TDKLang_PropValueTranslationState = (
+    dklptsUntranslated); // For translation purposes: the property value is still untranslated
+  TDKLang_PropValueTranslationStates = set of TDKLang_PropValueTranslationState;  
+
   PDKLang_PropValueTranslation = ^TDKLang_PropValueTranslation;
   TDKLang_PropValueTranslation = record
-    iID:    Integer; // An entry ID, form-wide unique and permanent
-    sValue: String;  // The property value translation
+    iID:    Integer;                            // An entry ID, form-wide unique and permanent
+    sValue: String;                             // The property value translation
+    States: TDKLang_PropValueTranslationStates; // Value states
   end;
 
    //-------------------------------------------------------------------------------------------------------------------
@@ -52,7 +59,7 @@ type
   public
     constructor Create(const sComponentName: String);
      // Adds an entry into the list and returns the index of the newly added entry
-    function  Add(iID: Integer; const sValue: String): Integer;
+    function  Add(iID: Integer; const sValue: String; States: TDKLang_PropValueTranslationStates): Integer;
      // Returns index of entry by its ID; -1 if not found
     function  IndexOfID(iID: Integer): Integer;
      // Tries to find the entry by property ID; returns True, if succeeded, and its index in iIndex; otherwise returns
@@ -249,11 +256,17 @@ type
    // A constant
    //-------------------------------------------------------------------------------------------------------------------
 
+   // Constant state
+  TDKLang_ConstantState = (
+    dklcsUntranslated); // For translation purposes: the constant value is still untranslated
+  TDKLang_ConstantStates = set of TDKLang_ConstantState;
+
   PDKLang_Constant = ^TDKLang_Constant;
   TDKLang_Constant = record
-    sName:     String; // Constant name
-    sValue:    String; // Constant value
-    sDefValue: String; // Default constant value (in the default language; initially the same as sValue)
+    sName:     String;                 // Constant name
+    sValue:    String;                 // Constant value
+    sDefValue: String;                 // Default constant value (in the default language; initially the same as sValue)
+    States:    TDKLang_ConstantStates; // Constant state
   end;
 
    //-------------------------------------------------------------------------------------------------------------------
@@ -273,7 +286,7 @@ type
     procedure IDKLang_LanguageSourceObject.StoreLangSource = LSO_StoreLangSource;
     function  IDKLang_LanguageSourceObject.GetSectionName  = LSO_GetSectionName;
     function  LSO_CanStore: Boolean;
-    procedure LSO_StoreLangSource(Strings: TStrings);
+    procedure LSO_StoreLangSource(Strings: TStrings; bSkipUntranslated: Boolean);
     function  LSO_GetSectionName: String;
      // Prop handlers
     function  GetItems(Index: Integer): PDKLang_Constant;
@@ -287,7 +300,7 @@ type
   public
     constructor Create;
      // Add an entry into the list; returns the index of the newly inserted entry
-    function  Add(const sName, sValue: String): Integer;
+    function  Add(const sName, sValue: String; States: TDKLang_ConstantStates): Integer;
      // Returns index of entry by name; -1 if not found
     function  IndexOfName(const sName: String): Integer;
      // Tries to find the entry by name; returns True, if succeeded, and its index in iIndex; otherwise returns False
@@ -344,7 +357,7 @@ type
     procedure IDKLang_LanguageSourceObject.StoreLangSource = LSO_StoreLangSource;
     function  IDKLang_LanguageSourceObject.GetSectionName  = LSO_GetSectionName;
     function  LSO_CanStore: Boolean;
-    procedure LSO_StoreLangSource(Strings: TStrings);
+    procedure LSO_StoreLangSource(Strings: TStrings; bSkipUntranslated: Boolean);
     function  LSO_GetSectionName: String;
   protected
     procedure DefineProperties(Filer: TFiler); override;
@@ -482,10 +495,10 @@ type
   function GetLangIDName(wLangID: LANGID): String;
    // Finds and updates the corresponding section in Strings (which appear as language source file). If no appropriate
    //   section found, appends the lines to the end of Strings
-  procedure UpdateLangSourceStrings(Strings: TStrings; LSObject: IDKLang_LanguageSourceObject);
+  procedure UpdateLangSourceStrings(Strings: TStrings; LSObject: IDKLang_LanguageSourceObject; bSkipUntranslated: Boolean);
    // The same as UpdateLangSourceStrings() but operates directly on a language source file. If no such file, a new file
    //   is created
-  procedure UpdateLangSourceFile(const sFileName: String; LSObject: IDKLang_LanguageSourceObject);
+  procedure UpdateLangSourceFile(const sFileName: String; LSObject: IDKLang_LanguageSourceObject; bSkipUntranslated: Boolean);
    // Raises exception EDKLangError
   procedure DKLangError(const sMsg: String); overload;
   procedure DKLangError(const sMsg: String; const aParams: Array of const); overload;
@@ -565,7 +578,7 @@ var
     Result := acBuf;
   end;
 
-  procedure UpdateLangSourceStrings(Strings: TStrings; LSObject: IDKLang_LanguageSourceObject);
+  procedure UpdateLangSourceStrings(Strings: TStrings; LSObject: IDKLang_LanguageSourceObject; bSkipUntranslated: Boolean);
   var
     idx, i: Integer;
     sSectionName: String;
@@ -578,7 +591,7 @@ var
       sSectionName := Format('[%s]', [LSObject.SectionName]);
       SLLangSrc.Add(sSectionName);
        // Export language source data
-      LSObject.StoreLangSource(SLLangSrc);
+      LSObject.StoreLangSource(SLLangSrc, bSkipUntranslated);
        // Add empty string
       SLLangSrc.Add('');
        // Lock Strings updates
@@ -606,7 +619,7 @@ var
     end;
   end;
 
-  procedure UpdateLangSourceFile(const sFileName: String; LSObject: IDKLang_LanguageSourceObject);
+  procedure UpdateLangSourceFile(const sFileName: String; LSObject: IDKLang_LanguageSourceObject; bSkipUntranslated: Boolean);
   var SLLangSrc: TStringList;
   begin
     SLLangSrc := TStringList.Create;
@@ -614,7 +627,7 @@ var
        // Load language file source, if any
       if FileExists(sFileName) then SLLangSrc.LoadFromFile(sFileName);
        // Store the data
-      UpdateLangSourceStrings(SLLangSrc, LSObject);
+      UpdateLangSourceStrings(SLLangSrc, LSObject, bSkipUntranslated);
        // Save the language source back into file
       SLLangSrc.SaveToFile(sFileName);
     finally
@@ -710,7 +723,7 @@ var
    // TDKLang_CompTranslation
    //===================================================================================================================
 
-  function TDKLang_CompTranslation.Add(iID: Integer; const sValue: String): Integer;
+  function TDKLang_CompTranslation.Add(iID: Integer; const sValue: String; States: TDKLang_PropValueTranslationStates): Integer;
   var p: PDKLang_PropValueTranslation;
   begin
      // Find insertion point and check ID uniqueness
@@ -721,6 +734,7 @@ var
      // Initialize entry
     p.iID    := iID;
     p.sValue := sValue;
+    p.States := States;
   end;
 
   constructor TDKLang_CompTranslation.Create(const sComponentName: String);
@@ -904,10 +918,10 @@ var
        // Implement the parsed values
       case Part of
         tpParam: FParams.Values[sName] := sValue;
-        tpConstant: FConstants.Add(sName, LineToMultiline(sValue));
+        tpConstant: FConstants.Add(sName, LineToMultiline(sValue), []);
         tpComponent: if CT<>nil then begin
           iID := StrToIntDef(sName, 0);
-          if iID>0 then CT.Add(iID, LineToMultiline(sValue));
+          if iID>0 then CT.Add(iID, LineToMultiline(sValue), []);
         end;
       end;
     end;
@@ -1501,7 +1515,7 @@ var
    // TDKLang_Constants
    //===================================================================================================================
 
-  function TDKLang_Constants.Add(const sName, sValue: String): Integer;
+  function TDKLang_Constants.Add(const sName, sValue: String; States: TDKLang_ConstantStates): Integer;
   var p: PDKLang_Constant;
   begin
     if not IsValidIdent(sName) then DKLangError(SDKLangErrMsg_InvalidConstName, [sName]);
@@ -1514,6 +1528,7 @@ var
     p.sName     := sName;
     p.sValue    := sValue;
     p.sDefValue := sValue;
+    p.States    := States;
   end;
 
   constructor TDKLang_Constants.Create;
@@ -1613,7 +1628,7 @@ var
     for i := 0 to StreamReadInt(Stream)-1 do begin
       sName  := StreamReadStr(Stream);
       sValue := StreamReadStr(Stream);
-      Add(sName, sValue);
+      Add(sName, sValue, []);
     end;
   end;
 
@@ -1628,11 +1643,12 @@ var
     Result := SDKLang_ConstSectionName; 
   end;
 
-  procedure TDKLang_Constants.LSO_StoreLangSource(Strings: TStrings);
+  procedure TDKLang_Constants.LSO_StoreLangSource(Strings: TStrings; bSkipUntranslated: Boolean);
   var i: Integer;
   begin
     for i := 0 to Count-1 do
-      with GetItems(i)^ do Strings.Add(sName+'='+MultilineToLine(sValue));
+      with GetItems(i)^ do
+        if not bSkipUntranslated or not (dklcsUntranslated in States) then Strings.Add(sName+'='+MultilineToLine(sValue));
   end;
 
   procedure TDKLang_Constants.Notify(Ptr: Pointer; Action: TListNotification);
@@ -1776,9 +1792,9 @@ var
     Result := Owner.Name;
   end;
 
-  procedure TDKLanguageController.LSO_StoreLangSource(Strings: TStrings);
+  procedure TDKLanguageController.LSO_StoreLangSource(Strings: TStrings; bSkipUntranslated: Boolean);
   begin
-    FRootCompEntry.StoreLangSource(Strings);
+    FRootCompEntry.StoreLangSource(Strings); // bSkipUntranslated is not applicable
   end;
 
   procedure TDKLanguageController.Notification(AComponent: TComponent; Operation: TOperation);
