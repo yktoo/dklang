@@ -495,7 +495,9 @@ type
      //   subdirectories of sDir. Returns the number of files successfully registered. Sample:
      //     ScanForLangFiles(ExtractFileDir(ParamStr(0)), '*.lng', False); - Scans the application directory for files
      //     with '.lng' extension
-    function ScanForLangFiles(const sDir, sMask: String; bRecursive: Boolean): Integer;
+    function  ScanForLangFiles(const sDir, sMask: String; bRecursive: Boolean): Integer;
+     // Returns the index of specified LangID, or -1 if not found
+    function  IndexOfLanguageID(wLangID: LANGID): Integer;
      // Props
      // -- Constant values by name
     property ConstantValue[const sName: String]: String read GetConstantValue;
@@ -513,14 +515,14 @@ type
   end;
 
    // Returns the global language manager instance (allowed at runtime only)
-  function LangManager: TDKLanguageManager;
+  function  LangManager: TDKLanguageManager;
 
    // Replaces linebreaks with \n
-  function MultilineToLine(const s: String): String;
+  function  MultilineToLine(const s: String): String;
    // Replaces \n with linebreaks
-  function LineToMultiline(const s: String): String;
+  function  LineToMultiline(const s: String): String;
    // Translates LANGID into language name
-  function GetLangIDName(wLangID: LANGID): String;
+  function  GetLangIDName(wLangID: LANGID): String;
    // Finds and updates the corresponding section in Strings (which appear as language source file). If no appropriate
    //   section found, appends the lines to the end of Strings
   procedure UpdateLangSourceStrings(Strings: TStrings; LSObject: IDKLang_LanguageSourceObject; bSkipUntranslated: Boolean);
@@ -2129,6 +2131,16 @@ var
           raise;
         end;
       end;
+    end;
+  end;
+
+  function TDKLanguageManager.IndexOfLanguageID(wLangID: LANGID): Integer;
+  begin
+    FSynchronizer.BeginRead;
+    try
+      if wLangID=FDefaultLanguageID then Result := 0 else Result := FLangResources.IndexOfLangID(wLangID);
+    finally
+      FSynchronizer.EndRead;
     end;
   end;
 
