@@ -1,4 +1,4 @@
-$Id: readme.txt,v 1.8 2004-12-20 20:04:11 dale Exp $
+$Id: readme.txt,v 1.9 2005-03-06 19:04:38 dale Exp $
 ------------------------------------------------------------------------------------------------------------------------
 
 DKLang Localization Package
@@ -190,6 +190,14 @@ readme.txt                      This file
 
 REVISION HISTORY
 ------------------------------------------------------------------------------------------------------------------------
+
+DKLang 2.4 [xxx xx, 2005]
+  [+] Added property TDKLanguageController.SectionName which allows customizing
+      section which stores language data 
+  [+] Added properties TDKLanguageManager.LanguageIndex,
+      TDKLanguageManager.LanguageResources[]
+  [-] Bugfix: TDKLanguageManager.IndexOfLanguageID() returned value less by 1 
+      than correct value for non-default languages
 
 DKLang 2.3 [Dec 21, 2004]
   [+] DKLang now uses a double licensing system. You may use, modify or
