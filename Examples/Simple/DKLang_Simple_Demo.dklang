@@ -1,0 +1,5 @@
+[fMain]
+Caption=00000001,Sample Form
+bCancel.Caption=00000003,Cancel
+lSampleMessage.Caption=00000004,This is a sample message.
+
