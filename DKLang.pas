@@ -1,5 +1,5 @@
 ///**********************************************************************************************************************
-///  $Id: DKLang.pas,v 1.23 2004-12-20 20:01:27 dale Exp $
+///  $Id: DKLang.pas,v 1.24 2005-01-23 18:13:35 dale Exp $
 ///----------------------------------------------------------------------------------------------------------------------
 ///  DKLang Localization Package
 ///  Copyright 2002-2004 DK Software, http://www.dk-soft.org/
@@ -135,7 +135,7 @@ type
     constructor Create;
     destructor Destroy; override;
     procedure Clear; override;
-     // Adds an item into the list and returns the index of the newly added entry
+     // Adds an item to the list and returns the index of the newly added entry
     function  Add(Item: TDKLang_CompTranslation): Integer;
      // Returns index of entry by component name; -1 if not found
     function  IndexOfComponentName(const sComponentName: String): Integer;
@@ -387,11 +387,12 @@ type
   TDKLanguageController = class(TComponent, IDKLang_LanguageSourceObject)
   private
      // Prop storage
-    FRootCompEntry: TDKLang_CompEntry;
-    FOptions: TDKLanguageControllerOptions;
-    FOnLanguageChanged: TNotifyEvent;
     FIgnoreList: TStrings;
+    FOnLanguageChanged: TNotifyEvent;
     FOnLanguageChanging: TNotifyEvent;
+    FOptions: TDKLanguageControllerOptions;
+    FRootCompEntry: TDKLang_CompEntry;
+    FSectionName: String;
     FStoreList: TStrings;
      // Methods for LangData custom property support
     procedure LangData_Load(Stream: TStream);
@@ -399,16 +400,16 @@ type
      // IDKLang_LanguageSourceObject
     function  IDKLang_LanguageSourceObject.CanStore        = LSO_CanStore;
     procedure IDKLang_LanguageSourceObject.StoreLangSource = LSO_StoreLangSource;
-    function  IDKLang_LanguageSourceObject.GetSectionName  = LSO_GetSectionName;
+    function  IDKLang_LanguageSourceObject.GetSectionName  = GetActualSectionName;
     function  LSO_CanStore: Boolean;
     procedure LSO_StoreLangSource(Strings: TStrings; StateFilter: TDKLang_TranslationStates);
-    function  LSO_GetSectionName: String;
      // Forces component entries to update their entries. If bModifyList=False, only default property values are
      //   initialized, no entry additions/removes are allowed
     procedure UpdateComponents(bModifyList: Boolean);
      // Prop handlers
     procedure SetIgnoreList(Value: TStrings);
     procedure SetStoreList(Value: TStrings);
+    function  GetActualSectionName: String;
   protected
     procedure DefineProperties(Filer: TFiler); override;
     procedure Notification(AComponent: TComponent; Operation: TOperation); override;
@@ -421,6 +422,8 @@ type
     destructor Destroy; override;
     procedure Loaded; override;
      // Props
+     // -- Name of a section that is actually used to store and read language data
+    property ActualSectionName: String read GetActualSectionName;
      // -- The root entry, corresponding to the instance's owner
     property RootCompEntry: TDKLang_CompEntry read FRootCompEntry;
   published
@@ -428,6 +431,9 @@ type
     property IgnoreList: TStrings read FIgnoreList write SetIgnoreList;
      // -- Language controller options
     property Options: TDKLanguageControllerOptions read FOptions write FOptions default DKLang_DefaultControllerOptions;
+     // -- Name of a section corresponding to the form or frame served by the controller. If empty (default), Owner's
+     //    name is used as section name
+    property SectionName: String read FSectionName write FSectionName;
      // -- List of forcibly stored properties
     property StoreList: TStrings read FStoreList write SetStoreList;
      // Events
@@ -627,12 +633,12 @@ var
       case c of
          // Tab character
         #9:  Result := Result+'\t';
-         // Linefeed character. Skip nexct Carriage Return char, if any
+         // Linefeed character. Skip subsequent Carriage Return char, if any
         #10: begin
           Result := Result+'\n';
           if (i<iLen) and (s[i+1]=#13) then Inc(i);
         end;
-         // Carriage Return character. Skip next Linefeed char, if any
+         // Carriage Return character. Skip subsequent Linefeed char, if any
         #13: begin
           Result := Result+'\n';
           if (i<iLen) and (s[i+1]=#10) then Inc(i);
@@ -1873,7 +1879,7 @@ var
   function TDKLang_Constants.LSO_GetSectionName: String;
   begin
      // Constants always use the predefined section name
-    Result := SDKLang_ConstSectionName; 
+    Result := SDKLang_ConstSectionName;
   end;
 
   procedure TDKLang_Constants.LSO_StoreLangSource(Strings: TStrings; StateFilter: TDKLang_TranslationStates);
@@ -2005,6 +2011,11 @@ var
     if Assigned(FOnLanguageChanging) then FOnLanguageChanging(Self);
   end;
 
+  function TDKLanguageController.GetActualSectionName: String;
+  begin
+    if FSectionName='' then Result := Owner.Name else Result := FSectionName;
+  end;
+
   procedure TDKLanguageController.LangData_Load(Stream: TStream);
   begin
     FRootCompEntry.LoadFromDFMResource(Stream);
@@ -2033,12 +2044,6 @@ var
     Result := (Owner<>nil) and (Owner.Name<>'');
      // Update the entries
     if Result then UpdateComponents(True);
-  end;
-
-  function TDKLanguageController.LSO_GetSectionName: String;
-  begin
-     // The section is to be named after the actual component owner (ie. Form, Frame etc)
-    Result := Owner.Name;
   end;
 
   procedure TDKLanguageController.LSO_StoreLangSource(Strings: TStrings; StateFilter: TDKLang_TranslationStates);
@@ -2170,7 +2175,7 @@ var
        // Get the controller's root component entry
       CE := Controller.RootCompEntry;
        // If Translations supplied, try to find the translation for the entry
-      if Translations=nil then CT := nil else CT := Translations.FindComponentName(CE.Name);
+      if Translations=nil then CT := nil else CT := Translations.FindComponentName(Controller.ActualSectionName);
        // Finally apply the translation, either found or default
       CE.ApplyTranslation(CT);
     finally

@@ -1,5 +1,5 @@
 ///*********************************************************************************************************************
-///  $Id: DKL_ConstEditor.pas,v 1.7 2004-12-20 20:01:27 dale Exp $
+///  $Id: DKL_ConstEditor.pas,v 1.8 2005-01-23 18:13:35 dale Exp $
 ///---------------------------------------------------------------------------------------------------------------------
 ///  DKLang Localization Package
 ///  Copyright 2002-2004 DK Software, http://www.dk-soft.org
@@ -33,19 +33,21 @@ uses
 
 type
   TdDKL_ConstEditor = class(TForm)
-    vleMain: TValueListEditor;
-    bOK: TButton;
     bCancel: TButton;
-    lCount: TLabel;
+    bErase: TButton;
     bLoad: TButton;
+    bOK: TButton;
     bSave: TButton;
     cbSaveToLangSource: TCheckBox;
-    bErase: TButton;
-    procedure bOKClick(Sender: TObject);
-    procedure vleMainStringsChange(Sender: TObject);
-    procedure bLoadClick(Sender: TObject);
-    procedure bSaveClick(Sender: TObject);
+    lCount: TLabel;
+    vleMain: TValueListEditor;
     procedure bEraseClick(Sender: TObject);
+    procedure bLoadClick(Sender: TObject);
+    procedure bOKClick(Sender: TObject);
+    procedure bSaveClick(Sender: TObject);
+    procedure FormClose(Sender: TObject; var Action: TCloseAction);
+    procedure FormShow(Sender: TObject);
+    procedure vleMainStringsChange(Sender: TObject);
   private
      // The constants being edited
     FConsts: TDKLang_Constants;
@@ -55,7 +57,13 @@ type
     procedure InitializeDialog(AConsts: TDKLang_Constants; bEraseAllowed: Boolean);
      // Updates the count info
     procedure UpdateCount;
+     // Storing/restoring the settings
+    procedure SaveSettings;
+    procedure LoadSettings; 
   end;
+
+const
+  SRegKey_DKLangConstEditor = 'Software\DKSoftware\DKLang\ConstEditor';
 
    // Show constant editor dialog
    //   AConsts       - The constants being edited
@@ -65,6 +73,7 @@ type
 
 implementation
 {$R *.dfm}
+uses Registry;
 
   function EditConstants(AConsts: TDKLang_Constants; var bEraseAllowed: Boolean): Boolean;
   begin
@@ -128,6 +137,16 @@ implementation
       end;
   end;
 
+  procedure TdDKL_ConstEditor.FormClose(Sender: TObject; var Action: TCloseAction);
+  begin
+    SaveSettings;
+  end;
+
+  procedure TdDKL_ConstEditor.FormShow(Sender: TObject);
+  begin
+    LoadSettings;
+  end;
+
   procedure TdDKL_ConstEditor.InitializeDialog(AConsts: TDKLang_Constants; bEraseAllowed: Boolean);
   var i: Integer;
   begin
@@ -139,6 +158,49 @@ implementation
     for i := 0 to FConsts.Count-1 do vleMain.Strings.Add(FConsts[i].sName+'='+EncodeControlChars(FConsts[i].sValue));
      // Update count info
     UpdateCount;
+  end;
+
+  procedure TdDKL_ConstEditor.LoadSettings;
+  var
+    rif: TRegIniFile;
+    rBounds: TRect;
+  begin
+    rif := TRegIniFile.Create(SRegKey_DKLangConstEditor);
+    try
+       // Restore form bounds
+      rBounds := Rect(
+        rif.ReadInteger('', 'Left',   MaxInt),
+        rif.ReadInteger('', 'Top',    MaxInt),
+        rif.ReadInteger('', 'Right',  MaxInt),
+        rif.ReadInteger('', 'Bottom', MaxInt));
+       // If all the coords are valid
+      if (rBounds.Left<MaxInt) and (rBounds.Top<MaxInt) and (rBounds.Right<MaxInt) and (rBounds.Bottom<MaxInt) then
+        BoundsRect := rBounds;
+       // Load other settings
+      vleMain.ColWidths[0] := rif.ReadInteger('', 'NameColWidth', vleMain.ClientWidth div 2);
+    finally
+      rif.Free;
+    end;
+  end;
+
+  procedure TdDKL_ConstEditor.SaveSettings;
+  var
+    rif: TRegIniFile;
+    rBounds: TRect;
+  begin
+    rif := TRegIniFile.Create(SRegKey_DKLangConstEditor);
+    try
+       // Store form bounds
+      rBounds := BoundsRect;
+      rif.WriteInteger('', 'Left',         rBounds.Left);
+      rif.WriteInteger('', 'Top',          rBounds.Top);
+      rif.WriteInteger('', 'Right',        rBounds.Right);
+      rif.WriteInteger('', 'Bottom',       rBounds.Bottom);
+       // Store other settings
+      rif.WriteInteger('', 'NameColWidth', vleMain.ColWidths[0]);
+    finally
+      rif.Free;
+    end;
   end;
 
   procedure TdDKL_ConstEditor.UpdateCount;

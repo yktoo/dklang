@@ -17,6 +17,8 @@ object dDKL_ConstEditor: TdDKL_ConstEditor
   Font.Style = []
   OldCreateOrder = False
   Position = poScreenCenter
+  OnClose = FormClose
+  OnShow = FormShow
   DesignSize = (
     592
     435)
