@@ -2,9 +2,6 @@
 
 ..\Packages\*.*
 
-..\TranEditor\DKTranEd.exe
-..\TranEditor\Language\*.lng
-
 ..\Examples\Simple\*.cfg
 ..\Examples\Simple\*.dof
 ..\Examples\Simple\*.res
@@ -13,3 +10,12 @@
 ..\Examples\Simple\*.dfm
 ..\Examples\Simple\*.lng
 ..\Examples\Simple\*.dklang
+
+..\Examples\Constants\*.cfg
+..\Examples\Constants\*.dof
+..\Examples\Constants\*.res
+..\Examples\Constants\*.dpr
+..\Examples\Constants\*.pas
+..\Examples\Constants\*.dfm
+..\Examples\Constants\*.lng
+..\Examples\Constants\*.dklang
