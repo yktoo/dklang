@@ -362,6 +362,7 @@ type
     FOptions: TDKLanguageControllerOptions;
     FOnLanguageChanged: TNotifyEvent;
     FIgnoreList: TStrings;
+    FOnLanguageChanging: TNotifyEvent;
      // Methods for LangData custom property support
     procedure LangData_Load(Stream: TStream);
     procedure LangData_Store(Stream: TStream);
@@ -383,6 +384,8 @@ type
   protected
     procedure DefineProperties(Filer: TFiler); override;
     procedure Notification(AComponent: TComponent; Operation: TOperation); override;
+     // Fires the OnLanguageChanging event
+    procedure DoLanguageChanging;
      // Fires the OnLanguageChanged event
     procedure DoLanguageChanged;
   public
@@ -398,6 +401,8 @@ type
      // -- Language controller options
     property Options: TDKLanguageControllerOptions read FOptions write FOptions default DKLang_DefaultControllerOptions;
      // Events
+     // -- Fires when language is changed through the LangManager
+    property OnLanguageChanging: TNotifyEvent read FOnLanguageChanging write FOnLanguageChanging;
      // -- Fires when language is changed through the LangManager
     property OnLanguageChanged: TNotifyEvent read FOnLanguageChanged write FOnLanguageChanged;
   end;
@@ -1851,6 +1856,11 @@ var
     if Assigned(FOnLanguageChanged) then FOnLanguageChanged(Self);
   end;
 
+  procedure TDKLanguageController.DoLanguageChanging;
+  begin
+    if Assigned(FOnLanguageChanging) then FOnLanguageChanging(Self);
+  end;
+
   function TDKLanguageController.IgnoreList_Matches(const s: String): Boolean;
   var i: Integer;
   begin
@@ -2020,14 +2030,17 @@ var
     CE: TDKLang_CompEntry;
     CT: TDKLang_CompTranslation;
   begin
-     // Get the controller's root component entry
-    CE := Controller.RootCompEntry;
-     // If Translations supplied, try to find the translation for the entry
-    if Translations=nil then CT := nil else CT := Translations.FindComponentName(CE.Name);
-     // Finally apply the translation, either found or default
-    CE.ApplyTranslation(CT);
-     // Fire the Controller's event
-    Controller.DoLanguageChanged;
+    Controller.DoLanguageChanging;
+    try
+       // Get the controller's root component entry
+      CE := Controller.RootCompEntry;
+       // If Translations supplied, try to find the translation for the entry
+      if Translations=nil then CT := nil else CT := Translations.FindComponentName(CE.Name);
+       // Finally apply the translation, either found or default
+      CE.ApplyTranslation(CT);
+    finally
+      Controller.DoLanguageChanged;
+    end;
   end;
 
   constructor TDKLanguageManager.Create;
