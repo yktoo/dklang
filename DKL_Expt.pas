@@ -24,7 +24,10 @@ resourcestring
   SDKLExptErr_CannotObtainResources  = 'Failed to get project resource interface. Check whether project is open and active, and it uses a resource file';
   SDKLExptErr_CannotSaveLangSource   = 'Failed to update project language source. Check whether project is open and active';
 
+  SDKLExptMsg_LCsUpdated             = '%d language controllers has updated the project language source.';
+
   SDKLExptMenuItem_EditConstants     = 'Edit pro&ject constants...';
+  SDKLExptMenuItem_UpdateLangSource  = 'Update projec&t language source';
 
 implementation //=======================================================================================================
 uses
@@ -47,6 +50,27 @@ uses
     Proj := GetActiveProject;
     Result := Proj<>nil;
     if Result then UpdateLangSourceFile(ChangeFileExt(Proj.FileName, '.'+SDKLang_LangSourceExtension), LSObject, False);
+  end;
+
+   // Finds first TDKLanguageController instance among components owned by RootComp, if any, and calls
+   //   UpdateProjectLangSource(). Returns True if succeeded
+  function LC_UpdateProjectLangSource(RootComp: TComponent): Boolean;
+  var
+    i: Integer;
+    LC: TDKLanguageController;
+  begin
+    Result := False;
+    if RootComp<>nil then
+      for i := 0 to RootComp.ComponentCount-1 do
+         // If found
+        if RootComp.Components[i] is TDKLanguageController then begin
+          LC := TDKLanguageController(RootComp.Components[i]);
+          if dklcoAutoSaveLangSource in LC.Options then begin
+            UpdateProjectLangSource(LC);
+            Result := True;
+          end;
+          Break;
+        end;
   end;
 
 type
@@ -102,10 +126,12 @@ type
     FMenuOwner: TComponent;
      // Menu items
     FItem_EditConstants: TMenuItem;
+    FItem_UpdateLangSource: TMenuItem;
      // Adds and returns a menu item
-    function  NewMenuItem(const sCaption, sRsrcName: String; Menu: TMenuItem; AOnClick: TNotifyEvent): TMenuItem;
+    function  NewMenuItem(const sCaption: String; Menu: TMenuItem; AOnClick: TNotifyEvent): TMenuItem;
      // Menu item click events
     procedure ItemClick_EditConstants(Sender: TObject);
+    procedure ItemClick_UpdateLangSource(Sender: TObject);
      // Invokes the constant editor for editing constant data in the project resources. Returns True if user saved the
      //   changes
     function  EditConstantsResource: Boolean;
@@ -146,25 +172,14 @@ type
 
   procedure TDKLang_FormNotifier.FormSaving;
   var
-    i, ic: Integer;
+    i: Integer;
     NTAFormEditor: INTAFormEditor;
-    RootComp: TComponent;
-    LC: TDKLanguageController;
   begin
     if FModule=nil then Exit;
      // Find the FormEditor interface for the module
     for i := 0 to FModule.ModuleFileCount-1 do
       if Supports(FModule.ModuleFileEditors[i], INTAFormEditor, NTAFormEditor) then begin
-         // Try to find a TDKLanguageController instance on the form
-        RootComp := NTAFormEditor.FormDesigner.Root;
-        if RootComp<>nil then
-          for ic := 0 to RootComp.ComponentCount-1 do
-             // If found
-            if RootComp.Components[ic] is TDKLanguageController then begin
-              LC := TDKLanguageController(RootComp.Components[ic]);
-              if dklcoAutoSaveLangSource in LC.Options then UpdateProjectLangSource(LC);
-              Break;
-            end;
+        LC_UpdateProjectLangSource(NTAFormEditor.FormDesigner.Root);
         Break;
       end;
   end;
@@ -225,9 +240,10 @@ type
      // Create a dummy menu item owner component
     FMenuOwner := TComponent.Create(nil);
      // Insert a separator
-    NewMenuItem('-', '', mi, nil);
+    NewMenuItem('-', mi, nil);
      // Create menu items
-    FItem_EditConstants := NewMenuItem(SDKLExptMenuItem_EditConstants,  '', mi, ItemClick_EditConstants);
+    FItem_EditConstants    := NewMenuItem(SDKLExptMenuItem_EditConstants,    mi, ItemClick_EditConstants);
+    FItem_UpdateLangSource := NewMenuItem(SDKLExptMenuItem_UpdateLangSource, mi, ItemClick_UpdateLangSource);
      // Set the designtime flag
     IsDesignTime := True;
   end;
@@ -324,29 +340,39 @@ type
     EditConstantsResource;
   end;
 
-  function TDKLang_Expert.NewMenuItem(const sCaption, sRsrcName: String; Menu: TMenuItem; AOnClick: TNotifyEvent): TMenuItem;
-
-    function GetImgIndex: Integer;
-    var bmp: TBitmap;
-    begin
-      bmp := TBitmap.Create;
-      try
-        bmp.LoadFromResourceName(HInstance, sRsrcName);
-        Result := FNTAServices.AddMasked(bmp, clFuchsia, 'ITES_MENU_IMG_'+sRsrcName);
-      finally
-        bmp.Free;
+  procedure TDKLang_Expert.ItemClick_UpdateLangSource(Sender: TObject);
+  var
+    Proj: IOTAProject;
+    i, iMod, iLCUpdated: Integer;
+    ModuleInfo: IOTAModuleInfo;
+    Module: IOTAModule;
+    NTAFormEditor: INTAFormEditor;
+  begin
+    iLCUpdated := 0;
+     // Iterate through project modules to discover form editors
+    Proj := GetActualProject;
+    for iMod := 0 to Proj.GetModuleCount-1 do begin
+      ModuleInfo := Proj.GetModule(iMod);
+      if (ModuleInfo.ModuleType=omtForm) and (ModuleInfo.FormName<>'') then begin
+        Module := ModuleInfo.OpenModule;
+        if Module<>nil then
+          for i := 0 to Module.ModuleFileCount-1 do
+            if Supports(Module.ModuleFileEditors[i], INTAFormEditor, NTAFormEditor) then begin
+              if LC_UpdateProjectLangSource(NTAFormEditor.FormDesigner.Root) then Inc(iLCUpdated);
+              Break;
+            end;
       end;
     end;
+     // Show info
+    ShowMessage(Format(SDKLExptMsg_LCsUpdated, [iLCUpdated]));
+  end;
 
+  function TDKLang_Expert.NewMenuItem(const sCaption: String; Menu: TMenuItem; AOnClick: TNotifyEvent): TMenuItem;
   begin
     Result := TMenuItem.Create(FMenuOwner);
     with Result do begin
       Caption      := sCaption;
       OnClick      := AOnClick;
-      if sRsrcName<>'' then begin
-        Name       := 'DKLXpt_'+sRsrcName;
-        ImageIndex := GetImgIndex;
-      end;
     end;
     Menu.Add(Result);
   end;

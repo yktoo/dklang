@@ -28,6 +28,16 @@ type
   end;
 
    //-------------------------------------------------------------------------------------------------------------------
+   // An interface to mask set capable of test a string for matching
+   //-------------------------------------------------------------------------------------------------------------------
+
+  IDKLang_MaskTest = interface(IInterface)
+    ['{86AE47C7-6A58-4D83-9AB5-13FF438F64D1}']
+     // Should return True if s matches an internal set of masks
+    function Matches(const s: String): Boolean;
+  end;
+
+   //-------------------------------------------------------------------------------------------------------------------
    // A single component property value translation, referred to by ID
    //-------------------------------------------------------------------------------------------------------------------
 
@@ -186,7 +196,7 @@ type
      // Returns max property entry ID across all owned components; 0 if list is empty
     function  GetMaxPropEntryID: Integer;
      // Recursive update routine
-    procedure InternalUpdateEntries(var iFreePropEntryID: Integer; bIgnoreEmptyProps: Boolean; IgnoreList: TStrings);
+    procedure InternalUpdateEntries(var iFreePropEntryID: Integer; bIgnoreEmptyProps: Boolean; IgnoreTest: IDKLang_MaskTest);
      // Recursively establishes links to components by filling FComponent field with the component reference found by
      //   its Name. Also removes components whose names no longer associated with actually instantiated components.
      //   Required to be called after loading from the stream
@@ -200,7 +210,7 @@ type
     constructor Create(AOwner: TDKLang_CompEntry);
     destructor Destroy; override;
      // Recursively updates (or creates) component hierarchy and component property values
-    procedure UpdateEntries(bIgnoreEmptyProps: Boolean; IgnoreList: TStrings);
+    procedure UpdateEntries(bIgnoreEmptyProps: Boolean; IgnoreTest: IDKLang_MaskTest);
      // Recursively replaces the property values with ones found in Translation; if Translation=nil, applies the default
      //   property values
     procedure ApplyTranslation(Translation: TDKLang_CompTranslation);
@@ -343,8 +353,10 @@ const
   DKLang_DefaultControllerOptions = [dklcoAutoSaveLangSource, dklcoIgnoreEmptyProps];
 
 type
-  TDKLanguageController = class(TComponent, IDKLang_LanguageSourceObject)
+  TDKLanguageController = class(TComponent, IDKLang_LanguageSourceObject, IDKLang_MaskTest)
   private
+     // List of TMask objects, valid only during UpdateComponents() call
+    FIgnoreMasks: TList;
      // Prop storage
     FRootCompEntry: TDKLang_CompEntry;
     FOptions: TDKLanguageControllerOptions;
@@ -360,6 +372,11 @@ type
     function  LSO_CanStore: Boolean;
     procedure LSO_StoreLangSource(Strings: TStrings; bSkipUntranslated: Boolean);
     function  LSO_GetSectionName: String;
+     // IDKLang_MaskTest
+    function  IDKLang_MaskTest.Matches = IgnoreList_Matches;
+    function  IgnoreList_Matches(const s: String): Boolean;
+     // Forces component entries to update their entries
+    procedure UpdateComponents;
      // Prop handlers
     function  IsIgnoreListStored: Boolean;
     procedure SetIgnoreList(Value: TStrings);
@@ -547,7 +564,7 @@ resourcestring
   SDKLangErrMsg_LangManagerCalledAtDT  = 'Call to LangManager() is allowed at runtime only';
 
 implementation
-uses TypInfo, Math;
+uses TypInfo, Math, Masks;
 
 var
   _LangManager: TDKLanguageManager = nil;
@@ -1154,50 +1171,82 @@ var
 
      // Applies translations to component's properties
     procedure TranslateProps;
-    var
-      i, iPropCnt, idxTran: Integer;
-      pInfo: PPropInfo;
-      pList: PPropList;
-      PE: PDKLang_PropEntry;
-      o: TObject;
-      sTranslation: String;
-    begin
-      if FPropEntries<>nil then begin
+
+       // Returns translation of a property value in sTranslation and True if it is present in PropEntries
+      function GetTranslation(const sPropName: String; out sTranslation: String): Boolean;
+      var
+        PE: PDKLang_PropEntry;
+        idxTran: Integer;
+      begin
+         // Try to locate prop translation entry
+        PE := FPropEntries.FindPropByName(sPropName);
+        Result := PE<>nil;
+        if Result then begin
+          sTranslation := PE.sDefLangValue;
+           // If actual translation is supplied
+          if Translation<>nil then begin
+             // Try to find the appropriate translation by property entry ID
+            idxTran := Translation.IndexOfID(PE.iID);
+            if idxTran>=0 then sTranslation := Translation[idxTran].sValue;
+          end;
+        end else
+          sTranslation := '';
+      end;
+
+      procedure ProcessObject(const sPrefix: String; Instance: TObject); forward;
+
+       // Processes the specified property and adds it to PropEntries if it appears suitable
+      procedure ProcessProp(const sPrefix: String; Instance: TObject; pInfo: PPropInfo);
+      const asSep: Array[Boolean] of String[1] = ('', '.');
+      var
+        i: Integer;
+        o: TObject;
+        sFullName, sTranslation: String;
+      begin
+         // Test whether property is to be ignored (don't use IgnoreTest interface here)
+        if ((Instance is TComponent) and (pInfo.Name='Name')) or not (pInfo.PropType^.Kind in [tkClass, tkString, tkLString, tkWString]) then Exit;
+        sFullName := sPrefix+asSep[sPrefix<>'']+pInfo.Name;
+         // Assign the new [translated] value to the property
+        case pInfo.PropType^.Kind of
+          tkClass:
+            if Assigned(pInfo.GetProc) and Assigned(pInfo.SetProc) then begin
+              o := GetObjectProp(Instance, pInfo);
+              if o<>nil then
+                 // TStrings property
+                if o is TStrings then begin
+                  if GetTranslation(sFullName, sTranslation) then TStrings(o).Text := sTranslation;
+                 // TCollection property
+                end else if o is TCollection then
+                  for i := 0 to TCollection(o).Count-1 do ProcessObject(sFullName+Format('[%d]', [i]), TCollection(o).Items[i])
+                 // TPersistent property. Avoid processing TComponent references which may lead to a circular loop
+                else if (o is TPersistent) and not (o is TComponent) then
+                  ProcessObject(sFullName, o);
+            end;
+          tkString,
+            tkLString,
+            tkWString: if GetTranslation(sFullName, sTranslation) then SetStrProp(Instance, pInfo, sTranslation);
+        end;
+      end;
+
+       // Iterates through Instance's properties and add them to PropEntries. sPrefix is the object name prefix part
+      procedure ProcessObject(const sPrefix: String; Instance: TObject);
+      var
+        i, iPropCnt: Integer;
+        pList: PPropList;
+      begin
          // Get property list
-        iPropCnt := GetPropList(FComponent, pList);
+        iPropCnt := GetPropList(Instance, pList);
+         // Iterate thru Instance's properties
         if iPropCnt>0 then
           try
-             // Iterate thru component's properties
-            for i := 0 to iPropCnt-1 do begin
-               // Get PropInfo
-              pInfo := pList^[i];
-              if not SameText(pInfo.Name, 'Name') and not SameText(pInfo.Name, 'SecondaryShortCuts') then begin
-                 // Try to locate prop translation entry
-                PE := FPropEntries.FindPropByName(pInfo.Name);
-                if PE<>nil then begin
-                  sTranslation := PE.sDefLangValue;
-                   // If actual translation is supplied
-                  if Translation<>nil then begin
-                     // Try to find the appropriate translation by property entry ID
-                    idxTran := Translation.IndexOfID(PE.iID);
-                    if idxTran>=0 then sTranslation := Translation[idxTran].sValue;
-                  end;
-                   // Assign the new [translated] value to the property
-                  case pInfo.PropType^.Kind of
-                    tkClass:
-                      if Assigned(pInfo.GetProc) and Assigned(pInfo.SetProc) then begin
-                        o := GetObjectProp(FComponent, pInfo);
-                        if (o<>nil) and (o is TStrings) then TStrings(o).Text := sTranslation;
-                      end;
-                    tkString, tkLString, tkWString: SetStrProp(FComponent, pInfo, sTranslation);
-                  end;
-                end;
-              end;
-            end;
+            for i := 0 to iPropCnt-1 do ProcessProp(sPrefix, Instance, pList^[i]);
           finally
             FreeMem(pList);
           end;
       end;
+
+    begin
+      if FPropEntries<>nil then ProcessObject('', FComponent);
     end;
 
      // Recursively applies translations to owned components
@@ -1278,23 +1327,11 @@ var
     if FComponent=nil then Result := FName else Result := FComponent.Name;
   end;
 
-  procedure TDKLang_CompEntry.InternalUpdateEntries(var iFreePropEntryID: Integer; bIgnoreEmptyProps: Boolean; IgnoreList: TStrings);
+  procedure TDKLang_CompEntry.InternalUpdateEntries(var iFreePropEntryID: Integer; bIgnoreEmptyProps: Boolean; IgnoreTest: IDKLang_MaskTest);
   var sCompPathPrefix: String;
 
      // Updates property entries
     procedure UpdateProps;
-
-       // Checks only property type and presence in IgnoreList. Doesn't consider property value emptyness
-      function IsPropIgnored(const sPropFullName: String; pInfo: PPropInfo): Boolean;
-      begin
-        Result :=
-           // Test type kind
-          not (pInfo.PropType^.Kind in [tkClass, tkString, tkLString, tkWString]) or
-           // Test property name
-          (IgnoreList.IndexOf(sPropFullName)>=0) or
-           // Test full component/property path
-          (IgnoreList.IndexOf(sCompPathPrefix+sPropFullName)>=0);
-      end;
 
       procedure SetVal(const sName, sVal: String);
       begin
@@ -1308,7 +1345,7 @@ var
 
       procedure ProcessObject(const sPrefix: String; Instance: TObject); forward;
 
-       // Processes the specified property and adds it to PrpEntries if it appears suitable
+       // Processes the specified property and adds it to PropEntries if it appears suitable
       procedure ProcessProp(const sPrefix: String; Instance: TObject; pInfo: PPropInfo);
       const asSep: Array[Boolean] of String[1] = ('', '.');
       var
@@ -1317,7 +1354,11 @@ var
         sFullName: String;
       begin
         sFullName := sPrefix+asSep[sPrefix<>'']+pInfo.Name;
-        if ((Instance is TComponent) and (pInfo.Name='Name')) or IsPropIgnored(sFullName, pInfo) then Exit;
+         // Test whether property is to be ignored
+        if ((Instance is TComponent) and (pInfo.Name='Name')) or
+           not (pInfo.PropType^.Kind in [tkClass, tkString, tkLString, tkWString]) or
+           IgnoreTest.Matches(sFullName) then Exit;
+         // Obtain and store property value  
         case pInfo.PropType^.Kind of
           tkClass:
             if Assigned(pInfo.GetProc) and Assigned(pInfo.SetProc) and IsStoredProp(Instance, pInfo) then begin
@@ -1329,7 +1370,7 @@ var
                  // TCollection property
                 else if o is TCollection then
                   for i := 0 to TCollection(o).Count-1 do ProcessObject(sFullName+Format('[%d]', [i]), TCollection(o).Items[i])
-                 // TPersistent property. Avoid processing TComponent references which may lead to circular loop
+                 // TPersistent property. Avoid processing TComponent references which may lead to a circular loop
                 else if (o is TPersistent) and not (o is TComponent) then
                   ProcessObject(sFullName, o);
             end;
@@ -1389,7 +1430,7 @@ var
             FOwnedCompEntries.Add(CE);
           end;
            // Update the component's property entries
-          CE.InternalUpdateEntries(iFreePropEntryID, bIgnoreEmptyProps, IgnoreList);
+          CE.InternalUpdateEntries(iFreePropEntryID, bIgnoreEmptyProps, IgnoreTest);
         end;
       end;
     end;
@@ -1479,7 +1520,7 @@ var
       for i := 0 to FOwnedCompEntries.Count-1 do FOwnedCompEntries[i].StoreLangSource(Strings);
   end;
 
-  procedure TDKLang_CompEntry.UpdateEntries(bIgnoreEmptyProps: Boolean; IgnoreList: TStrings);
+  procedure TDKLang_CompEntry.UpdateEntries(bIgnoreEmptyProps: Boolean; IgnoreTest: IDKLang_MaskTest);
   var iFreePropEntryID: Integer;
   begin
      // Invalidate all property entries
@@ -1487,7 +1528,7 @@ var
      // Compute next free property entry ID
     iFreePropEntryID := GetMaxPropEntryID+1;
      // Call recursive update routine
-    InternalUpdateEntries(iFreePropEntryID, bIgnoreEmptyProps, IgnoreList);
+    InternalUpdateEntries(iFreePropEntryID, bIgnoreEmptyProps, IgnoreTest);
   end;
 
    //===================================================================================================================
@@ -1809,6 +1850,18 @@ var
     if Assigned(FOnLanguageChanged) then FOnLanguageChanged(Self);
   end;
 
+  function TDKLanguageController.IgnoreList_Matches(const s: String): Boolean;
+  var i: Integer;
+  begin
+     // Test s for matching any mask from FIgnoreMasks
+    for i := 0 to FIgnoreMasks.Count-1 do
+      if TMask(FIgnoreMasks[i]).Matches(s) then begin
+        Result := True;
+        Exit;
+      end;
+    Result := False;
+  end;
+
   function TDKLanguageController.IsIgnoreListStored: Boolean;
   begin
     Result := FIgnoreList.Count>0;
@@ -1821,7 +1874,7 @@ var
 
   procedure TDKLanguageController.LangData_Store(Stream: TStream);
   begin
-    FRootCompEntry.UpdateEntries(dklcoIgnoreEmptyProps in FOptions, FIgnoreList);
+    UpdateComponents;
     FRootCompEntry.SaveToDFMResource(Stream);
   end;
 
@@ -1831,7 +1884,7 @@ var
      // Bind the components and refresh the properties
     if Owner<>nil then begin
       FRootCompEntry.BindComponents(Owner);
-      FRootCompEntry.UpdateEntries(dklcoIgnoreEmptyProps in FOptions, FIgnoreList);
+      UpdateComponents;
        // If at runtime, apply the language currently selected in the LangManager, to the controller itself
       if not (csDesigning in ComponentState) then LangManager.TranslateController(Self);
     end;
@@ -1841,7 +1894,7 @@ var
   begin
     Result := (Owner<>nil) and (Owner.Name<>'');
      // Update the entries
-    if Result then FRootCompEntry.UpdateEntries(dklcoIgnoreEmptyProps in FOptions, FIgnoreList);
+    if Result then UpdateComponents;
   end;
 
   function TDKLanguageController.LSO_GetSectionName: String;
@@ -1865,6 +1918,20 @@ var
   procedure TDKLanguageController.SetIgnoreList(Value: TStrings);
   begin
     FIgnoreList.Assign(Value);
+  end;
+
+  procedure TDKLanguageController.UpdateComponents;
+  var i: Integer;
+  begin
+     // Create list of masks for testing property names
+    FIgnoreMasks := TList.Create;
+    try
+      for i := 0 to FIgnoreList.Count-1 do FIgnoreMasks.Add(TMask.Create(FIgnoreList[i]));
+      FRootCompEntry.UpdateEntries(dklcoIgnoreEmptyProps in FOptions, Self);
+    finally
+      for i := 0 to FIgnoreMasks.Count-1 do TMask(FIgnoreMasks[i]).Free;
+      FIgnoreMasks.Free;
+    end;
   end;
 
    //===================================================================================================================
