@@ -1,4 +1,4 @@
-$Id: readme.txt,v 1.2 2004-09-23 04:07:58 dale Exp $
+$Id: readme.txt,v 1.3 2004-09-26 15:46:04 dale Exp $
 ------------------------------------------------------------------------------------------------------------------------
 
 
@@ -77,6 +77,9 @@ ISSUES/DRAWBACKS
   It is recommended to put language controller onto a final, derived form, and not
   onto the common ancestor form, since there's no means to track the origin of a
   property value.
+- No support for custom-defined properties implemented (ie. ones defined with
+  DefineProperties() method). Implementing such a feature would require knowing and
+  analyzing all the form (visual) ancestors, which is a somewhat hard task.
 - You cannot properly handle the forms open in the IDE as standalone files. DKLang
   package requires that you have an active project open.
 - I'm using Delphi 7 for all my projects so the package was designed for Delphi 7. But
@@ -115,15 +118,7 @@ readme.txt                      This file
     Russian.lng                 DKLang Translation Editor Russian interface localization 
 + Examples
   + Simple                      A simple package usage example
-    DKLang_Simple_Demo.cfg
-    DKLang_Simple_Demo.dklang
-    DKLang_Simple_Demo.dof
-    DKLang_Simple_Demo.dpr
-    DKLang_Simple_Demo.res
-    German.lng
-    Main.dfm
-    Main.pas
-    Russian.lng
+  + Constants                   A demo of localizable constants usage
 + Packages                      Package files
   dcldklang7.cfg
   dcldklang7.dof
