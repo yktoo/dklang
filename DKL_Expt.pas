@@ -298,12 +298,13 @@ type
       Result := EditConstants(Consts, bErase);
        // If changes made
       if Result then
-         // If user clicked 'Erase'
-        if bErase then begin
-          if ConstResource<>nil then ProjResource.DeleteEntry(ConstResource.GetEntryHandle);
-         // Else save the constants back to the resources
-        end else begin
-          if ConstResource=nil then ConstResource := ProjResource.CreateEntry(RT_RCDATA, SDKLang_ConstResourceName, 0, 0, 0, 0, 0);
+        if ConstResource<>nil then begin
+          ProjResource.DeleteEntry(ConstResource.GetEntryHandle);
+          ConstResource := nil;
+        end;
+         // If user didn't click 'Erase', save the constants back to the resources
+        if not bErase then begin
+          ConstResource := ProjResource.CreateEntry(RT_RCDATA, SDKLang_ConstResourceName, 0, 0, 0, 0, 0);
           sBuf := Consts.AsString;
           ConstResource.DataSize := Length(sBuf);
           Move(sBuf[1], ConstResource.GetData^, Length(sBuf));
