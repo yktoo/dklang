@@ -30,6 +30,6 @@ requires
   rtl;
 
 contains
-  DKLang in 'DKLang.pas';
+  DKLang in '..\DKLang.pas';
 
 end.

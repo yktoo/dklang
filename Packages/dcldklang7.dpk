@@ -33,8 +33,8 @@ requires
   vcl;
 
 contains
-  DKLangReg in 'DKLangReg.pas',
-  DKL_Expt in 'DKL_Expt.pas',
-  DKL_ConstEditor in 'DKL_ConstEditor.pas' {dDKL_ConstEditor};
+  DKLangReg in '..\DKLangReg.pas',
+  DKL_Expt in '..\DKL_Expt.pas',
+  DKL_ConstEditor in '..\DKL_ConstEditor.pas' {dDKL_ConstEditor};
 
 end.
