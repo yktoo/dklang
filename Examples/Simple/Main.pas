@@ -1,13 +1,13 @@
 //**********************************************************************************************************************
-//  $Id: Main.pas,v 1.1.1.1 2004-09-08 13:14:32 dale Exp $
+//  $Id: Main.pas,v 1.2 2004-09-21 05:10:48 dale Exp $
 //----------------------------------------------------------------------------------------------------------------------
 //  DKLang Localization Package
-//  Copyright 2002-2004 Dmitry Kann, http://www.dk-soft.org
+//  Copyright 2002-2004 DK Software, http://www.dk-soft.org
 //**********************************************************************************************************************
 // This is a most simple example on how DKLang Package works. Only GUI elements are
 // localized in this example. Notice that lcMain.IgnoreList contains '*.Font.Name'
-// to avoid font names from being saved into the project language source file
-
+// to prevent font names from being saved into the project language source file
+//
 unit Main;
 
 interface
