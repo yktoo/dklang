@@ -1,5 +1,5 @@
 ///**********************************************************************************************************************
-///  $Id: DKLang.pas,v 1.22 2004-11-14 14:11:30 dale Exp $
+///  $Id: DKLang.pas,v 1.23 2004-12-20 20:01:27 dale Exp $
 ///----------------------------------------------------------------------------------------------------------------------
 ///  DKLang Localization Package
 ///  Copyright 2002-2004 DK Software, http://www.dk-soft.org/
@@ -9,14 +9,21 @@
 /// Version 1.1 (the "License"); you may not use this file except in compliance
 /// with the License. You may obtain a copy of the License at http://www.mozilla.org/MPL/
 ///
+/// Alternatively, you may redistribute this library, use and/or modify it under the
+/// terms of the GNU Lesser General Public License as published by the Free Software
+/// Foundation; either version 2.1 of the License, or (at your option) any later
+/// version. You may obtain a copy of the LGPL at http://www.gnu.org/copyleft/
+///
 /// Software distributed under the License is distributed on an "AS IS" basis,
 /// WITHOUT WARRANTY OF ANY KIND, either express or implied. See the License for the
 /// specific language governing rights and limitations under the License.
 ///
 /// The initial developer of the original code is Dmitry Kann, http://www.dk-soft.org/
 ///
+///**********************************************************************************************************************
 // The main unit (and the only required runtime unit) of the package. Contains all the
 // basic class and component declarations
+//
 unit DKLang;
 
 interface

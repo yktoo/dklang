@@ -1,4 +1,4 @@
-$Id: readme.txt,v 1.6 2004-12-02 11:28:46 dale Exp $
+$Id: readme.txt,v 1.7 2004-12-20 20:01:27 dale Exp $
 ------------------------------------------------------------------------------------------------------------------------
 
 DKLang Localization Package
@@ -10,6 +10,11 @@ LEGAL INFO
 The contents of this package are subject to the Mozilla Public License
 Version 1.1 (the "License"); you may not use this package except in compliance
 with the License. You may obtain a copy of the License at http://www.mozilla.org/MPL/
+
+Alternatively, you may redistribute this library, use and/or modify it under the
+terms of the GNU Lesser General Public License as published by the Free Software
+Foundation; either version 2.1 of the License, or (at your option) any later
+version. You may obtain a copy of the LGPL at http://www.gnu.org/copyleft/
 
 Software distributed under the License is distributed on an "AS IS" basis,
 WITHOUT WARRANTY OF ANY KIND, either express or implied. See the License for the
@@ -178,6 +183,7 @@ DKL_ConstEditor.dfm             A package source file
 DKL_ConstEditor.pas             A package source file
 DKL_Expt.pas                    A package source file
 MPL-1.1.txt                     Mozilla Public License, Version 1.1
+LGPL-2.1.txt                    GNU Lesser General Public License, Version 2.1
 readme.txt                      This file
 + Examples
   + Simple\*.*                  A simple package usage example
@@ -187,8 +193,12 @@ readme.txt                      This file
 REVISION HISTORY
 ------------------------------------------------------------------------------------------------------------------------
 
-DKLang 2.3 [xxx xx, 2004]
-  [+] Fixed dcldklang* installation problem under non-English versions of Delphi
+DKLang 2.3 [Dec 21, 2004]
+  [+] DKLang now uses a double licensing system. You may use, modify or
+      redistribute it either under Mozilla Public License 1.1, or under GNU
+      Lesser General Public License 2.1 terms. In particular, this means the
+      library can be used in any GPL-licensed application or library.
+  [+] Fixed dcldklang* installation problem under non-English versions of Delphi.
 
 DKLang 2.2 [Nov 27, 2004]
   [+] Added support for Delphi 2005.
@@ -197,4 +207,4 @@ DKLang 2.2 [Nov 27, 2004]
       OnLanguageChanged event handlers.
 
 DKLang 2.1 [Sep 26, 2004]
-  The first public release (all prior versions were only for individual use)
+  The first public release (all prior versions were only for individual use).
