@@ -1,5 +1,5 @@
 //**********************************************************************************************************************
-//  $Id: DKLang.pas,v 1.17 2004-09-21 05:10:48 dale Exp $
+//  $Id: DKLang.pas,v 1.18 2004-09-25 07:29:40 dale Exp $
 //----------------------------------------------------------------------------------------------------------------------
 //  DKLang Localization Package
 //  Copyright 2002-2004 DK Software, http://www.dk-soft.org/
@@ -543,10 +543,9 @@ type
    // Returns the global language manager instance (allowed at runtime only)
   function  LangManager: TDKLanguageManager;
 
-   // Replaces linebreaks with \n
-  function  MultilineToLine(const s: String): String;
-   // Replaces \n with linebreaks
-  function  LineToMultiline(const s: String): String;
+   // Encoding/decoding of control characters in backslashed (escaped) form (CRLF -> \n, TAB -> \t, \ -> \\ etc)
+  function  EncodeControlChars(const s: String): String; // Raw string -> Escaped string
+  function  DecodeControlChars(const s: String): String; // Escaped string -> Raw string
    // Translates LANGID into language name
   function  GetLangIDName(wLangID: LANGID): String;
    // Finds and updates the corresponding section in Strings (which appear as language source file). If no appropriate
@@ -606,14 +605,77 @@ var
     Result := _LangManager;
   end;
 
-  function MultilineToLine(const s: String): String;
+  function EncodeControlChars(const s: String): String;
+  var
+    i, iLen: Integer;
+    c: Char;
   begin
-    Result := StringReplace(AdjustLineBreaks(s), #13#10, '\n', [rfReplaceAll]);
+    Result := '';
+    iLen := Length(s);
+    i := 1;
+    while i<=iLen do begin
+      c := s[i];
+      case c of
+         // Tab character
+        #9:  Result := Result+'\t';
+         // Linefeed character. Skip nexct Carriage Return char, if any
+        #10: begin
+          Result := Result+'\n';
+          if (i<iLen) and (s[i+1]=#13) then Inc(i);
+        end;
+         // Carriage Return character. Skip next Linefeed char, if any
+        #13: begin
+          Result := Result+'\n';
+          if (i<iLen) and (s[i+1]=#10) then Inc(i);
+        end;
+         // Backslash. Just duplicate it
+        '\': Result := Result+'\\';
+         // All control characters having no special names represent as '\00' escape sequence; add directly all others
+        else if c<#32 then Result := Result+Format('\%.2d', [Byte(c)]) else Result := Result+c;
+      end;
+      Inc(i);
+    end;
   end;
 
-  function LineToMultiline(const s: String): String;
+  function DecodeControlChars(const s: String): String;
+  var
+    i, iLen: Integer;
+    c: Char;
+    bEscape: Boolean;
   begin
-    Result := StringReplace(s, '\n', #13#10, [rfReplaceAll]);
+    Result := '';
+    iLen := Length(s);
+    i := 1;
+    while i<=iLen do begin
+      c := s[i];
+      bEscape := False;
+      if (c='\') and (i<iLen) then
+        case s[i+1] of
+           // An escaped charcode '\00'
+          '0'..'9': if (i<iLen-1) and (s[i+2] in ['0'..'9']) then begin
+            Result := Result+Char((Byte(s[i+1])-Byte('0'))*10+(Byte(s[i+2])-Byte('0')));
+            Inc(i, 2);
+            bEscape := True;
+          end;
+          '\': begin
+            Result := Result+'\';
+            Inc(i);
+            bEscape := True;
+          end;
+          'n': begin
+            Result := Result+#13#10;
+            Inc(i);
+            bEscape := True;
+          end;
+          't': begin
+            Result := Result+#9;
+            Inc(i);
+            bEscape := True;
+          end;
+        end;
+      if not bEscape then Result := Result+c;
+      Inc(i);
+    end;
   end;
 
   function GetLangIDName(wLangID: LANGID): String;
@@ -990,10 +1052,10 @@ var
        // Implement the parsed values
       case Part of
         tpParam: FParams.Values[sName] := sValue;
-        tpConstant: FConstants.Add(sName, LineToMultiline(sValue), []);
+        tpConstant: FConstants.Add(sName, DecodeControlChars(sValue), []);
         tpComponent: if CT<>nil then begin
           iID := StrToIntDef(sName, 0);
-          if iID>0 then CT.Add(iID, LineToMultiline(sValue), []);
+          if iID>0 then CT.Add(iID, DecodeControlChars(sValue), []);
         end;
       end;
     end;
@@ -1073,7 +1135,7 @@ var
         for iEntry := 0 to CT.Count-1 do
           with CT[iEntry]^ do
             if not bSkipUntranslated or not (dktsUntranslated in TranStates) then
-              StreamWriteLine(Stream, '%.8d=%s', [iID, MultilineToLine(sValue)]);
+              StreamWriteLine(Stream, '%.8d=%s', [iID, EncodeControlChars(sValue)]);
          // Insert an empty line
         StreamWriteLine(Stream, '');
       end;
@@ -1088,7 +1150,7 @@ var
       for i := 0 to FConstants.Count-1 do
         with FConstants[i]^ do
           if not bSkipUntranslated or not (dktsUntranslated in TranStates) then
-            StreamWriteLine(Stream, '%s=%s', [sName, MultilineToLine(sValue)]);
+            StreamWriteLine(Stream, '%s=%s', [sName, EncodeControlChars(sValue)]);
     end;
 
   begin
@@ -1582,7 +1644,7 @@ var
        // Iterate through the property entries
       for i := 0 to FPropEntries.Count-1 do begin
         PE := FPropEntries[i];
-        Strings.Add(Format('%s%s=%.8d,%s', [sCompPath, PE.sPropName, PE.iID, MultilineToLine(PE.sDefLangValue)]));
+        Strings.Add(Format('%s%s=%.8d,%s', [sCompPath, PE.sPropName, PE.iID, EncodeControlChars(PE.sDefLangValue)]));
       end;
     end;
      // Recursively call the method for owned entries
@@ -1810,7 +1872,7 @@ var
   begin
     for i := 0 to Count-1 do
       with GetItems(i)^ do
-        if TranStates*StateFilter=[] then Strings.Add(sName+'='+MultilineToLine(sValue));
+        if TranStates*StateFilter=[] then Strings.Add(sName+'='+EncodeControlChars(sValue));
   end;
 
   procedure TDKLang_Constants.Notify(Ptr: Pointer; Action: TListNotification);

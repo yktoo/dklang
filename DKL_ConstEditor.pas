@@ -1,5 +1,5 @@
 //**********************************************************************************************************************
-//  $Id: DKL_ConstEditor.pas,v 1.3 2004-09-21 05:10:48 dale Exp $
+//  $Id: DKL_ConstEditor.pas,v 1.4 2004-09-25 07:29:40 dale Exp $
 //----------------------------------------------------------------------------------------------------------------------
 //  DKLang Localization Package
 //  Copyright 2002-2004 DK Software, http://www.dk-soft.org
@@ -91,7 +91,7 @@ implementation
      // Copy the constans from the editor back into FConsts
     FConsts.Clear;
     FConsts.AutoSaveLangSource := cbSaveToLangSource.Checked;
-    for i := 0 to vleMain.Strings.Count-1 do FConsts.Add(vleMain.Strings.Names[i], LineToMultiline(vleMain.Strings.ValueFromIndex[i]), []);
+    for i := 0 to vleMain.Strings.Count-1 do FConsts.Add(vleMain.Strings.Names[i], DecodeControlChars(vleMain.Strings.ValueFromIndex[i]), []);
     ModalResult := mrOK;
   end;
 
@@ -117,7 +117,7 @@ implementation
     bErase.Enabled             := bEraseAllowed;
     FErase                     := False;
      // Copy the constans into the editor
-    for i := 0 to FConsts.Count-1 do vleMain.Strings.Add(FConsts[i].sName+'='+MultilineToLine(FConsts[i].sValue));
+    for i := 0 to FConsts.Count-1 do vleMain.Strings.Add(FConsts[i].sName+'='+EncodeControlChars(FConsts[i].sValue));
      // Update count info
     UpdateCount;
   end;
