@@ -1,5 +1,5 @@
 ///**********************************************************************************************************************
-///  $Id: DKLang.pas,v 1.24 2005-01-23 18:13:35 dale Exp $
+///  $Id: DKLang.pas,v 1.25 2005-03-06 19:06:21 dale Exp $
 ///----------------------------------------------------------------------------------------------------------------------
 ///  DKLang Localization Package
 ///  Copyright 2002-2004 DK Software, http://www.dk-soft.org/
@@ -503,14 +503,17 @@ type
      // Creates and returns the translations object, or nil if wLangID=DefaultLangID or creation failed
     function  GetTranslationsForLang(wLangID: LANGID): TDKLang_CompTranslations;
      // Prop handlers
-    function  GetLanguageCount: Integer;
-    function  GetLanguageIDs(Index: Integer): LANGID;
-    function  GetLanguageNames(Index: Integer): String;
+    function  GetConstantValue(const sName: String): String;
     function  GetDefaultLanguageID: LANGID;
+    function  GetLanguageCount: Integer;
     function  GetLanguageID: LANGID;
+    function  GetLanguageIDs(Index: Integer): LANGID;
+    function  GetLanguageIndex: Integer;
+    function  GetLanguageNames(Index: Integer): String;
+    function  GetLanguageResources(Index: Integer): PDKLang_LangResource;
     procedure SetDefaultLanguageID(Value: LANGID);
     procedure SetLanguageID(Value: LANGID);
-    function  GetConstantValue(const sName: String): String;
+    procedure SetLanguageIndex(Value: Integer);
   protected
      // Internal language controller registration procedures (allowed at runtime only)
     procedure AddLangController(Controller: TDKLanguageController);
@@ -547,12 +550,17 @@ type
      // -- Current language ID. Initially equals to DefaultLanguageID. When being changed, affects all the registered
      //    language controllers as well as constants
     property LanguageID: LANGID read GetLanguageID write SetLanguageID;
-     // -- Number of languages (language resources) registered, including the default language 
+     // -- Current language index
+    property LanguageIndex: Integer read GetLanguageIndex write SetLanguageIndex;
+     // -- Number of languages (language resources) registered, including the default language
     property LanguageCount: Integer read GetLanguageCount;
      // -- LangIDs of languages (language resources) registered, index ranged 0 to LanguageCount-1
     property LanguageIDs[Index: Integer]: LANGID read GetLanguageIDs;
      // -- Names of languages (language resources) registered, index ranged 0 to LanguageCount-1
     property LanguageNames[Index: Integer]: String read GetLanguageNames;
+     // -- Language resources registered, index ranged 0 to LanguageCount-1. Always nil for Index=0, ie. for default
+     //    language
+    property LanguageResources[Index: Integer]: PDKLang_LangResource read GetLanguageResources;
   end;
 
    // Returns the global language manager instance (allowed at runtime only)
@@ -2255,11 +2263,32 @@ var
     end;
   end;
 
+  function TDKLanguageManager.GetLanguageIndex: Integer;
+  begin
+    FSynchronizer.BeginRead;
+    try
+      Result := IndexOfLanguageID(FLanguageID);
+    finally
+      FSynchronizer.EndRead;
+    end;
+  end;
+
   function TDKLanguageManager.GetLanguageNames(Index: Integer): String;
   begin
     FSynchronizer.BeginRead;
     try
       Result := GetLangIDName(GetLanguageIDs(Index));
+    finally
+      FSynchronizer.EndRead;
+    end;
+  end;
+
+  function TDKLanguageManager.GetLanguageResources(Index: Integer): PDKLang_LangResource;
+  begin
+    FSynchronizer.BeginRead;
+    try
+       // Index=0 always means the default language
+      if Index=0 then Result := nil else Result := FLangResources[Index-1];
     finally
       FSynchronizer.EndRead;
     end;
@@ -2292,7 +2321,7 @@ var
   begin
     FSynchronizer.BeginRead;
     try
-      if wLangID=FDefaultLanguageID then Result := 0 else Result := FLangResources.IndexOfLangID(wLangID);
+      if wLangID=FDefaultLanguageID then Result := 0 else Result := FLangResources.IndexOfLangID(wLangID)+1;
     finally
       FSynchronizer.EndRead;
     end;
@@ -2413,6 +2442,11 @@ var
     finally
       Tran.Free;
     end;
+  end;
+
+  procedure TDKLanguageManager.SetLanguageIndex(Value: Integer);
+  begin
+    SetLanguageID(GetLanguageIDs(Value));
   end;
 
   procedure TDKLanguageManager.TranslateController(Controller: TDKLanguageController);
