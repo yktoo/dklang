@@ -1,5 +1,5 @@
 //**********************************************************************************************************************
-//  $Id: DKL_Expt.pas,v 1.8 2004-09-21 05:10:48 dale Exp $
+//  $Id: DKL_Expt.pas,v 1.9 2004-09-22 15:12:14 dale Exp $
 //----------------------------------------------------------------------------------------------------------------------
 //  DKLang Localization Package
 //  Copyright 2002-2004 DK Software, http://www.dk-soft.org
@@ -286,6 +286,11 @@ type
       Result := nil;
     end;
 
+    function Pad4(i: Integer): Integer;
+    begin
+      Result := i+(i mod 4);
+    end;
+
   begin
      // Get the project resource interface
     ProjResource := GetProjectResource;
@@ -304,15 +309,15 @@ type
       Result := EditConstants(Consts, bErase);
        // If changes made
       if Result then
-        if ConstResource<>nil then begin
-          ProjResource.DeleteEntry(ConstResource.GetEntryHandle);
-          ConstResource := nil;
-        end;
-         // If user didn't click 'Erase', save the constants back to the resources
-        if not bErase then begin
-          ConstResource := ProjResource.CreateEntry(RT_RCDATA, SDKLang_ConstResourceName, 0, 0, 0, 0, 0);
+         // If user clicked 'Erase'
+        if bErase then begin
+          if ConstResource<>nil then ProjResource.DeleteEntry(ConstResource.GetEntryHandle);
+         // Else save the constants back to the resources
+        end else begin
+          if ConstResource=nil then ConstResource := ProjResource.CreateEntry(RT_RCDATA, SDKLang_ConstResourceName, 0, 0, 0, 0, 0);
           sBuf := Consts.AsString;
-          ConstResource.DataSize := Length(sBuf);
+          ConstResource.DataSize := Pad4(Length(sBuf));
+          FillChar(ConstResource.GetData^, ConstResource.DataSize, 0);
           Move(sBuf[1], ConstResource.GetData^, Length(sBuf));
            // Update the project language source file if needed
           if Consts.AutoSaveLangSource and not UpdateProjectLangSource(Consts) then DKLangError(SDKLExptErr_CannotSaveLangSource);
