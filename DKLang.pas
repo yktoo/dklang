@@ -1,5 +1,5 @@
 ///**********************************************************************************************************************
-///  $Id: DKLang.pas,v 1.20 2004-09-27 10:15:18 dale Exp $
+///  $Id: DKLang.pas,v 1.21 2004-10-11 11:42:35 dale Exp $
 ///----------------------------------------------------------------------------------------------------------------------
 ///  DKLang Localization Package
 ///  Copyright 2002-2004 DK Software, http://www.dk-soft.org/
@@ -2190,6 +2190,7 @@ var
   begin
     FConstants.Free;
     FLangControllers.Free;
+    FLangResources.Free;
     FSynchronizer.Free;
     inherited Destroy;
   end;
