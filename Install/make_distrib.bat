@@ -1,11 +1,11 @@
 @echo off
 rem ********************************************************************************************************************
-rem $Id: make_distrib.bat,v 1.3 2004-09-26 15:46:04 dale Exp $
+rem $Id: make_distrib.bat,v 1.4 2004-09-26 17:17:02 dale Exp $
 rem --------------------------------------------------------------------------------------------------------------------
 rem DKLang Localization Package
 rem Copyright 2002-2004 DK Software, http://www.dk-soft.org/
 rem ********************************************************************************************************************
-rem ** Making bundle of the package files and the Translation Editor application
+rem ** Making bundle of the package files 
 
 set VERSION=2.1
 set OUT_FILE_NAME=dklang-package-%VERSION%.zip
