@@ -1,0 +1,15 @@
+..\*.*
+
+..\Packages\*.*
+
+..\TranEditor\DKTranEd.exe
+..\TranEditor\Language\*.lng
+
+..\Examples\Simple\*.cfg
+..\Examples\Simple\*.dof
+..\Examples\Simple\*.res
+..\Examples\Simple\*.dpr
+..\Examples\Simple\*.pas
+..\Examples\Simple\*.dfm
+..\Examples\Simple\*.lng
+..\Examples\Simple\*.dklang
