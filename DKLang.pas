@@ -513,6 +513,9 @@ const
    // Component translations parameter names
   SDKLang_TranParam_LangID             = 'LANGID';
   SDKLang_TranParam_Author             = 'Author';
+  SDKLang_TranParam_Generator          = 'Generator';
+  SDKLang_TranParam_LastModified       = 'LastModified';
+  SDKLang_TranParam_TargetApplication  = 'TargetApplication';
 
    // Default language source file extension
   SDKLang_LangSourceExtension          = 'dklang';
