@@ -87,7 +87,7 @@ DebugInfo=0
 RemoteSymbols=0
 MinStackSize=16384
 MaxStackSize=1048576
-ImageBase=558891008
+ImageBase=622854144
 ExeDescription=DKLang Localization Package v2.1
 [Directories]
 OutputDir=
