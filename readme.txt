@@ -1,4 +1,4 @@
-$Id: readme.txt,v 1.7 2004-12-20 20:01:27 dale Exp $
+$Id: readme.txt,v 1.8 2004-12-20 20:04:11 dale Exp $
 ------------------------------------------------------------------------------------------------------------------------
 
 DKLang Localization Package
@@ -182,8 +182,6 @@ DKLangReg.pas                   A package source file
 DKL_ConstEditor.dfm             A package source file
 DKL_ConstEditor.pas             A package source file
 DKL_Expt.pas                    A package source file
-MPL-1.1.txt                     Mozilla Public License, Version 1.1
-LGPL-2.1.txt                    GNU Lesser General Public License, Version 2.1
 readme.txt                      This file
 + Examples
   + Simple\*.*                  A simple package usage example
