@@ -24,7 +24,7 @@ resourcestring
   SDKLExptErr_CannotObtainResources  = 'Failed to get project resource interface. Check whether project is open and active, and it uses a resource file';
   SDKLExptErr_CannotSaveLangSource   = 'Failed to update project language source. Check whether project is open and active';
 
-  SDKLExptMsg_LCsUpdated             = '%d language controllers has updated the project language source.';
+  SDKLExptMsg_LCsUpdated             = '%d language controllers have updated the project language source.';
 
   SDKLExptMenuItem_EditConstants     = 'Edit pro&ject constants...';
   SDKLExptMenuItem_UpdateLangSource  = 'Update project lan&guage source';
