@@ -49,7 +49,7 @@ uses
      // If a project is open
     Proj := GetActiveProject;
     Result := Proj<>nil;
-    if Result then UpdateLangSourceFile(ChangeFileExt(Proj.FileName, '.'+SDKLang_LangSourceExtension), LSObject, False);
+    if Result then UpdateLangSourceFile(ChangeFileExt(Proj.FileName, '.'+SDKLang_LangSourceExtension), LSObject, []);
   end;
 
    // Finds first TDKLanguageController instance among components owned by RootComp, if any, and calls
@@ -396,7 +396,7 @@ type
             Filter     := 'Language source files (*.'+SDKLang_LangSourceExtension+')|*.'+SDKLang_LangSourceExtension+'|All files (*.*)|*.*';
             Options    := [ofHideReadOnly, ofEnableSizing, ofOverwritePrompt, ofPathMustExist];
             Title      := 'Select a language source file';
-            if Execute then UpdateLangSourceFile(FileName, LC, False);
+            if Execute then UpdateLangSourceFile(FileName, LC, []);
           finally
             Free;
           end;
