@@ -46,7 +46,7 @@ uses
      // If a project is open
     Proj := GetActiveProject;
     Result := Proj<>nil;
-    if Result then UpdateLangSourceFile(ChangeFileExt(Proj.FileName, '.'+SDKLang_LangSourceExtension), LSObject);
+    if Result then UpdateLangSourceFile(ChangeFileExt(Proj.FileName, '.'+SDKLang_LangSourceExtension), LSObject, False);
   end;
 
 type
@@ -370,7 +370,7 @@ type
             Filter     := 'Language source files (*.'+SDKLang_LangSourceExtension+')|*.'+SDKLang_LangSourceExtension+'|All files (*.*)|*.*';
             Options    := [ofHideReadOnly, ofEnableSizing, ofOverwritePrompt, ofPathMustExist];
             Title      := 'Select a language source file';
-            if Execute then UpdateLangSourceFile(FileName, LC);
+            if Execute then UpdateLangSourceFile(FileName, LC, False);
           finally
             Free;
           end;
