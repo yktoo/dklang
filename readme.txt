@@ -1,4 +1,4 @@
-$Id: readme.txt,v 1.1 2004-09-21 05:10:48 dale Exp $
+$Id: readme.txt,v 1.2 2004-09-23 04:07:58 dale Exp $
 ------------------------------------------------------------------------------------------------------------------------
 
 
@@ -61,6 +61,12 @@ LangManager.ConstantValue['MyConstant'].
 Afterwards you may use the supplied DKLang Translation Editor application to open
 the language source files (.dklang), and to create new translations based on them.
 
+NB: DO NOT edit .dklang files directly since the contents of these files is
+    controlled automatically by language controllers and constant editor. Any
+    changes to property mappings or constant values will be lost once the file is
+    updated!
+    Nevertheless, you can add your custom comments (each line starting with a
+    semicolon) at the top of the file. The package leaves such comments intact.
 
 ISSUES/DRAWBACKS
 ------------------------------------------------------------------------------------------------------------------------
@@ -73,10 +79,6 @@ ISSUES/DRAWBACKS
   property value.
 - You cannot properly handle the forms open in the IDE as standalone files. DKLang
   package requires that you have an active project open.
-- There's a strange error regarding editing project constants placed in the project
-  resources. Sometimes after you modify the constant entries the IDE ceases to link
-  the project saying something like 'RLINK32 error: Out of memory'. Some manipulations
-  with constants sometimes help here.
 - I'm using Delphi 7 for all my projects so the package was designed for Delphi 7. But
   I believe it will work under Delphi 6, and very likely under Delphi 5. You may use
   the supplied package files, or derive the corresponding package files from them.
@@ -91,6 +93,9 @@ INSTALLATION
 4. Open Packages\dcldklang7.dpk, click Compile, then click Install.
 5. Close the files (don't save the changes if any).
 6. Add the path to DKLang.pas to IDE library path.
+
+Notice that both compiled packages (dklang7.bpl and dcldklang7.bpl) must reside in a
+directory listed in system PATH (usually packages are compiled to ...\Delphi7\Projects\Bpl).
 
 
 PACKAGE CONTENTS
