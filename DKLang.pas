@@ -100,10 +100,10 @@ type
      // Stream loading and storing. bParamsOnly tells the object to load only the sectionless parameters and not to load
      //   components nor constants. This may be used to evaluate the translation parameters only (eg. its language)
     procedure LoadFromStream(Stream: TStream; bParamsOnly: Boolean = False);
-    procedure SaveToStream(Stream: TStream);
+    procedure SaveToStream(Stream: TStream; bSkipUntranslated: Boolean);
      // File loading and storing
     procedure LoadFromFile(const sFileName: String; bParamsOnly: Boolean = False);
-    procedure SaveToFile(const sFileName: String);
+    procedure SaveToFile(const sFileName: String; bSkipUntranslated: Boolean);
      // Resource loading
     procedure LoadFromResource(Instance: HINST; const sResName: String; bParamsOnly: Boolean = False); overload;
     procedure LoadFromResource(Instance: HINST; iResID: Integer; bParamsOnly: Boolean = False); overload;
@@ -963,18 +963,18 @@ var
     if Action=lnDeleted then TDKLang_CompTranslation(Ptr).Free;
   end;
 
-  procedure TDKLang_CompTranslations.SaveToFile(const sFileName: String);
+  procedure TDKLang_CompTranslations.SaveToFile(const sFileName: String; bSkipUntranslated: Boolean);
   var Stream: TStream;
   begin
     Stream := TFileStream.Create(sFileName, fmCreate);
     try
-      SaveToStream(Stream);
+      SaveToStream(Stream, bSkipUntranslated);
     finally
       Stream.Free;
     end;
   end;
 
-  procedure TDKLang_CompTranslations.SaveToStream(Stream: TStream);
+  procedure TDKLang_CompTranslations.SaveToStream(Stream: TStream; bSkipUntranslated: Boolean);
 
     procedure WriteParams;
     var i: Integer;
@@ -995,7 +995,9 @@ var
         StreamWriteLine(Stream, '[%s]', [CT.ComponentName]);
          // Write translated values in the form 'ID=Value'
         for iEntry := 0 to CT.Count-1 do
-          with CT[iEntry]^ do StreamWriteLine(Stream, '%.8d=%s', [iID, MultilineToLine(sValue)]);
+          with CT[iEntry]^ do
+            if not bSkipUntranslated or not (dklptsUntranslated in States) then
+              StreamWriteLine(Stream, '%.8d=%s', [iID, MultilineToLine(sValue)]);
          // Insert an empty line
         StreamWriteLine(Stream, '');
       end;
@@ -1008,7 +1010,9 @@ var
       StreamWriteLine(Stream, '[%s]', [SDKLang_ConstSectionName]);
        // Write constant in the form 'Name=Value'
       for i := 0 to FConstants.Count-1 do
-        with FConstants[i]^ do StreamWriteLine(Stream, '%s=%s', [sName, MultilineToLine(sValue)]);
+        with FConstants[i]^ do
+          if not bSkipUntranslated or not (dklcsUntranslated in States) then
+            StreamWriteLine(Stream, '%s=%s', [sName, MultilineToLine(sValue)]);
     end;
 
   begin
