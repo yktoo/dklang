@@ -1,7 +1,7 @@
 unit DKLang;
 
 interface
-uses SysUtils, Windows, Classes;
+uses Windows, SysUtils, Classes;
 
 type
    // Error
@@ -467,7 +467,12 @@ type
     procedure RegisterLangResource(Instance: HINST; iResID: Integer; wLangID: LANGID); overload;
      // Removes language with the specified LangID from the registered language resources list. You cannot remove the
      //   DefaultLanguage  
-    procedure UnregisterLangResource(wLangID: LANGID); 
+    procedure UnregisterLangResource(wLangID: LANGID);
+     // Scans the specified directory for language files using given file mask. If bRecursive=True, also searches in the
+     //   subdirectories of sDir. Returns the number of files successfully registered. Sample:
+     //     ScanForLangFiles(ExtractFileDir(ParamStr(0)), '*.lng', False); - Scans the application directory for files
+     //     with '.lng' extension
+    function ScanForLangFiles(const sDir, sMask: String; bRecursive: Boolean): Integer;
      // Props
      // -- Constant values by name
     property ConstantValue[const sName: String]: String read GetConstantValue;
@@ -529,6 +534,7 @@ var
 
 resourcestring
   SDKLangErrMsg_DuplicatePropValueID   = 'Duplicate property value translation ID (%d)';
+  SDKLangErrMsg_ErrorLoadingTran       = 'Loading translations failed.'#13#10'Line %d: %s';
   SDKLangErrMsg_InvalidConstName       = 'Invalid constant name ("%s")';
   SDKLangErrMsg_DuplicateConstName     = 'Duplicate constant name ("%s")';
   SDKLangErrMsg_ConstantNotFound       = 'Constant "%s" not found';
@@ -922,23 +928,27 @@ var
     try
       SL.LoadFromStream(Stream);
        // Parse the string list line-by-line
-      Part := tpParam; // Initially we're dealing with the sectionless part 
+      Part := tpParam; // Initially we're dealing with the sectionless part
       CT := nil;
       for i := 0 to SL.Count-1 do begin
-        sLine := Trim(SL[i]);
-         // Skip empty lines
-        if sLine<>'' then
-          case sLine[1] of
-             // A comment
-            ';': ;
-             // A section
-            '[': begin
-              if bParamsOnly then Break;
-              if (Length(sLine)>2) and (sLine[Length(sLine)]=']') then ParseSectionLine(Trim(Copy(sLine, 2, Length(sLine)-2)));
+        try
+          sLine := Trim(SL[i]);
+           // Skip empty lines
+          if sLine<>'' then
+            case sLine[1] of
+               // A comment
+              ';': ;
+               // A section
+              '[': begin
+                if bParamsOnly then Break;
+                if (Length(sLine)>2) and (sLine[Length(sLine)]=']') then ParseSectionLine(Trim(Copy(sLine, 2, Length(sLine)-2)));
+              end;
+               // Probably an entry of form '<Name or ID>=<Value>'
+              else ParseValueLine(sLine);
             end;
-             // Probably an entry of form '<Name or ID>=<Value>'
-            else ParseValueLine(sLine);
-          end;
+        except
+          on e: Exception do DKLangError(SDKLangErrMsg_ErrorLoadingTran, [i, e.Message]);
+        end;
       end;
     finally
       SL.Free;
@@ -2053,6 +2063,30 @@ var
     finally
       FSynchronizer.EndWrite;
     end;
+  end;
+
+  function TDKLanguageManager.ScanForLangFiles(const sDir, sMask: String; bRecursive: Boolean): Integer;
+  var
+    sPath: String;
+    SRec: TSearchRec;
+  begin
+    Result := 0;
+     // Determine the path
+    sPath := IncludeTrailingPathDelimiter(sDir);
+     // Scan the directory
+    if FindFirst(sPath+sMask, faAnyFile, SRec)=0 then
+      try
+        repeat
+           // Plain file. Try to register it
+          if SRec.Attr and faDirectory=0 then begin
+            if RegisterLangFile(sPath+SRec.Name) then Inc(Result);
+           // Directory. Recurse if needed
+          end else if bRecursive and (SRec.Name[1]<>'.') then
+            Inc(Result, ScanForLangFiles(sPath+SRec.Name, sMask, True));
+        until FindNext(SRec)<>0;
+      finally
+        FindClose(SRec);
+      end;
   end;
 
   procedure TDKLanguageManager.SetDefaultLanguageID(Value: LANGID);
