@@ -1,8 +1,8 @@
-$Id: readme.txt,v 1.5 2004-11-27 10:29:44 dale Exp $
+$Id: readme.txt,v 1.6 2004-12-02 11:28:46 dale Exp $
 ------------------------------------------------------------------------------------------------------------------------
 
 DKLang Localization Package
-Version 2.2
+Version 2.3
 
 LEGAL INFO
 ------------------------------------------------------------------------------------------------------------------------
@@ -179,9 +179,6 @@ DKL_ConstEditor.pas             A package source file
 DKL_Expt.pas                    A package source file
 MPL-1.1.txt                     Mozilla Public License, Version 1.1
 readme.txt                      This file
-+ TranEditor
-  DKTranEd.exe                  DKLang Translation Editor application
-  + Language\*.*                DKLang Translation Editor interface localizations
 + Examples
   + Simple\*.*                  A simple package usage example
   + Constants\*.*               A demo of localizable constants usage
@@ -189,6 +186,9 @@ readme.txt                      This file
 
 REVISION HISTORY
 ------------------------------------------------------------------------------------------------------------------------
+
+DKLang 2.3 [xxx xx, 2004]
+  [+] Fixed dcldklang* installation problem under non-English versions of Delphi
 
 DKLang 2.2 [Nov 27, 2004]
   [+] Added support for Delphi 2005.

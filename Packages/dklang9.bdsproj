@@ -112,7 +112,7 @@
       <Linker Name="MinStackSize">16384</Linker>
       <Linker Name="MaxStackSize">1048576</Linker>
       <Linker Name="ImageBase">621805568</Linker>
-      <Linker Name="ExeDescription">DKLang Localization Package v2.2</Linker>
+      <Linker Name="ExeDescription">DKLang Localization Package</Linker>
     </Linker>
     <Directories>
       <Directories Name="OutputDir"></Directories>
@@ -160,13 +160,13 @@
     <VersionInfoKeys>
       <VersionInfoKeys Name="CompanyName">DK Software</VersionInfoKeys>
       <VersionInfoKeys Name="FileDescription">DKLang runtime package</VersionInfoKeys>
-      <VersionInfoKeys Name="FileVersion">2.2.0.8</VersionInfoKeys>
+      <VersionInfoKeys Name="FileVersion">2.3.0.8</VersionInfoKeys>
       <VersionInfoKeys Name="InternalName">dklang7</VersionInfoKeys>
       <VersionInfoKeys Name="LegalCopyright">Copyright ©2002-2004 DK Software</VersionInfoKeys>
       <VersionInfoKeys Name="LegalTrademarks"></VersionInfoKeys>
       <VersionInfoKeys Name="OriginalFilename">dklang7.bpl</VersionInfoKeys>
       <VersionInfoKeys Name="ProductName">DKLang Localization Package</VersionInfoKeys>
-      <VersionInfoKeys Name="ProductVersion">2.2</VersionInfoKeys>
+      <VersionInfoKeys Name="ProductVersion">2.3</VersionInfoKeys>
       <VersionInfoKeys Name="Comments">http://www.dk-soft.org/</VersionInfoKeys>
     </VersionInfoKeys>
   </Delphi.Personality>

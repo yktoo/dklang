@@ -22,7 +22,7 @@ package dcldklang9;
 {$WRITEABLECONST OFF}
 {$MINENUMSIZE 1}
 {$IMAGEBASE $25200000}
-{$DESCRIPTION 'DKLang Localization Package v2.2'}
+{$DESCRIPTION 'DKLang Localization Package'}
 {$DESIGNONLY}
 {$IMPLICITBUILD OFF}
 

@@ -1,5 +1,5 @@
 ///*********************************************************************************************************************
-///  $Id: DKL_Expt.pas,v 1.11 2004-09-27 10:15:18 dale Exp $
+///  $Id: DKL_Expt.pas,v 1.12 2004-12-02 11:28:46 dale Exp $
 ///---------------------------------------------------------------------------------------------------------------------
 ///  DKLang Localization Package
 ///  Copyright 2002-2004 DK Software, http://www.dk-soft.org
@@ -26,7 +26,7 @@ resourcestring
   SDKLExptErr_CannotObtainNTAIntf    = 'Cannot obtain INTAServices interface';
   SDKLExptErr_CannotObtainOTAIntf    = 'Cannot obtain IOTAServices interface';
   SDKLExptErr_CannotObtainModSvcIntf = 'Cannot obtain IOTAModuleServices interface';
-  SDKLExptErr_CannotFindProjectMenu  = 'Cannot locate ''Project'' submenu';
+  SDKLExptErr_CannotFindProjectMenu  = 'Cannot locate ''ProjectMenu'' submenu item';
   SDKLExptErr_CannotFindProject      = 'No active project found';
   SDKLExptErr_CannotObtainResources  = 'Failed to get project resource interface. Check whether project is open and active, and it uses a resource file';
   SDKLExptErr_CannotSaveLangSource   = 'Failed to update project language source. Check whether project is open and active';
@@ -256,7 +256,9 @@ type
    //===================================================================================================================
 
   constructor TDKLang_Expert.Create;
-  var mi: TMenuItem;
+  var
+    mi, miTest: TMenuItem;
+    i: Integer;
   begin
     inherited Create;
      // Obtain needed IDE interfaces
@@ -266,7 +268,14 @@ type
      // Register OTA services notifier
     FOTANotifierIndex := FOTAServices.AddNotifier(TDKLang_OTAIDENotifier.Create(Self));
      // Find 'Project' menu
-    mi := FNTAServices.MainMenu.Items.Find('Project');
+    mi := nil;
+    for i := 0 to FNTAServices.MainMenu.Items.Count-1 do begin
+      miTest := FNTAServices.MainMenu.Items[i];
+      if SameText(miTest.Name, 'ProjectMenu') then begin
+        mi := miTest;
+        Break;
+      end;
+    end;
     if mi=nil then DKLangError(SDKLExptErr_CannotFindProjectMenu);
      // Create a dummy menu item owner component
     FMenuOwner := TComponent.Create(nil);
