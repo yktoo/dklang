@@ -512,26 +512,10 @@ const
 
    // Component translations parameter names
   SDKLang_TranParam_LangID             = 'LANGID';
+  SDKLang_TranParam_Author             = 'Author';
 
    // Default language source file extension
   SDKLang_LangSourceExtension          = 'dklang';
-
-   // XML Tags
-  SXML_Tag_Root                        = 'DTTMProject';
-  SXML_Tag_TranEntry                   = 'tranEntry';
-  SXML_Tag_TranEntries                 = 'tranEntries';
-  SXML_Tag_PropEntry                   = 'propEntry';
-  SXML_Tag_PropEntries                 = 'propEntries';
-  SXML_Tag_CompEntry                   = 'compEntry';
-  SXML_Tag_CompEntries                 = 'compEntries';
-  SXML_Tag_ConstEntries                = 'constEntries';
-   // XML attributes                   
-  SXML_Attr_Generator                  = 'generator';
-  SXML_Attr_Name                       = 'name';
-  SXML_Attr_LangID                     = 'langID';
-  SXML_Attr_Value                      = 'value';
-
-  SProductName                         = 'DTLangTools v1.1';
 
 var
    // Set to True by DKLang expert to indicate the design time execution
