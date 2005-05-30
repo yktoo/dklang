@@ -1,0 +1,17 @@
+TargetApplication=DKLang_Simple_Demo
+Author=Dmitry Kann
+SourceLANGID=1033
+LANGID=1031
+Generator=DKLang Translation Editor v2.4
+LastModified=2005-05-30 18:38:41
+
+[fMain]
+00000001=Beispielform
+00000002=Neu Fenster
+
+[fMDIChild]
+00000001=Beispiel MDI Child
+00000003=Abbrechen
+00000004=Das ist eine beispiele Mitteilung.
+
+[$CONSTANTS]
