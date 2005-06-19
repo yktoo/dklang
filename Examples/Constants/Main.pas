@@ -1,5 +1,5 @@
 //**********************************************************************************************************************
-//  $Id: Main.pas,v 1.1.1.1 2004-09-25 18:45:47 dale Exp $
+//  $Id: Main.pas,v 1.2 2005-06-19 12:32:04 dale Exp $
 //----------------------------------------------------------------------------------------------------------------------
 //  DKLang Localization Package
 //  Copyright 2002-2004 DK Software, http://www.dk-soft.org
@@ -48,9 +48,11 @@ implementation
   end;
 
   procedure TfMain.cbLanguageChange(Sender: TObject);
+  var iIndex: Integer;
   begin
-     // This is the most straightforward way but not always correct, at least because cbLanguage.ItemIndex might be <0
-    LangManager.LanguageID := LangManager.LanguageIDs[cbLanguage.ItemIndex];
+    iIndex := cbLanguage.ItemIndex;
+    if iIndex<0 then iIndex := 0; // When there's no valid selection in cbLanguage we use the default language (Index=0)
+    LangManager.LanguageID := LangManager.LanguageIDs[iIndex];
   end;
 
   procedure TfMain.FormCreate(Sender: TObject);
