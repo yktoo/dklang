@@ -1,8 +1,8 @@
-$Id: readme.txt,v 1.9 2005-03-06 19:04:38 dale Exp $
+$Id: readme.txt,v 1.10 2005-06-19 12:32:45 dale Exp $
 ------------------------------------------------------------------------------------------------------------------------
 
 DKLang Localization Package
-Version 2.3
+Version 2.4
 
 LEGAL INFO
 ------------------------------------------------------------------------------------------------------------------------
@@ -46,7 +46,7 @@ Environment)?
   resides in the program directory: this means you should redistribute all the language
   DLLs with each copy of the program.
 * And finally, language files are plain-text files so one can edit them with any text
-  editor. ITE uses only compiled resource DLLs prepared with using special Tranlsation
+  editor. ITE uses only compiled resource DLLs prepared with using special Translation
   Manager.
 
 
@@ -116,7 +116,7 @@ The package also introduces the TDKLanguageManager class the instance of which i
 accessible via global function LangManager. The manager is instantiated first time
 the function is called. This will happen once a form having a controller will be
 instantiated, or when you invoke the LangManager eg to scan for language files (see
-the provided demo). Language manager performs all tasks of maintaining the list of
+the provided examples). Language manager performs all tasks of maintaining the list of
 available languages or switching between them.
 
 There's also a possibility of having a number of string constants for the project.
@@ -139,8 +139,6 @@ NB: DO NOT edit .dklang files directly since the contents of these files is
 ISSUES/DRAWBACKS
 ------------------------------------------------------------------------------------------------------------------------
 
-- The package is not proven to be stable yet (although no problems were found for the
-  moment).
 - The implemented localization mechanism doesn't support VFI (visual form inheritance).
   It is recommended to put language controller onto a final, derived form, and not
   onto the common ancestor form, since there's no means to track the origin of a
@@ -183,9 +181,7 @@ DKL_ConstEditor.dfm             A package source file
 DKL_ConstEditor.pas             A package source file
 DKL_Expt.pas                    A package source file
 readme.txt                      This file
-+ Examples
-  + Simple\*.*                  A simple package usage example
-  + Constants\*.*               A demo of localizable constants usage
++ Examples                      Demo projects
 + Packages\*.*                  Package files
 
 REVISION HISTORY
@@ -198,6 +194,7 @@ DKLang 2.4 [xxx xx, 2005]
       TDKLanguageManager.LanguageResources[]
   [-] Bugfix: TDKLanguageManager.IndexOfLanguageID() returned value less by 1 
       than correct value for non-default languages
+  [+] New demos: Frames, MDI, Resource
 
 DKLang 2.3 [Dec 21, 2004]
   [+] DKLang now uses a double licensing system. You may use, modify or
