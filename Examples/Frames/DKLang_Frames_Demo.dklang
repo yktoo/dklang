@@ -8,3 +8,8 @@ lLanguage.Caption=00000005,&Interface language:
 bSelectFont.Caption=00000001,Select...
 pSample.Caption=00000002,This is a sample text
 
+[$CONSTANTS]
+SFontEditorTitle_Interface=Interface
+SFontEditorTitle_Table=Table
+SFontEditorTitle_Toolbar=Toolbar
+

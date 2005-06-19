@@ -104,6 +104,7 @@ object fMain: TfMain
     IgnoreList.Strings = (
       '*.Font.Name'
       'frFontSettings_*')
+    OnLanguageChanged = lcMainLanguageChanged
     Left = 12
     Top = 248
     LangData = {

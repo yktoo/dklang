@@ -9,16 +9,21 @@ uses
 type
   TfrFontSettings = class(TFrame)
     bSelectFont: TButton;
-    pSample: TPanel;
     gbMain: TGroupBox;
     lcMain: TDKLanguageController;
+    pSample: TPanel;
     procedure bSelectFontClick(Sender: TObject);
   private
      // Prop handlers
     function  GetSelectedFont: TFont;
+    function  GetTitle: String;
     procedure SetSelectedFont(Value: TFont);
+    procedure SetTitle(const Value: String);
   public
      // Props
+     // -- Frame title, assigned at runtime (we cannot localize it at design time since all of the controllers share the
+     //    same translation in this example)
+    property Title: String read GetTitle write SetTitle;
      // -- A font selected in the editor
     property SelectedFont: TFont read GetSelectedFont write SetSelectedFont;
   end;
@@ -43,9 +48,19 @@ implementation
     Result := pSample.Font;
   end;
 
+  function TfrFontSettings.GetTitle: String;
+  begin
+    Result := gbMain.Caption;
+  end;
+
   procedure TfrFontSettings.SetSelectedFont(Value: TFont);
   begin
     pSample.Font.Assign(Value);
+  end;
+
+  procedure TfrFontSettings.SetTitle(const Value: String);
+  begin
+    gbMain.Caption := Value;
   end;
 
 end.

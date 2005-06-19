@@ -1,5 +1,5 @@
 //**********************************************************************************************************************
-//  $Id: Main.pas,v 1.1 2005-01-23 18:14:44 dale Exp $
+//  $Id: Main.pas,v 1.2 2005-06-19 12:32:23 dale Exp $
 //----------------------------------------------------------------------------------------------------------------------
 //  DKLang Localization Package
 //  Copyright (c)DK Software, http://www.dk-soft.org/
@@ -32,6 +32,8 @@
 // It's up to you to decide which method is more suitable for your needs; you can use
 // different methods in a project.
 //
+// Also this example demonstrates project constants usage.
+//
 unit Main;
 
 interface
@@ -43,17 +45,19 @@ uses
 type
   TfMain = class(TForm)
     bCancel: TButton;
-    lcMain: TDKLanguageController;
     bOK: TButton;
+    cbLanguage: TComboBox;
+    frFontSettings_Interface: TfrFontSettings;
     frFontSettings_Table: TfrFontSettings;
     frFontSettings_Toolbar: TfrFontSettings;
-    frFontSettings_Interface: TfrFontSettings;
+    lcMain: TDKLanguageController;
     lLanguage: TLabel;
-    cbLanguage: TComboBox;
     procedure cbLanguageChange(Sender: TObject);
     procedure FormCreate(Sender: TObject);
+    procedure lcMainLanguageChanged(Sender: TObject);
   private
-    { Private declarations }
+     // Updates the localizable font editor frame titles
+    procedure UpdateFrameTitles;
   public
     { Public declarations }
   end;
@@ -65,8 +69,11 @@ implementation
 {$R *.dfm}
 
   procedure TfMain.cbLanguageChange(Sender: TObject);
+  var iIndex: Integer;
   begin
-    LangManager.LanguageID := LangManager.LanguageIDs[cbLanguage.ItemIndex];
+    iIndex := cbLanguage.ItemIndex;
+    if iIndex<0 then iIndex := 0; // When there's no valid selection in cbLanguage we use the default language (Index=0)
+    LangManager.LanguageID := LangManager.LanguageIDs[iIndex];
   end;
 
   procedure TfMain.FormCreate(Sender: TObject);
@@ -78,6 +85,22 @@ implementation
     for i := 0 to LangManager.LanguageCount-1 do cbLanguage.Items.Add(LangManager.LanguageNames[i]);
      // Index=0 always means the default language
     cbLanguage.ItemIndex := 0;
+     // Let's now differentiate the trilling frames
+    UpdateFrameTitles; 
+  end;
+
+  procedure TfMain.lcMainLanguageChanged(Sender: TObject);
+  begin
+     // Since frame titles are localized with project constants, we should update them here in response to language
+     //   change
+    UpdateFrameTitles;
+  end;
+
+  procedure TfMain.UpdateFrameTitles;
+  begin
+    frFontSettings_Table.Title     := LangManager.ConstantValue['SFontEditorTitle_Table'];
+    frFontSettings_Toolbar.Title   := LangManager.ConstantValue['SFontEditorTitle_Toolbar'];
+    frFontSettings_Interface.Title := LangManager.ConstantValue['SFontEditorTitle_Interface'];
   end;
 
 end.

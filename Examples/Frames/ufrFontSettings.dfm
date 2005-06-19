@@ -16,9 +16,9 @@ object frFontSettings: TfrFontSettings
       312
       57)
     object pSample: TPanel
-      Left = 12
-      Top = 12
-      Width = 205
+      Left = 8
+      Top = 16
+      Width = 213
       Height = 33
       Anchors = [akLeft, akTop, akRight, akBottom]
       BevelOuter = bvLowered
@@ -26,8 +26,8 @@ object frFontSettings: TfrFontSettings
       TabOrder = 0
     end
     object bSelectFont: TButton
-      Left = 224
-      Top = 16
+      Left = 228
+      Top = 20
       Width = 75
       Height = 23
       Anchors = [akTop, akRight]

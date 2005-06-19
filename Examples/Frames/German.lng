@@ -3,7 +3,7 @@ Author=Dmitry Kann
 SourceLANGID=1033
 LANGID=1031
 Generator=DKLang Translation Editor v2.4
-LastModified=2005-01-23 11:54:52
+LastModified=2005-06-19 18:13:35
 
 [fMain]
 00000001=Optionen
@@ -16,3 +16,6 @@ LastModified=2005-01-23 11:54:52
 00000002=Das ist ein Beispieltext
 
 [$CONSTANTS]
+SFontEditorTitle_Interface=Benutzeroberfläche
+SFontEditorTitle_Table=Tafel
+SFontEditorTitle_Toolbar=Symbolleiste

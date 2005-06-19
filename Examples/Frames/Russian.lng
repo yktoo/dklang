@@ -3,7 +3,7 @@ Author=Dmitry Kann
 SourceLANGID=1033
 LANGID=1049
 Generator=DKLang Translation Editor v2.4
-LastModified=2005-01-23 11:41:09
+LastModified=2005-06-19 18:10:40
 
 [fMain]
 00000001=Настройки
@@ -14,3 +14,8 @@ LastModified=2005-01-23 11:41:09
 [frFontSettings]
 00000001=Выбрать...
 00000002=Это пример текста
+
+[$CONSTANTS]
+SFontEditorTitle_Interface=Интерфейс
+SFontEditorTitle_Table=Таблица
+SFontEditorTitle_Toolbar=Панель инструментов
