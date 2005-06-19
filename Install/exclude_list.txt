@@ -2,7 +2,9 @@
 *.dcu
 *.ddp
 *.dsk
+*.exe
 Entries
 Entries.*
 Repository
 Root
+CVS

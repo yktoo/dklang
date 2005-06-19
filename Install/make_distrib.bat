@@ -1,13 +1,13 @@
 @echo off
 rem ********************************************************************************************************************
-rem $Id: make_distrib.bat,v 1.6 2004-12-02 11:28:46 dale Exp $
+rem $Id: make_distrib.bat,v 1.7 2005-06-19 19:25:29 dale Exp $
 rem --------------------------------------------------------------------------------------------------------------------
 rem DKLang Localization Package
 rem Copyright 2002-2004 DK Software, http://www.dk-soft.org/
 rem ********************************************************************************************************************
 rem ** Making bundle of the package files 
 
-set VERSION=2.3
+set VERSION=2.4
 set OUT_FILE_NAME=dklang-package-%VERSION%.zip
 
 if exist %OUT_FILE_NAME% del %OUT_FILE_NAME%
