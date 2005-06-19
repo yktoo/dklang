@@ -3,14 +3,15 @@ Author=Dmitry Kann
 SourceLANGID=1033
 LANGID=1049
 Generator=DKLang Translation Editor v2.4
-LastModified=2005-05-30 18:35:23
+LastModified=2005-06-19 17:54:45
 
 [fMain]
 00000001=Форма-пример
-00000002=Новое окно
+00000002=&Новое окно
+00000003=&Черепица
+00000004=&Каскад
 
 [fMDIChild]
-00000001=Пример дочерней MDI-формы
 00000003=Отмена
 00000004=Это пример сообщения.
 

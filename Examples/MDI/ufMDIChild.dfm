@@ -3,7 +3,7 @@ object fMDIChild: TfMDIChild
   Top = 341
   Width = 288
   Height = 148
-  Caption = 'Sample MDI Child'
+  Caption = '<caption>'
   Color = clBtnFace
   Font.Charset = DEFAULT_CHARSET
   Font.Color = clWindowText
@@ -15,6 +15,7 @@ object fMDIChild: TfMDIChild
   Position = poDefault
   Visible = True
   OnClose = FormClose
+  OnCreate = FormCreate
   PixelsPerInch = 96
   TextHeight = 13
   object lSampleMessage: TLabel
@@ -34,13 +35,14 @@ object fMDIChild: TfMDIChild
   end
   object lcMain: TDKLanguageController
     IgnoreList.Strings = (
-      '*.Font.Name')
+      '*.Font.Name'
+      '.Caption')
+    SectionName = 'fMDIChild'
     Left = 240
     Top = 48
     LangData = {
-      0900664D44494368696C64010100000001000000070043617074696F6E010200
-      000007006243616E63656C010100000003000000070043617074696F6E000E00
-      6C53616D706C654D657373616765010100000004000000070043617074696F6E
-      00}
+      0900664D44494368696C6400010200000007006243616E63656C010100000003
+      000000070043617074696F6E000E006C53616D706C654D657373616765010100
+      000004000000070043617074696F6E00}
   end
 end

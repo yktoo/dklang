@@ -3,14 +3,15 @@ Author=Dmitry Kann
 SourceLANGID=1033
 LANGID=1031
 Generator=DKLang Translation Editor v2.4
-LastModified=2005-05-30 18:38:41
+LastModified=2005-06-19 17:54:32
 
 [fMain]
 00000001=Beispielform
-00000002=Neu Fenster
+00000002=&Neu Fenster
+00000003=&Fliese
+00000004=&Kaskade
 
 [fMDIChild]
-00000001=Beispiel MDI Child
 00000003=Abbrechen
 00000004=Das ist eine beispiele Mitteilung.
 
