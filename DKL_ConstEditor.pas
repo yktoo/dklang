@@ -1,8 +1,8 @@
 ///*********************************************************************************************************************
-///  $Id: DKL_ConstEditor.pas,v 1.8 2005-01-23 18:13:35 dale Exp $
+///  $Id: DKL_ConstEditor.pas,v 1.9 2005-08-15 11:19:01 dale Exp $
 ///---------------------------------------------------------------------------------------------------------------------
 ///  DKLang Localization Package
-///  Copyright 2002-2004 DK Software, http://www.dk-soft.org
+///  Copyright 2002-2005 DK Software, http://www.dk-soft.org
 ///*********************************************************************************************************************
 ///
 /// The contents of this package are subject to the Mozilla Public License

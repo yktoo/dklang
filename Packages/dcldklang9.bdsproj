@@ -162,7 +162,7 @@
       <VersionInfoKeys Name="FileDescription">DKLang designtime package</VersionInfoKeys>
       <VersionInfoKeys Name="FileVersion">2.3.0.8</VersionInfoKeys>
       <VersionInfoKeys Name="InternalName">dcldklang7</VersionInfoKeys>
-      <VersionInfoKeys Name="LegalCopyright">Copyright ©2002-2004 DK Software</VersionInfoKeys>
+      <VersionInfoKeys Name="LegalCopyright">Copyright ©2002-2005 DK Software</VersionInfoKeys>
       <VersionInfoKeys Name="LegalTrademarks"></VersionInfoKeys>
       <VersionInfoKeys Name="OriginalFilename">dcldklang7.bpl</VersionInfoKeys>
       <VersionInfoKeys Name="ProductName">DKLang Localization Package</VersionInfoKeys>

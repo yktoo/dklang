@@ -1,8 +1,8 @@
-$Id: readme.txt,v 1.11 2005-06-24 03:38:53 dale Exp $
+$Id: readme.txt,v 1.12 2005-08-15 11:19:01 dale Exp $
 ------------------------------------------------------------------------------------------------------------------------
 
 DKLang Localization Package
-Version 2.4
+Version 2.5
 
 LEGAL INFO
 ------------------------------------------------------------------------------------------------------------------------
@@ -186,6 +186,8 @@ readme.txt                      This file
 
 REVISION HISTORY
 ------------------------------------------------------------------------------------------------------------------------
+
+DKLang 2.5 [xxx xx, xxxx]
 
 DKLang 2.4 [Jun 23, 2005]
   [+] Added property TDKLanguageController.SectionName which allows customizing
