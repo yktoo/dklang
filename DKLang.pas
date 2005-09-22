@@ -1,5 +1,5 @@
 ///**********************************************************************************************************************
-///  $Id: DKLang.pas,v 1.26 2005-08-15 11:19:01 dale Exp $
+///  $Id: DKLang.pas,v 1.27 2005-09-22 19:31:06 dale Exp $
 ///----------------------------------------------------------------------------------------------------------------------
 ///  DKLang Localization Package
 ///  Copyright 2002-2005 DK Software, http://www.dk-soft.org/
@@ -29,6 +29,9 @@ unit DKLang;
 interface
 uses Windows, SysUtils, Classes, Contnrs, Masks;
 
+const
+  IDKLang_HookCodeLength = 5;
+  
 type
    // Error
   EDKLangError = class(Exception);
@@ -61,7 +64,7 @@ type
 
    //-------------------------------------------------------------------------------------------------------------------
    // A list of masks capable of testing an arbitrary string for matching. A string is considered matching when it
-   //   matches any mask from the list  
+   //   matches any mask from the list
    //-------------------------------------------------------------------------------------------------------------------
 
   TDKLang_MaskList = class(TObjectList)
@@ -75,6 +78,33 @@ type
      // -- Masks by index
     property Items[Index: Integer]: TMask read GetItems; default;
   end;
+
+   //-------------------------------------------------------------------------------------------------------------------
+   // Library procedure runtime hook. Based on an idea by Igor Siticov and dxgettext library
+   //-------------------------------------------------------------------------------------------------------------------
+
+  TDKLang_ProcHook = class(TObject)
+  private
+     // Original saved proc code
+    FOriginalCode: Array[0..IDKLang_HookCodeLength-1] of Byte;
+     // Prop storage
+    FEnabled: Boolean;
+    FHookProc: Pointer;
+    FOriginalProc: Pointer;
+     // Prop handlers
+    procedure SetEnabled(Value: Boolean);
+  public
+    constructor Create(AOriginalProc, AHookProc: Pointer; bEnable: Boolean);
+    destructor Destroy; override;
+     // Props
+     // -- True if the hook is enabled; otherwise False
+    property Enabled: Boolean read FEnabled write SetEnabled;
+     // -- Pointer to the hook procedure (a replacement for the original one)
+    property HookProc: Pointer read FHookProc;
+     // -- Pointer to the original library procedure
+    property OriginalProc: Pointer read FOriginalProc;
+  end;
+
 
    //-------------------------------------------------------------------------------------------------------------------
    // A single component property value translation, referred to by ID
@@ -492,6 +522,10 @@ type
     FLangControllers: TList;
      // Language resources registered (runtime only)
     FLangResources: TDKLang_LangResources;
+     // Runtime library hooks
+    FHook_LoadResString: TDKLang_ProcHook;
+    FHook_LoadStr: TDKLang_ProcHook;
+    FHook_FmtLoadStr: TDKLang_ProcHook;
      // Prop storage
     FDefaultLanguageID: LANGID;
     FLanguageID: LANGID;
@@ -788,6 +822,46 @@ var
   end;
 
    //===================================================================================================================
+   // Library hook procs
+   //===================================================================================================================
+
+  function DKL_LoadResString(ResStringRec: PResStringRec): String;
+  type TOrigProc = function(ResStringRec: PResStringRec): String;
+  begin
+    _LangManager.FHook_LoadResString.Enabled := False;
+    try
+      Result := TOrigProc(_LangManager.FHook_LoadResString.OriginalProc)(ResStringRec)+' -- DKLang'{!!!};
+    finally
+      _LangManager.FHook_LoadResString.Enabled := True;
+    end;
+  end;
+
+  function DKL_LoadStr(Ident: Integer): String;
+  type TOrigProc = function(Ident: Integer): String;
+  begin
+    _LangManager.FHook_LoadStr.Enabled := False;
+    try
+      Result := TOrigProc(_LangManager.FHook_LoadStr.OriginalProc)(Ident)+' -- DKLang'{!!!};
+    finally
+      _LangManager.FHook_LoadStr.Enabled := True;
+    end;
+    //Result := ResourceStringGettext(SysUtilsFindStringResource(Ident));
+  end;
+
+  function DKL_FmtLoadStr(Ident: Integer; const Args: array of const): String;
+  type TOrigProc = function(Ident: Integer; const Args: array of const): String;
+  begin
+    _LangManager.FHook_FmtLoadStr.Enabled := False;
+    try
+      Result := TOrigProc(_LangManager.FHook_FmtLoadStr.OriginalProc)(Ident, Args)+' -- DKLang'{!!!};
+    finally
+      _LangManager.FHook_FmtLoadStr.Enabled := True;
+    end;
+    //FmtStr(Result, SysUtilsFindStringResource(Ident), Args);
+    //Result:=ResourceStringGettext(Result);
+  end;
+
+   //===================================================================================================================
    //  Stream I/O
    //===================================================================================================================
 
@@ -874,6 +948,53 @@ var
         Exit;
       end;
     Result := False;
+  end;
+
+   //===================================================================================================================
+   // TDKLang_ProcHook
+   //===================================================================================================================
+
+  constructor TDKLang_ProcHook.Create(AOriginalProc, AHookProc: Pointer; bEnable: Boolean);
+  var cOldProtect: Cardinal;
+  begin
+    inherited Create;
+    FOriginalProc := AOriginalProc;
+    FHookProc     := AHookProc;
+     // Store the original code
+    Move(FOriginalProc^, FOriginalCode[0], IDKLang_HookCodeLength);
+     // Enable code page execution
+    if not VirtualProtect(FOriginalProc, IDKLang_HookCodeLength, PAGE_EXECUTE_READWRITE, cOldProtect) then RaiseLastOSError;
+     // Set the hook if required
+    Enabled := bEnable;
+  end;
+
+  destructor TDKLang_ProcHook.Destroy;
+  begin
+     // Revert to the original code
+    Enabled := False;
+    inherited Destroy;
+  end;
+
+  procedure TDKLang_ProcHook.SetEnabled(Value: Boolean);
+  var
+    iOffset: Integer;
+    pOriginalBytes: PByteArray;
+  begin
+    if FEnabled<>Value then begin
+       // Hook. Inject the jump code
+      if Value then begin
+        iOffset := Integer(FHookProc)-Integer(FOriginalProc)-IDKLang_HookCodeLength;
+        pOriginalBytes := FOriginalProc;
+        pOriginalBytes^[0] := $e9; // jmp
+        pOriginalBytes^[1] := iOffset and $ff; // Jump address
+        pOriginalBytes^[2] := (iOffset shr 8) and $ff;
+        pOriginalBytes^[3] := (iOffset shr 16) and $ff;
+        pOriginalBytes^[4] := (iOffset shr 24) and $ff;
+       // Unhook
+      end else
+        Move(FOriginalCode[0], FOriginalProc^, IDKLang_HookCodeLength);
+      FEnabled := Value;
+    end;
   end;
 
    //===================================================================================================================
@@ -2194,12 +2315,16 @@ var
   constructor TDKLanguageManager.Create;
   begin
     inherited Create;
-    FSynchronizer      := TMultiReadExclusiveWriteSynchronizer.Create;
-    FConstants         := TDKLang_Constants.Create;
-    FLangControllers   := TList.Create;
-    FLangResources     := TDKLang_LangResources.Create;
-    FDefaultLanguageID := ILangID_USEnglish;
-    FLanguageID        := FDefaultLanguageID;
+    FSynchronizer       := TMultiReadExclusiveWriteSynchronizer.Create;
+    FConstants          := TDKLang_Constants.Create;
+    FLangControllers    := TList.Create;
+    FLangResources      := TDKLang_LangResources.Create;
+    FDefaultLanguageID  := ILangID_USEnglish;
+    FLanguageID         := FDefaultLanguageID;
+     // Create hooks
+    FHook_LoadResString := TDKLang_ProcHook.Create(@System.LoadResString, @DKL_LoadResString, True);
+    FHook_LoadStr       := TDKLang_ProcHook.Create(@SysUtils.LoadStr,     @DKL_LoadStr,       True);
+    FHook_FmtLoadStr    := TDKLang_ProcHook.Create(@SysUtils.FmtLoadStr,  @DKL_FmtLoadStr,    True);
      // Load the constants from the executable's resources
     FConstants.LoadFromResource(HInstance, SDKLang_ConstResourceName);
      // Load the default translations
@@ -2208,6 +2333,9 @@ var
 
   destructor TDKLanguageManager.Destroy;
   begin
+    FHook_FmtLoadStr.Free;
+    FHook_LoadStr.Free;
+    FHook_LoadResString.Free;
     FConstants.Free;
     FLangControllers.Free;
     FLangResources.Free;
