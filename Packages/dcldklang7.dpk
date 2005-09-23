@@ -34,7 +34,6 @@ requires
 
 contains
   DKLangReg in '..\DKLangReg.pas',
-  DKL_Expt in '..\DKL_Expt.pas',
-  DKL_ConstEditor in '..\DKL_ConstEditor.pas' {dDKL_ConstEditor};
+  DKL_Expt in '..\DKL_Expt.pas';
 
 end.

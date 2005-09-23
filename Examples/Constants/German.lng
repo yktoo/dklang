@@ -11,5 +11,5 @@ LastModified=2004-09-26 00:17:03
 00000004=Das ist eine Beispielmitteilung.
 
 [$CONSTANTS]
-SMessageCaption=Info
-STestMessage=Oops, Sie betätigten die Testschaltfläche!
+65293=Oops, Sie betätigten die Testschaltfläche!
+65294=Info

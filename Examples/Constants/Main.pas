@@ -1,5 +1,5 @@
 //**********************************************************************************************************************
-//  $Id: Main.pas,v 1.4 2005-08-15 11:19:01 dale Exp $
+//  $Id: Main.pas,v 1.5 2005-09-23 19:50:47 dale Exp $
 //----------------------------------------------------------------------------------------------------------------------
 //  DKLang Localization Package
 //  Copyright 2002-2005 DK Software, http://www.dk-soft.org
@@ -15,30 +15,27 @@ uses
 type
   TfMain = class(TForm)
     bTest: TButton;
+    cbLanguage: TComboBox;
     lcMain: TDKLanguageController;
     lSampleMessage: TLabel;
-    cbLanguage: TComboBox;
+    procedure bTestClick(Sender: TObject);
     procedure cbLanguageChange(Sender: TObject);
     procedure FormCreate(Sender: TObject);
-    procedure bTestClick(Sender: TObject);
-  private
-    { Private declarations }
-  public
-    { Public declarations }
   end;
 
 var
   fMain: TfMain;
+
+resourcestring
+  STestMessage    = 'This is a test message';
+  SMessageCaption = 'Message';
 
 implementation
 {$R *.dfm}
 
   procedure TfMain.bTestClick(Sender: TObject);
   begin
-    Application.MessageBox(
-      PChar(LangManager.ConstantValue['STestMessage']),
-      PChar(LangManager.ConstantValue['SMessageCaption']),
-      MB_ICONINFORMATION or MB_OK);
+    Application.MessageBox(PChar(STestMessage), PChar(SMessageCaption), MB_ICONINFORMATION or MB_OK);
   end;
 
   procedure TfMain.cbLanguageChange(Sender: TObject);
