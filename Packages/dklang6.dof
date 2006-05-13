@@ -101,15 +101,15 @@ DebugSourceDirs=
 UsePackages=0
 [Parameters]
 RunParams=
-HostApplication=C:\Program Files\Borland\Delphi7\Bin\delphi32.exe
+HostApplication=
 Launcher=
 UseLauncher=0
 DebugCWD=
 [Version Info]
 IncludeVerInfo=1
 AutoIncBuild=0
-MajorVer=2
-MinorVer=1
+MajorVer=3
+MinorVer=0
 Release=0
 Build=8
 Debug=0
@@ -122,11 +122,11 @@ CodePage=1252
 [Version Info Keys]
 CompanyName=DK Software
 FileDescription=DKLang runtime package
-FileVersion=2.3.0.8
-InternalName=dklang7
-LegalCopyright=Copyright ©2002-2005 DK Software
+FileVersion=3.0.0.8
+InternalName=dklang
+LegalCopyright=Copyright ©2002-2006 DK Software
 LegalTrademarks=
-OriginalFilename=dklang7.bpl
+OriginalFilename=dklang6.bpl
 ProductName=DKLang Localization Package
-ProductVersion=2.3
+ProductVersion=3.0
 Comments=http://www.dk-soft.org/

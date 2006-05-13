@@ -24,7 +24,7 @@ package dcldklang7;
 {$IMAGEBASE $25200000}
 {$DESCRIPTION 'DKLang Localization Package'}
 {$DESIGNONLY}
-{$IMPLICITBUILD OFF}
+{$IMPLICITBUILD ON}
 
 requires
   rtl,
@@ -34,6 +34,7 @@ requires
 
 contains
   DKLangReg in '..\DKLangReg.pas',
-  DKL_Expt in '..\DKL_Expt.pas';
+  DKL_Expt in '..\DKL_Expt.pas',
+  DKL_ConstEditor in '..\DKL_ConstEditor.pas' {dDKL_ConstEditor};
 
 end.

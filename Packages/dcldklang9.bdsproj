@@ -1,4 +1,4 @@
-﻿<?xml version="1.0" encoding="utf-8"?>
+<?xml version="1.0" encoding="utf-8"?>
 <BorlandProject>
   <PersonalityInfo>
     <Option>
@@ -127,7 +127,7 @@
     </Directories>
     <Parameters>
       <Parameters Name="RunParams"></Parameters>
-      <Parameters Name="HostApplication">C:\Program Files\Borland\Delphi7\Bin\delphi32.exe</Parameters>
+      <Parameters Name="HostApplication"></Parameters>
       <Parameters Name="Launcher"></Parameters>
       <Parameters Name="UseLauncher">False</Parameters>
       <Parameters Name="DebugCWD"></Parameters>
@@ -145,8 +145,8 @@
     <VersionInfo>
       <VersionInfo Name="IncludeVerInfo">True</VersionInfo>
       <VersionInfo Name="AutoIncBuild">False</VersionInfo>
-      <VersionInfo Name="MajorVer">2</VersionInfo>
-      <VersionInfo Name="MinorVer">1</VersionInfo>
+      <VersionInfo Name="MajorVer">3</VersionInfo>
+      <VersionInfo Name="MinorVer">0</VersionInfo>
       <VersionInfo Name="Release">0</VersionInfo>
       <VersionInfo Name="Build">8</VersionInfo>
       <VersionInfo Name="Debug">False</VersionInfo>
@@ -160,13 +160,13 @@
     <VersionInfoKeys>
       <VersionInfoKeys Name="CompanyName">DK Software</VersionInfoKeys>
       <VersionInfoKeys Name="FileDescription">DKLang designtime package</VersionInfoKeys>
-      <VersionInfoKeys Name="FileVersion">2.3.0.8</VersionInfoKeys>
-      <VersionInfoKeys Name="InternalName">dcldklang7</VersionInfoKeys>
-      <VersionInfoKeys Name="LegalCopyright">Copyright ©2002-2005 DK Software</VersionInfoKeys>
+      <VersionInfoKeys Name="FileVersion">3.0.0.8</VersionInfoKeys>
+      <VersionInfoKeys Name="InternalName">dklang</VersionInfoKeys>
+      <VersionInfoKeys Name="LegalCopyright">Copyright ©2002-2006 DK Software</VersionInfoKeys>
       <VersionInfoKeys Name="LegalTrademarks"></VersionInfoKeys>
-      <VersionInfoKeys Name="OriginalFilename">dcldklang7.bpl</VersionInfoKeys>
+      <VersionInfoKeys Name="OriginalFilename">dcldklang9.bpl</VersionInfoKeys>
       <VersionInfoKeys Name="ProductName">DKLang Localization Package</VersionInfoKeys>
-      <VersionInfoKeys Name="ProductVersion">2.3</VersionInfoKeys>
+      <VersionInfoKeys Name="ProductVersion">3.0</VersionInfoKeys>
       <VersionInfoKeys Name="Comments">http://www.dk-soft.org/</VersionInfoKeys>
     </VersionInfoKeys>
   </Delphi.Personality>

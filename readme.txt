@@ -1,8 +1,8 @@
-$Id: readme.txt,v 1.12 2005-08-15 11:19:01 dale Exp $
+$Id: readme.txt,v 1.13 2006-05-13 08:04:46 dale Exp $
 ------------------------------------------------------------------------------------------------------------------------
 
 DKLang Localization Package
-Version 2.5
+Version 3.0 beta
 
 LEGAL INFO
 ------------------------------------------------------------------------------------------------------------------------
@@ -187,7 +187,8 @@ readme.txt                      This file
 REVISION HISTORY
 ------------------------------------------------------------------------------------------------------------------------
 
-DKLang 2.5 [xxx xx, xxxx]
+DKLang 3.0 beta [xxx xx, xxxx]
+  [+] Unicode support, initially developed by Bruce J. Miller <bjmiller@gmail.com>
 
 DKLang 2.4 [Jun 23, 2005]
   [+] Added property TDKLanguageController.SectionName which allows customizing

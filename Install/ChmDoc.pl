@@ -1,6 +1,6 @@
 #!/usr/bin/perl
 #****************************************************************
-#  $Id: ChmDoc.pl,v 1.1 2004-09-25 19:01:19 dale Exp $
+#  $Id: ChmDoc.pl,v 1.2 2006-05-13 08:04:37 dale Exp $
 #****************************************************************
 
 use strict;
@@ -10,7 +10,7 @@ use locale;
  # Declare constants
 my $usr_short_name = 'DKLang API';
 my $usr_long_name  = 'DKLang Localization Package. API Description';
-my $usr_copyright  = 'Copyright &copy;2004 DK Software, <a href="http://www.dk-soft.org/" target=_blank>www.dk-soft.org</a>';
+my $usr_copyright  = 'Copyright &copy;2002-2006 DK Software, <a href="http://www.dk-soft.org/" target=_blank>www.dk-soft.org</a>';
  
 my $src_path     = 'C:/Delphi/CVSpro~1/dale/DKLang';
 my $out_path     = 'C:/Tmp/dklang-docs';
