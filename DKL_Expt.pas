@@ -1,5 +1,5 @@
 ///*********************************************************************************************************************
-///  $Id: DKL_Expt.pas,v 1.15 2005-09-23 19:50:47 dale Exp $
+///  $Id: DKL_Expt.pas,v 1.16 2006-05-13 08:06:57 dale Exp $
 ///---------------------------------------------------------------------------------------------------------------------
 ///  DKLang Localization Package
 ///  Copyright 2002-2005 DK Software, http://www.dk-soft.org
@@ -46,16 +46,18 @@ resourcestring
   SDKLExptErr_CannotObtainModSvcIntf = 'Cannot obtain IOTAModuleServices interface';
   SDKLExptErr_CannotFindProjectMenu  = 'Cannot locate ''ProjectMenu'' submenu item';
   SDKLExptErr_CannotFindProject      = 'No active project found';
+  SDKLExptErr_CannotObtainResources  = 'Failed to get project resource interface. Check whether project is open and active, and it uses a resource file';
   SDKLExptErr_CannotSaveLangSource   = 'Failed to update project language source. Check whether project is open and active';
 
   SDKLExptMsg_LCsUpdated             = '%d language controllers have updated the project language source.';
 
+  SDKLExptMenuItem_EditConstants     = 'Edit pro&ject constants...';
   SDKLExptMenuItem_UpdateLangSource  = 'Update project lan&guage source';
 
 implementation //=======================================================================================================
 uses
   SysUtils, Windows, Registry, Menus, Graphics, Dialogs, DesignIntf, TypInfo, Forms, RTLConsts, 
-  DKLang;
+  DKLang, DKL_ConstEditor;
 
   {$IFNDEF VER150}
 
@@ -172,11 +174,16 @@ type
      // Menu item owner
     FMenuOwner: TComponent;
      // Menu items
+    FItem_EditConstants: TMenuItem;
     FItem_UpdateLangSource: TMenuItem;
      // Adds and returns a menu item
     function  NewMenuItem(const sCaption: String; Menu: TMenuItem; AOnClick: TNotifyEvent): TMenuItem;
      // Menu item click events
+    procedure ItemClick_EditConstants(Sender: TObject);
     procedure ItemClick_UpdateLangSource(Sender: TObject);
+     // Invokes the constant editor for editing constant data in the project resources. Returns True if user saved the
+     //   changes
+    function  EditConstantsResource: Boolean;
      // IOTAWizard
     function  GetIDString: string;
     function  GetName: string;
@@ -293,6 +300,7 @@ type
      // Insert a separator
     NewMenuItem('-', mi, nil);
      // Create menu items
+    FItem_EditConstants    := NewMenuItem(SDKLExptMenuItem_EditConstants,    mi, ItemClick_EditConstants);
     FItem_UpdateLangSource := NewMenuItem(SDKLExptMenuItem_UpdateLangSource, mi, ItemClick_UpdateLangSource);
      // Set the designtime flag
     IsDesignTime := True;
@@ -307,6 +315,68 @@ type
      // Release the OTA notifier
     if FOTAServices<>nil then FOTAServices.RemoveNotifier(FOTANotifierIndex);
     inherited Destroy;
+  end;
+
+  function TDKLang_Expert.EditConstantsResource: Boolean;
+  var
+    ProjResource: IOTAProjectResource;
+    ConstResource: IOTAResourceEntry;
+    Consts: TDKLang_Constants;
+    sBuf: String;
+    bErase: Boolean;
+
+     // Returns project resource interface or nil if none available
+    function GetProjectResource: IOTAProjectResource;
+    var
+      Proj: IOTAProject;
+      i: Integer;
+    begin
+       // Iterate through project files to find the resource editor
+      Proj := GetActualProject;
+      for i := 0 to Proj.ModuleFileCount-1 do
+        if Supports(Proj.ModuleFileEditors[i], IOTAProjectResource, Result) then Exit;
+      Result := nil;
+    end;
+
+    function Pad4(i: Integer): Integer;
+    begin
+      Result := i+(i mod 4);
+    end;
+
+  begin
+     // Get the project resource interface
+    ProjResource := GetProjectResource;
+    if ProjResource=nil then DKLangError(SDKLExptErr_CannotObtainResources);
+     // Create constant list object
+    Consts := TDKLang_Constants.Create(Self);
+    try
+       // Try to find the constant resource
+      ConstResource := ProjResource.FindEntry(RT_RCDATA, SDKLang_ConstResourceName);
+       // If constant resource exists, load the constant list from it
+      if ConstResource<>nil then begin
+        SetString(sBuf, PChar(ConstResource.GetData), ConstResource.DataSize);
+        Consts.AsString := sBuf;
+      end;
+      bErase := ConstResource<>nil;
+      Result := EditConstants(Consts, bErase);
+       // If changes made
+      if Result then
+         // If user clicked 'Erase'
+        if bErase then begin
+          if ConstResource<>nil then ProjResource.DeleteEntry(ConstResource.GetEntryHandle);
+         // Else save the constants back to the resources
+        end else begin
+          if ConstResource=nil then ConstResource := ProjResource.CreateEntry(RT_RCDATA, SDKLang_ConstResourceName, 0, 0, 0, 0, 0);
+          sBuf := Consts.AsString;
+          ConstResource.DataSize := Pad4(Length(sBuf));
+          FillChar(ConstResource.GetData^, ConstResource.DataSize, 0);
+          Move(sBuf[1], ConstResource.GetData^, Length(sBuf));
+           // Update the project language source file if needed
+          if Consts.AutoSaveLangSource and not UpdateProjectLangSource(Consts) then DKLangError(SDKLExptErr_CannotSaveLangSource);
+        end;
+    finally
+      Consts.Free;
+    end;
   end;
 
   procedure TDKLang_Expert.Execute;
@@ -327,6 +397,11 @@ type
   function TDKLang_Expert.GetState: TWizardState;
   begin
     Result := [wsEnabled];
+  end;
+
+  procedure TDKLang_Expert.ItemClick_EditConstants(Sender: TObject);
+  begin
+    EditConstantsResource;
   end;
 
   procedure TDKLang_Expert.ItemClick_UpdateLangSource(Sender: TObject);
