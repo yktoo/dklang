@@ -1,5 +1,5 @@
 ///**********************************************************************************************************************
-///  $Id: DKLang.pas,v 1.29 2006-05-13 08:06:57 dale Exp $
+///  $Id: DKLang.pas,v 1.30 2006-06-13 13:25:17 dale Exp $
 ///----------------------------------------------------------------------------------------------------------------------
 ///  DKLang Localization Package
 ///  Copyright 2002-2005 DK Software, http://www.dk-soft.org/
@@ -304,9 +304,9 @@ type
 
   PDKLang_Constant = ^TDKLang_Constant;
   TDKLang_Constant = record
-    sName:      WideString;                    // Constant name
-    sValue:     WideString;                    // Constant value
-    sDefValue:  WideString;                    // Default constant value (in the default language; initially the same as sValue)
+    sName:      String;                    // Constant name
+    sValue:     WideString;                // Constant value
+    sDefValue:  WideString;                // Default constant value (in the default language; initially the same as sValue)
     TranStates: TDKLang_TranslationStates; // Translation states
   end;
 
@@ -316,8 +316,8 @@ type
 
   TDKLang_Constants = class(TList, IInterface, IDKLang_LanguageSourceObject)
   private
-     // Should be either the translation manager or a translator.  So we can get
-     // a language ID to convert from ansi to unicode for legacy reads
+     // Should be either the translation manager or a translator. So we can get a language ID to convert from ANSI to
+     //   Unicode for legacy reads (??? -- dale)
     FOwner: TObject;
      // Prop storage
     FAutoSaveLangSource: Boolean;
@@ -332,29 +332,29 @@ type
     function  LSO_CanStore: Boolean;
     procedure LSO_StoreLangSource(Strings: TWideStrings; StateFilter: TDKLang_TranslationStates);
     function  LSO_GetSectionName: WideString;
-     // Prop handlers
-    function  GetItems(Index: Integer): PDKLang_Constant;
-    function  GetValues(const sName: WideString): WideString;
-    procedure SetValues(const sName, sValue: WideString);
-    function  GetItemsByName(const sName: WideString): PDKLang_Constant;
-    function  GetAsString: WideString;
-    procedure SetAsString(const Value: WideString);
-    // Stream loading
+     // Stream loading
     procedure UnicodeLoadFromStream(Stream: TStream);
     procedure LegacyLoadFromStream(Stream: TStream);
+     // Prop handlers
+    function  GetAsString: String;
+    function  GetItems(Index: Integer): PDKLang_Constant;
+    function  GetItemsByName(const sName: String): PDKLang_Constant;
+    function  GetValues(const sName: String): WideString;
+    procedure SetAsString(const Value: String);
+    procedure SetValues(const sName: String; const sValue: WideString);
   protected
     procedure Notify(Ptr: Pointer; Action: TListNotification); override;
   public
-    constructor Create(aOwner: TObject);
+    constructor Create(AOwner: TObject);
      // Add an entry into the list; returns the index of the newly inserted entry
-    function  Add(const sName, sValue: WideString; TranStates: TDKLang_TranslationStates): Integer;
+    function  Add(const sName: String; const sValue: WideString; TranStates: TDKLang_TranslationStates): Integer;
      // Returns index of entry by name; -1 if not found
-    function  IndexOfName(const sName: WideString): Integer;
+    function  IndexOfName(const sName: String): Integer;
      // Tries to find the entry by name; returns True, if succeeded, and its index in iIndex; otherwise returns False
      //   and its adviced insertion-point index in iIndex
-    function  FindName(const sName: WideString; out iIndex: Integer): Boolean;
+    function  FindName(const sName: String; out iIndex: Integer): Boolean;
      // Finds the constant by name; returns nil if not found
-    function  FindConstName(const sName: WideString): PDKLang_Constant;
+    function  FindConstName(const sName: String): PDKLang_Constant;
      // Stream loading/storing
     procedure LoadFromStream(Stream: TStream);
     procedure SaveToStream(Stream: TStream);
@@ -366,17 +366,15 @@ type
     procedure TranslateFrom(Constants: TDKLang_Constants);
      // Props
      // -- Binary list representation as raw data 
-    property AsString: WideString read GetAsString write SetAsString;
+    property AsString: String read GetAsString write SetAsString;
      // -- If True (default), the list will be automatically saved into the Project's language resource file (*.dklang)
     property AutoSaveLangSource: Boolean read FAutoSaveLangSource write FAutoSaveLangSource;
      // -- Constants by index
     property Items[Index: Integer]: PDKLang_Constant read GetItems; default;
      // -- Constants by name. If no constant of that name exists, an Exception is raised
-    property ItemsByName[const sName: WideString]: PDKLang_Constant read GetItemsByName;
+    property ItemsByName[const sName: String]: PDKLang_Constant read GetItemsByName;
      // -- Constant values, by name. If no constant of that name exists, an Exception is raised
-    property Values[const sName: WideString]: WideString read GetValues write SetValues;
-     // -- Locale ID for converting from legacy file or stream.  Set this before loading a file
-     //    else it defaults to the currently selected language
+    property Values[const sName: String]: WideString read GetValues write SetValues;
   end;
 
    //-------------------------------------------------------------------------------------------------------------------
@@ -467,7 +465,7 @@ type
   TDKLang_LangResource = record
     Kind:     TDKLang_LangResourceKind; // Entry kind
     Instance: HINST;                    // Instance containing the resource (Kind=[dklrkResName, dklrkResID])
-    sName:    WideString;                   // File (Kind=dklrkFile) or resource (Kind=dklrkResName) name
+    sName:    WideString;               // File (Kind=dklrkFile) or resource (Kind=dklrkResName) name
     iResID:   Integer;                  // Resource ID (Kind=dklrkResID)
     wLangID:  LANGID;                   // Language contained in the resource
   end;
@@ -513,7 +511,7 @@ type
      // Creates and returns the translations object, or nil if wLangID=DefaultLangID or creation failed
     function  GetTranslationsForLang(wLangID: LANGID): TDKLang_CompTranslations;
      // Prop handlers
-    function  GetConstantValue(const sName: WideString): WideString;
+    function  GetConstantValue(const sName: String): WideString;
     function  GetDefaultLanguageID: LANGID;
     function  GetLanguageCount: Integer;
     function  GetLanguageID: LANGID;
@@ -554,7 +552,7 @@ type
     function  IndexOfLanguageID(wLangID: LANGID): Integer;
      // Props
      // -- Constant values by name
-    property ConstantValue[const sName: WideString]: WideString read GetConstantValue;
+    property ConstantValue[const sName: String]: WideString read GetConstantValue;
      // -- Default language ID. The default value is US English ($409)
     property DefaultLanguageID: LANGID read GetDefaultLanguageID write SetDefaultLanguageID;
      // -- Current language ID. Initially equals to DefaultLanguageID. When being changed, affects all the registered
@@ -588,8 +586,8 @@ type
    //   is created
   procedure UpdateLangSourceFile(const sFileName: WideString; LSObject: IDKLang_LanguageSourceObject; StateFilter: TDKLang_TranslationStates);
    // Raises exception EDKLangError
-  procedure DKLangError(const sMsg: WideString); overload;
-  procedure DKLangError(const sMsg: WideString; const aParams: Array of const); overload;
+  procedure DKLangError(const sMsg: String); overload;
+  procedure DKLangError(const sMsg: String; const aParams: Array of const); overload;
 
 const
    // Resource name for constant entries in the project and executable resources
@@ -775,7 +773,7 @@ var
     end;
   end;
 
-  procedure DKLangError(const sMsg: WideString); overload;
+  procedure DKLangError(const sMsg: String); overload;
 
      function RetAddr: Pointer;
      asm
@@ -786,7 +784,7 @@ var
     raise EDKLangError.Create(sMsg) at RetAddr;
   end;
 
-  procedure DKLangError(const sMsg: WideString; const aParams: Array of const); overload;
+  procedure DKLangError(const sMsg: String; const aParams: Array of const); overload;
 
      function RetAddr: Pointer;
      asm
@@ -1835,7 +1833,7 @@ var
    // TDKLang_Constants
    //===================================================================================================================
 
-  function TDKLang_Constants.Add(const sName, sValue: WideString; TranStates: TDKLang_TranslationStates): Integer;
+  function TDKLang_Constants.Add(const sName: String; const sValue: WideString; TranStates: TDKLang_TranslationStates): Integer;
   var p: PDKLang_Constant;
   begin
     if not IsValidIdent(sName) then DKLangError(SDKLangErrMsg_InvalidConstName, [sName]);
@@ -1851,20 +1849,20 @@ var
     p.TranStates := TranStates;
   end;
 
-  constructor TDKLang_Constants.Create(aOwner: TObject);
+  constructor TDKLang_Constants.Create(AOwner: TObject);
   begin
     inherited Create;
     FAutoSaveLangSource := True;
-    FOwner := aOwner;
+    FOwner := AOwner;
   end;
 
-  function TDKLang_Constants.FindConstName(const sName: WideString): PDKLang_Constant;
+  function TDKLang_Constants.FindConstName(const sName: String): PDKLang_Constant;
   var idx: Integer;
   begin
     if FindName(sName, idx) then Result := GetItems(idx) else Result := nil;
   end;
 
-  function TDKLang_Constants.FindName(const sName: WideString; out iIndex: Integer): Boolean;
+  function TDKLang_Constants.FindName(const sName: String; out iIndex: Integer): Boolean;
   var iL, iR, i: Integer;
   begin
      // Since the list is sorted by constant name, implement binary search here
@@ -1873,8 +1871,9 @@ var
     iR := Count-1;
     while iL<=iR do begin
       i := (iL+iR) shr 1;
-       // Don't use AnsiCompareText() here as constant names are allowed to consist of alphanumeric chars and '_' only
-      case WideCompareText(GetItems(i).sName, sName) of
+       // Don't use AnsiCompareText()/WideCompareText() here as constant names are allowed to consist of alphanumeric
+       //   chars and '_' only
+      case CompareText(GetItems(i).sName, sName) of
         Low(Integer)..-1: iL := i+1;
         0: begin
           Result := True;
@@ -1887,13 +1886,13 @@ var
     iIndex := iL;
   end;
 
-  function TDKLang_Constants.GetAsString: WideString;      // I don't think this method gives valid results.  bjm
+  function TDKLang_Constants.GetAsString: String;
   var Stream: TStringStream;
   begin
     Stream := TStringStream.Create('');
     try
       SaveToStream(Stream);
-      Result := WideString(Stream.DataString);
+      Result := Stream.DataString;
     finally
       Stream.Free;
     end;
@@ -1904,19 +1903,19 @@ var
     Result := Get(Index);
   end;
 
-  function TDKLang_Constants.GetItemsByName(const sName: WideString): PDKLang_Constant;
+  function TDKLang_Constants.GetItemsByName(const sName: String): PDKLang_Constant;
   var idx: Integer;
   begin
     if not FindName(sName, idx) then DKLangError(SDKLangErrMsg_ConstantNotFound, [sName]);
     Result := GetItems(idx);
   end;
 
-  function TDKLang_Constants.GetValues(const sName: WideString): WideString;
+  function TDKLang_Constants.GetValues(const sName: String): WideString;
   begin
     Result := ItemsByName[sName].sValue;
   end;
 
-  function TDKLang_Constants.IndexOfName(const sName: WideString): Integer;
+  function TDKLang_Constants.IndexOfName(const sName: String): Integer;
   begin
     if not FindName(sName, Result) then Result := -1;
   end;
@@ -2037,7 +2036,7 @@ var
       end;
   end;
 
-  procedure TDKLang_Constants.SetAsString(const Value: WideString);   // I don't think this method gives valid results.  bjm
+  procedure TDKLang_Constants.SetAsString(const Value: String); 
   var Stream: TStringStream;
   begin
     Stream := TStringStream.Create(Value);
@@ -2048,7 +2047,7 @@ var
     end;
   end;
 
-  procedure TDKLang_Constants.SetValues(const sName, sValue: WideString);
+  procedure TDKLang_Constants.SetValues(const sName: String; const sValue: WideString);
   begin
     ItemsByName[sName].sValue := sValue;
   end;
@@ -2328,7 +2327,7 @@ var
     inherited Destroy;
   end;
 
-  function TDKLanguageManager.GetConstantValue(const sName: WideString): WideString;
+  function TDKLanguageManager.GetConstantValue(const sName: String): WideString;
   begin
     FSynchronizer.BeginRead;
     try
