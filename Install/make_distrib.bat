@@ -1,9 +1,9 @@
 @echo off
 rem ********************************************************************************************************************
-rem $Id: make_distrib.bat,v 1.9 2006-06-11 11:24:09 dale Exp $
+rem $Id: make_distrib.bat,v 1.10 2006-06-17 04:19:28 dale Exp $
 rem --------------------------------------------------------------------------------------------------------------------
 rem DKLang Localization Package
-rem Copyright 2002-2005 DK Software, http://www.dk-soft.org/
+rem Copyright 2002-2006 DK Software, http://www.dk-soft.org/
 rem ********************************************************************************************************************
 rem ** Making bundle of the package files 
 
