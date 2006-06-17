@@ -1,9 +1,9 @@
-///**********************************************************************************************************************
-///  $Id: DKLang.pas,v 1.31 2006-06-17 04:19:28 dale Exp $
-///----------------------------------------------------------------------------------------------------------------------
+///*********************************************************************************************************************
+///  $Id: DKLang.pas,v 1.32 2006-06-17 05:51:04 dale Exp $
+///---------------------------------------------------------------------------------------------------------------------
 ///  DKLang Localization Package
 ///  Copyright 2002-2006 DK Software, http://www.dk-soft.org/
-///**********************************************************************************************************************
+///*********************************************************************************************************************
 ///
 /// The contents of this package are subject to the Mozilla Public License
 /// Version 1.1 (the "License"); you may not use this file except in compliance
@@ -19,8 +19,9 @@
 /// specific language governing rights and limitations under the License.
 ///
 /// The initial developer of the original code is Dmitry Kann, http://www.dk-soft.org/
+/// Unicode support was initially developed by Bruce J. Miller <bjmiller-at-gmail.com>
 ///
-///**********************************************************************************************************************
+///*********************************************************************************************************************
 // The main unit (and the only required runtime unit) of the package. Contains all the
 // basic class and component declarations
 //
@@ -304,7 +305,7 @@ type
 
   PDKLang_Constant = ^TDKLang_Constant;
   TDKLang_Constant = record
-    sName:      String;                    // Constant name
+    sName:      String;                    // Constant name, written obeying standard rules for identifier naming
     sValue:     WideString;                // Constant value
     sDefValue:  WideString;                // Default constant value (in the default language; initially the same as sValue)
     TranStates: TDKLang_TranslationStates; // Translation states
@@ -799,6 +800,14 @@ var
    //  Stream I/O
    //===================================================================================================================
 
+   // Writes an Unicode byte-order mark
+  procedure StreamWriteUnicodeBOM(Stream: TStream);
+  var wcByteOrderMark: WideChar;
+  begin
+    wcByteOrderMark := UNICODE_BOM;
+    Stream.Write(wcByteOrderMark, 2);
+  end;
+
   procedure StreamWriteInt(Stream: TStream; i: Integer);
   begin
     Stream.WriteBuffer(i, 4);
@@ -1194,8 +1203,6 @@ var
   end;
 
   procedure TDKLang_CompTranslations.SaveToStream(Stream: TStream; bSkipUntranslated: Boolean);
-  var
-    ByteOrderMark: WideChar;
 
     procedure WriteParams;
     var i: Integer;
@@ -1237,10 +1244,8 @@ var
     end;
 
   begin
-    // mark the stream as unicode
-    ByteOrderMark := UNICODE_BOM;
-    Stream.Write(ByteOrderMark,sizeof(WideChar));
-
+     // Mark the stream as Unicode
+    StreamWriteUnicodeBOM(Stream);
     WriteParams;
     WriteComponents;
     WriteConstants;
@@ -2017,13 +2022,10 @@ var
   end;
 
   procedure TDKLang_Constants.SaveToStream(Stream: TStream);
-  var
-    i: Integer;
-    wcByteOrderMark: WideChar;
+  var i: Integer;
   begin
-    // Mark the stream as Unicode
-    wcByteOrderMark := UNICODE_BOM;
-    Stream.Write(wcByteOrderMark, SizeOf(wcByteOrderMark));
+     // Mark the stream as Unicode
+    StreamWriteUnicodeBOM(Stream);
      // Store props
     StreamWriteBool(Stream, FAutoSaveLangSource);
      // Store count
