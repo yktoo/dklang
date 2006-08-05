@@ -1,0 +1,56 @@
+<html>
+<!-- $Id: main-technology-and-background.html,v 1.1 2006-08-05 21:35:42 dale Exp $ -->
+<head>
+  <meta http-equiv="Content-Type" content="text/html; charset=windows-1252">
+  <link rel="stylesheet" type="text/css" href="main.css">
+  <title>Technology And Background</title>
+<head>
+<body>
+<h1>Technology And Background</h1>
+<div class=pagebody>
+<!--------------------------------------------------------------------------------------------------------------------->
+
+<p>The package introduces a non-visual VCL component called <b>TDKLanguageController</b>, which is to be placed on each
+  form you wish to localize. Language controller automatically maintains an internal list of all components and their
+  properties of type String (also known as AnsiString or long string), ShortString and WideString (complete Unicode
+  support is implemented). There's a little chance you will ever need another type of data to be changed in synch with
+  language change.
+
+<p>So, the language controller keeps a list of component properties, each having assigned a form-wide unique natural
+  number identifier (ID). This is done transparently by the controller so you don't need to bother when you add or
+  remove components to/from the form, or change their property values.
+
+<p>Additionally, if a controller's <b>Options</b> include <b>dklcoAutoSaveLangSource</b> (this is the default), the
+  controller saves its data in a plain text file (starting with version 3.0 of the package the file encoding is Unicode)
+  into the so-called project language source, each time you save modifications to the form the controller is on. The
+  project language source is a file named the same as the project (.dpr) file, but having .dklang extension. Each
+  controller replaces the corresponding section in that file when it saves its data. If autosave is off you are still
+  able to save the controller data by right-clicking the component on the form and selecting the <b>Save data to project
+  language source</b> item. You may also select the <b>Project | Update project language source</b> main menu item, this
+  will force all the contollers available for the project to update their language source in project's .dklang file.
+
+<p>The package also introduces the TDKLanguageManager class the instance of which is accessible via global function
+  <b>LangManager</b>. The manager is instantiated first time the function is called. This will happen once a form having
+  a controller will be instantiated, or when you invoke the LangManager eg to scan for language files (see the
+  <a href="main-supplied-examples.html">provided examples</a>). Language manager performs all tasks of maintaining the
+  list of available languages or switching between them.
+
+<p>There's also a possibility of having a number of string constants for the project. The constants and their values are
+  stored within the project resources; you edit them using the <b>Project | Edit project constants...</b> main menu
+  item. To obtain a constant value for the current language use the syntax:
+
+<div class=code>LangManager.ConstantValue['MyConstant']</div>
+
+<p>Afterwards you may use the supplied <b>DKLang Translation Editor</b> application to open the language source files
+  (.dklang), and to create new translations based on them.
+
+<p><b>NB:</b> <b>Do not</b> edit .dklang files directly since the contents of these files is controlled automatically by
+  language controllers and constant editor. Any changes to property mappings or constant values will be lost once the
+  file is updated!<br>
+  Nevertheless, you can add your custom comments (each line starting with a semicolon) at the top of the file. The
+  package leaves such comments intact.
+
+<!--------------------------------------------------------------------------------------------------------------------->
+</div>
+</body>
+</html>

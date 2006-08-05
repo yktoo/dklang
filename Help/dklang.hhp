@@ -1,0 +1,45 @@
+;***********************************************************************************************************************
+;   $Id: dklang.hhp,v 1.1 2006-08-05 21:35:42 dale Exp $
+;-----------------------------------------------------------------------------------------------------------------------
+;   DKLang Translation Editor
+;   Copyright 2002-2006 DK Software, http://www.dk-soft.org/
+;***********************************************************************************************************************
+[OPTIONS]
+Auto Index=Yes
+Compatibility=1.1 or later
+Compiled file=dklang.chm
+Contents file=dklang.hhc
+Default topic=index.html
+Display compile notes=No
+Display compile progress=No
+Full-text search=Yes
+Language=0x409 Английский (США)
+Title=DKLang Localization Package Help
+
+
+[FILES]
+example-ansi.html
+example-constants.html
+example-frames.html
+example-mdi.html
+example-notepad.html
+example-resource.html
+example-simple.html
+index.html
+lgpl-2.1.txt
+main-banners.html
+main-contributors.html
+main-general-description.html
+main-installation.html
+main-issues-drawbacks.html
+main-legal-info.html
+main-package-contents.html
+main-package-features.html
+main-requirements.html
+main-revision-history.html
+main-supplied-examples.html
+main-technology-and-background.html
+mpl-1.1.txt
+
+[INFOTYPES]
+

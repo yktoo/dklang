@@ -1,0 +1,37 @@
+<html>
+<!-- $Id: main-issues-drawbacks.html,v 1.1 2006-08-05 21:35:42 dale Exp $ -->
+<head>
+  <meta http-equiv="Content-Type" content="text/html; charset=windows-1252">
+  <link rel="stylesheet" type="text/css" href="main.css">
+  <title>Issues/Drawbacks</title>
+<head>
+<body>
+<h1>Issues/Drawbacks</h1>
+<div class=pagebody>
+<!--------------------------------------------------------------------------------------------------------------------->
+
+<ul>
+  <li>The implemented localization mechanism doesn't support VFI (visual form inheritance). It is recommended to put
+      language controller onto a final, derived form, and not onto the common ancestor form, since there's no means to
+      track the origin of a property value.
+  <li>No support for custom-defined properties implemented (ie. ones defined with DefineProperties() method).
+      Implementing such a feature would require knowing and analyzing all the form (visual) ancestors, which is a
+      somewhat hard task.
+  <li>You cannot properly handle the forms open in the IDE as standalone files. DKLang package requires that you have an
+      active project open.
+  <li>The packages were designed for the following versions of Borland IDE (all with the latest updates applied):
+      <ul>
+        <li>Delphi 6
+        <li>Delphi 7
+        <li>BDS 2005
+        <li>BDS 2006
+      </ul>
+      But there's a bug introduced in BDS 2005 (and still persisting in BDS 2006) which makes constant editing in those
+      IDEs impossible. The bug makes the <b>IOTAProjectResource</b> interface inaccessible. You can vote for this bug to
+      be fixed at <a href="http://qc.borland.com/wc/qcmain.aspx?d=15657" target=_blank>Borland Quality Central</a>.
+</ul>
+
+<!--------------------------------------------------------------------------------------------------------------------->
+</div>
+</body>
+</html>

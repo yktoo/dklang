@@ -1,0 +1,34 @@
+<html>
+<!-- $Id: example-ansi.html,v 1.1 2006-08-05 21:35:42 dale Exp $ -->
+<head>
+  <meta http-equiv="Content-Type" content="text/html; charset=windows-1252">
+  <link rel="stylesheet" type="text/css" href="main.css">
+  <title>Ansi Example</title>
+<head>
+<body>
+<h1>Ansi Example</h1>
+<div class=pagebody>
+<!--------------------------------------------------------------------------------------------------------------------->
+
+<p>File: <b>Examples\Ansi\DKLang_Ansi_Demo.dpr</b>
+
+<p>This example resembles <a href="example-simple.html">Simple</a> one except that it uses only conventional VCL
+  controls instead of Tnt Unicode Controls so it can't correcty display any interface language with character set other
+  than currently set default for non-Unicode programs.
+
+<p>Notice that the following line causes implicit Unicode-to-Ansi conversion:
+<div class=code>
+cbLanguage.Items.Add(LangManager.LanguageNames[i]);
+</div>
+
+<p>This is because LangManager.LanguageNames[] returns a WideString while cbLanguage.Items.Add() takes an AnsiString
+  as an argument. Implicit WideString to AnsiString and back conversions always use system default code page set for
+  Unicode-unaware software (configured in Regional Settings application of Control Panel). This is the best what we
+  might do here because language names returned by LangManager.LanguageNames[] are also taken from the system, being
+  produced in the current interface language. There's a good chance this language is the same as language being used for
+  non-Unicode programs, but if they differ, we again can't ensure language list is displayed correctly.
+
+<!--------------------------------------------------------------------------------------------------------------------->
+</div>
+</body>
+</html>

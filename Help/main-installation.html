@@ -1,0 +1,31 @@
+<html>
+<!-- $Id: main-installation.html,v 1.1 2006-08-05 21:35:42 dale Exp $ -->
+<head>
+  <meta http-equiv="Content-Type" content="text/html; charset=windows-1252">
+  <link rel="stylesheet" type="text/css" href="main.css">
+  <title>Installation</title>
+<head>
+<body>
+<h1>Installation</h1>
+<div class=pagebody>
+<!--------------------------------------------------------------------------------------------------------------------->
+
+<ol>
+  <li>Unpack the package files into a directory.
+  <li>Start Delphi IDE.
+  <li>Open Packages\dklang<i>N</i>.dpk (where <i>N</i> is your Delphi version: 6 for Delphi 6, 7 for Delphi 7, 9 for BDS
+      2005, 10 for BDS 2006) and click <b>Compile</b>.
+  <li>Open Packages\dcldklang<i>N</i>.dpk (where <i>N</i> is again your Delphi version), click <b>Compile</b>, then
+      click <b>Install</b>.
+  <li>Close the files (don't save the changes if any).
+  <li>Add the path to <b>DKLang.pas</b> to the IDE library path.
+</ol>
+
+<p>Notice that both compiled packages (dklang<i>N</i>.bpl and dcldklang<i>N</i>.bpl) must reside in a directory listed
+  in system <b>PATH</b> (usually packages are compiled to <b>...\Borland\DelphiN\Projects\Bpl</b> (Delphi 6 and 7) or 
+  <b><i>personal folder</i>\Borland Studio Projects\Bpl</b> (Delphi 8+)).
+
+<!--------------------------------------------------------------------------------------------------------------------->
+</div>
+</body>
+</html>
