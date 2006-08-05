@@ -1,0 +1,45 @@
+#------------------------------------------------------------------------------
+VERSION = BWS.01
+#------------------------------------------------------------------------------
+!ifndef ROOT
+ROOT = $(MAKEDIR)\..
+!endif
+#------------------------------------------------------------------------------
+MAKE = $(ROOT)\bin\make.exe -$(MAKEFLAGS) -f$**
+DCC = $(ROOT)\bin\dcc32.exe $**
+BRCC = $(ROOT)\bin\brcc32.exe $**
+#------------------------------------------------------------------------------
+PROJECTS = dklang7.bpl dcldklang7.bpl DKLang_Ansi_Demo.exe DKLang_Constants_Demo.exe DKLang_Frames_Demo.exe \
+  DKLang_MDI_Demo.exe DKLang_Notepad_Demo.exe DKLang_Resource_Demo.exe DKLang_Simple_Demo.exe
+#------------------------------------------------------------------------------
+default: $(PROJECTS)
+#------------------------------------------------------------------------------
+
+dklang7.bpl: dklang7.dpk
+  $(DCC)
+
+dcldklang7.bpl: dcldklang7.dpk
+  $(DCC)
+
+DKLang_Constants_Demo.exe: ..\Examples\Constants\DKLang_Constants_Demo.dpr
+  $(DCC)
+
+DKLang_Frames_Demo.exe: ..\Examples\Frames\DKLang_Frames_Demo.dpr
+  $(DCC)
+
+DKLang_MDI_Demo.exe: ..\Examples\MDI\DKLang_MDI_Demo.dpr
+  $(DCC)
+
+DKLang_Notepad_Demo.exe: ..\Examples\Notepad\DKLang_Notepad_Demo.dpr
+  $(DCC)
+
+DKLang_Resource_Demo.exe: ..\Examples\Resource\DKLang_Resource_Demo.dpr
+  $(DCC)
+
+DKLang_Simple_Demo.exe: ..\Examples\Simple\DKLang_Simple_Demo.dpr
+  $(DCC)
+
+DKLang_Ansi_Demo.exe: ..\Examples\Ansi\DKLang_Ansi_Demo.dpr
+  $(DCC)
+
+

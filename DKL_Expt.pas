@@ -1,5 +1,5 @@
 ///*********************************************************************************************************************
-///  $Id: DKL_Expt.pas,v 1.17 2006-06-17 04:19:28 dale Exp $
+///  $Id: DKL_Expt.pas,v 1.18 2006-08-05 21:42:34 dale Exp $
 ///---------------------------------------------------------------------------------------------------------------------
 ///  DKLang Localization Package
 ///  Copyright 2002-2006 DK Software, http://www.dk-soft.org
@@ -184,6 +184,8 @@ type
      // Invokes the constant editor for editing constant data in the project resources. Returns True if user saved the
      //   changes
     function  EditConstantsResource: Boolean;
+     // Callback function for obtaining current language ID
+    function  GetLangIDCallback: LANGID;
      // IOTAWizard
     function  GetIDString: string;
     function  GetName: string;
@@ -348,14 +350,14 @@ type
     ProjResource := GetProjectResource;
     if ProjResource=nil then DKLangError(SDKLExptErr_CannotObtainResources);
      // Create constant list object
-    Consts := TDKLang_Constants.Create(Self);
+    Consts := TDKLang_Constants.Create(GetLangIDCallback);
     try
        // Try to find the constant resource
       ConstResource := ProjResource.FindEntry(RT_RCDATA, SDKLang_ConstResourceName);
        // If constant resource exists, load the constant list from it
       if ConstResource<>nil then begin
         SetString(sBuf, PChar(ConstResource.GetData), ConstResource.DataSize);
-        Consts.AsString := sBuf;
+        Consts.AsRawString := sBuf;
       end;
       bErase := ConstResource<>nil;
       Result := EditConstants(Consts, bErase);
@@ -367,7 +369,7 @@ type
          // Else save the constants back to the resources
         end else begin
           if ConstResource=nil then ConstResource := ProjResource.CreateEntry(RT_RCDATA, SDKLang_ConstResourceName, 0, 0, 0, 0, 0);
-          sBuf := Consts.AsString;
+          sBuf := Consts.AsRawString;
           ConstResource.DataSize := Pad4(Length(sBuf));
           FillChar(ConstResource.GetData^, ConstResource.DataSize, 0);
           Move(sBuf[1], ConstResource.GetData^, Length(sBuf));
@@ -387,6 +389,11 @@ type
   function TDKLang_Expert.GetIDString: string;
   begin
     Result := 'DKSoftware.DKLang_IDE_Expert';
+  end;
+
+  function TDKLang_Expert.GetLangIDCallback: LANGID;
+  begin
+    Result := GetThreadLocale; // Implicit LCID to LANGID conversion 
   end;
 
   function TDKLang_Expert.GetName: string;

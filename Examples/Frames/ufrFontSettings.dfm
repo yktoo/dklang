@@ -5,7 +5,7 @@ object frFontSettings: TfrFontSettings
   Height = 57
   AutoScroll = False
   TabOrder = 0
-  object gbMain: TGroupBox
+  object gbMain: TTntGroupBox
     Left = 0
     Top = 0
     Width = 312
@@ -15,7 +15,7 @@ object frFontSettings: TfrFontSettings
     DesignSize = (
       312
       57)
-    object pSample: TPanel
+    object pSample: TTntPanel
       Left = 8
       Top = 16
       Width = 213
@@ -25,7 +25,7 @@ object frFontSettings: TfrFontSettings
       Caption = 'This is a sample text'
       TabOrder = 0
     end
-    object bSelectFont: TButton
+    object bSelectFont: TTntButton
       Left = 228
       Top = 20
       Width = 75
@@ -37,8 +37,6 @@ object frFontSettings: TfrFontSettings
     end
   end
   object lcMain: TDKLanguageController
-    IgnoreList.Strings = (
-      '*.Font.Name')
     SectionName = 'frFontSettings'
     Left = 180
     Top = 16

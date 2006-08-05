@@ -18,14 +18,14 @@ object fMDIChild: TfMDIChild
   OnCreate = FormCreate
   PixelsPerInch = 96
   TextHeight = 13
-  object lSampleMessage: TLabel
+  object lSampleMessage: TTntLabel
     Left = 12
     Top = 12
     Width = 123
     Height = 13
     Caption = 'This is a sample message.'
   end
-  object bCancel: TButton
+  object bCancel: TTntButton
     Left = 104
     Top = 76
     Width = 75
@@ -35,7 +35,6 @@ object fMDIChild: TfMDIChild
   end
   object lcMain: TDKLanguageController
     IgnoreList.Strings = (
-      '*.Font.Name'
       '.Caption')
     SectionName = 'fMDIChild'
     Left = 240

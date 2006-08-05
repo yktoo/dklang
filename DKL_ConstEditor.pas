@@ -1,5 +1,5 @@
 ///*********************************************************************************************************************
-///  $Id: DKL_ConstEditor.pas,v 1.12 2006-06-17 04:19:28 dale Exp $
+///  $Id: DKL_ConstEditor.pas,v 1.13 2006-08-05 21:42:34 dale Exp $
 ///---------------------------------------------------------------------------------------------------------------------
 ///  DKLang Localization Package
 ///  Copyright 2002-2006 DK Software, http://www.dk-soft.org
@@ -28,8 +28,9 @@ unit DKL_ConstEditor;
 interface
 
 uses
-  Windows, Messages, SysUtils, Variants, Classes, Graphics, Controls, Forms, Dialogs, DKLang,
-  StdCtrls, Grids, ValEdit;
+  Windows, Messages, SysUtils, Variants, Classes, Graphics, Controls, Forms, Dialogs, TntDialogs, DKLang,
+  StdCtrls, 
+  TntGrids, Grids;
 
 type
   TdDKL_ConstEditor = class(TForm)
@@ -39,15 +40,16 @@ type
     bOK: TButton;
     bSave: TButton;
     cbSaveToLangSource: TCheckBox;
+    gMain: TTntStringGrid;
     lCount: TLabel;
-    vleMain: TValueListEditor;
+    lDeleteHint: TLabel;
     procedure bEraseClick(Sender: TObject);
     procedure bLoadClick(Sender: TObject);
     procedure bOKClick(Sender: TObject);
     procedure bSaveClick(Sender: TObject);
-    procedure FormClose(Sender: TObject; var Action: TCloseAction);
-    procedure FormShow(Sender: TObject);
-    procedure vleMainStringsChange(Sender: TObject);
+    procedure gMainKeyDown(Sender: TObject; var Key: Word; Shift: TShiftState);
+    procedure gMainMouseUp(Sender: TObject; Button: TMouseButton; Shift: TShiftState; X, Y: Integer);
+    procedure gMainSelectCell(Sender: TObject; ACol, ARow: Integer; var CanSelect: Boolean);
   private
      // The constants being edited
     FConsts: TDKLang_Constants;
@@ -59,7 +61,39 @@ type
     procedure UpdateCount;
      // Storing/restoring the settings
     procedure SaveSettings;
-    procedure LoadSettings; 
+    procedure LoadSettings;
+     // Updates gMain columns' widths so that they both fit into the client area
+    procedure UpdateGridColumnWidths;
+     // Raises an exception if entry (constant) index is not valid
+    procedure CheckEntryIndexValidity(iIndex: Integer);
+     // Ensures a virtual row is available at the end of the table
+    procedure EnsureVirtualRowExists;
+     // Returns True if the specified row has neither name nor value
+    function  IsRowEmpty(iRow: Integer): Boolean;
+     // Raises an exception if constant names are not valid (includes uniqueness checking)
+    procedure CheckNamesValid;
+     // Deletes the specified entry
+    procedure DeleteEntry(iIndex: Integer);
+     // Prop handlers
+    function  GetEntryCount: Integer;
+    function  GetEntryNames(Index: Integer): String;
+    function  GetEntryValues(Index: Integer; bEncoded: Boolean): WideString;
+    procedure SetEntryCount(iCount: Integer);
+    procedure SetEntryNames(Index: Integer; const sValue: String);
+    procedure SetEntryValues(Index: Integer; bEncoded: Boolean; const wsValue: WideString);
+  protected
+    procedure DoClose(var Action: TCloseAction); override;
+    procedure DoShow; override;
+    procedure Resize; override;
+  public
+     // Props
+     // -- Entry (constant) count
+    property EntryCount: Integer read GetEntryCount write SetEntryCount;
+     // -- Constant names by index
+    property EntryNames[Index: Integer]: String read GetEntryNames write SetEntryNames;
+     // -- Constant names by index. If bEncoded=True, the constant value is represented 'encoded', with no literal
+     //    control chars; if bEncoded=False, the value is represented 'as is', with linebreaks, tabs, etc. in it
+    property EntryValues[Index: Integer; bEncoded: Boolean]: WideString read GetEntryValues write SetEntryValues;
   end;
 
 const
@@ -73,7 +107,12 @@ const
 
 implementation
 {$R *.dfm}
-uses Registry;
+uses Registry, TntClasses;
+
+const
+   // gMain's column indexes
+  IColIdx_Name  = 0;
+  IColIdx_Value = 1;
 
   function EditConstants(AConsts: TDKLang_Constants; var bEraseAllowed: Boolean): Boolean;
   begin
@@ -100,14 +139,33 @@ uses Registry;
   end;
 
   procedure TdDKL_ConstEditor.bLoadClick(Sender: TObject);
+
+    procedure DoLoad(const wsFileName: WideString);
+    var
+      SL: TTntStringList;
+      i: Integer;
+    begin
+      SL := TTntStringList.Create;
+      try
+        SL.LoadFromFile(wsFileName);
+        EntryCount := SL.Count;
+        for i := 0 to SL.Count-1 do begin
+          EntryNames [i]       := SL.Names[i];
+          EntryValues[i, True] := SL.ValueFromIndex[i]; // Assume the value is already encoded in the file
+        end;
+      finally
+        SL.Free;
+      end;
+    end;
+
   begin
-    with TOpenDialog.Create(Self) do
+    with TTntOpenDialog.Create(Self) do
       try
         DefaultExt := 'txt';
         Filter     := 'All files (*.*)|*.*';
         Options    := [ofHideReadOnly, ofPathMustExist, ofFileMustExist, ofEnableSizing];
         Title      := 'Select a text file to load from';
-        if Execute then vleMain.Strings.LoadFromFile(FileName);
+        if Execute then DoLoad(FileName);
       finally
         Free;
       end;
@@ -116,35 +174,141 @@ uses Registry;
   procedure TdDKL_ConstEditor.bOKClick(Sender: TObject);
   var i: Integer;
   begin
+     // Check that all names are valid
+    CheckNamesValid;
      // Copy the constans from the editor back into FConsts
     FConsts.Clear;
     FConsts.AutoSaveLangSource := cbSaveToLangSource.Checked;
-    for i := 1 to vleMain.Strings.Count do FConsts.Add(vleMain.Cells[0, i], DecodeControlChars(vleMain.Cells[1, i]), []);
+    for i := 0 to EntryCount-1 do FConsts.Add(EntryNames[i], EntryValues[i, False], []);
     ModalResult := mrOK;
   end;
 
   procedure TdDKL_ConstEditor.bSaveClick(Sender: TObject);
+
+    procedure DoSave(const wsFileName: WideString);
+    var
+      SL: TTntStringList;
+      i: Integer;
+    begin
+      SL := TTntStringList.Create;
+      try
+        for i := 0 to EntryCount-1 do SL.Add(EntryNames[i]+'='+EntryValues[i, True]);
+        SL.SaveToFile(wsFileName);
+      finally
+        SL.Free;
+      end;
+    end;
+
   begin
-    with TSaveDialog.Create(Self) do
+    with TTntSaveDialog.Create(Self) do
       try
         DefaultExt := 'txt';
         Filter     := 'All files (*.*)|*.*';
         Options    := [ofOverwritePrompt, ofHideReadOnly, ofPathMustExist, ofEnableSizing];
         Title      := 'Select a text file to save to';
-        if Execute then vleMain.Strings.SaveToFile(FileName);
+        if Execute then DoSave(FileName);
       finally
         Free;
       end;
   end;
 
-  procedure TdDKL_ConstEditor.FormClose(Sender: TObject; var Action: TCloseAction);
+  procedure TdDKL_ConstEditor.CheckEntryIndexValidity(iIndex: Integer);
   begin
+    if (iIndex<0) or (iIndex>=EntryCount) then DKLangError('Invalid entry index (%d)', [iIndex]);
+  end;
+
+  procedure TdDKL_ConstEditor.CheckNamesValid;
+  var
+    SL: TStringList; // No need to deal with wide strings here
+    s: String;
+    i: Integer;
+  begin
+    SL := TStringList.Create;
+    try
+      SL.Sorted := True;
+      for i := 0 to EntryCount-1 do begin
+        s := EntryNames[i];
+        if s='' then DKLangError('Constant name cannot be empty');
+        if not IsValidIdent(s) then DKLangError('Invalid constant name: "%s"', [s]);
+        if SL.IndexOf(s)<0 then SL.Add(s) else DKLangError('Duplicate constant name: "%s"', [s]);
+      end;
+    finally
+      SL.Free;
+    end;
+  end;
+
+  procedure TdDKL_ConstEditor.DeleteEntry(iIndex: Integer);
+  var i: Integer;
+  begin
+    CheckEntryIndexValidity(iIndex);
+     // Shift the grid contents
+    for i := iIndex to EntryCount-2 do begin
+      EntryNames [i]       := EntryNames [i+1];
+      EntryValues[i, True] := EntryValues[i+1, True];
+    end;
+     // Remove the last row
+    EntryCount := EntryCount-1;  
+  end;
+
+  procedure TdDKL_ConstEditor.DoClose(var Action: TCloseAction);
+  begin
+    inherited DoClose(Action);
     SaveSettings;
   end;
 
-  procedure TdDKL_ConstEditor.FormShow(Sender: TObject);
+  procedure TdDKL_ConstEditor.DoShow;
   begin
+    inherited DoShow;
     LoadSettings;
+  end;
+
+  procedure TdDKL_ConstEditor.EnsureVirtualRowExists;
+  var i: Integer;
+  begin
+     // Determine the index of last non-empty row
+    i := gMain.RowCount-1;
+    while (i>0) and IsRowEmpty(i) do Dec(i);
+     // Set the number of rows
+    EntryCount := i;
+  end;
+
+  function TdDKL_ConstEditor.GetEntryCount: Integer;
+  begin
+    Result := gMain.RowCount-2; // One for the header, one more for the virtual row
+  end;
+
+  function TdDKL_ConstEditor.GetEntryNames(Index: Integer): String;
+  begin
+    CheckEntryIndexValidity(Index);
+    Result := Trim(gMain.Cells[IColIdx_Name, Index+1]); // One more row to skip the header
+  end;
+
+  function TdDKL_ConstEditor.GetEntryValues(Index: Integer; bEncoded: Boolean): WideString;
+  begin
+    CheckEntryIndexValidity(Index);
+    Result := Trim(gMain.Cells[IColIdx_Value, Index+1]); // One more row to skip the header
+    if not bEncoded then Result := DecodeControlChars(Result);
+  end;
+
+  procedure TdDKL_ConstEditor.gMainKeyDown(Sender: TObject; var Key: Word; Shift: TShiftState);
+  begin
+    if (Key=VK_DELETE) and (Shift=[ssCtrl]) and (gMain.Row<gMain.RowCount-1) then begin      
+      DeleteEntry(gMain.Row-1);
+      Key := 0;
+    end;
+  end;
+
+  procedure TdDKL_ConstEditor.gMainMouseUp(Sender: TObject; Button: TMouseButton; Shift: TShiftState; X, Y: Integer);
+  begin
+     // Believe mouse up is linked to column resizing...
+    UpdateGridColumnWidths;
+  end;
+
+  procedure TdDKL_ConstEditor.gMainSelectCell(Sender: TObject; ACol, ARow: Integer; var CanSelect: Boolean);
+  begin
+    EnsureVirtualRowExists;
+    CheckNamesValid;
+    UpdateCount;
   end;
 
   procedure TdDKL_ConstEditor.InitializeDialog(AConsts: TDKLang_Constants; bEraseAllowed: Boolean);
@@ -154,10 +318,22 @@ uses Registry;
     cbSaveToLangSource.Checked := FConsts.AutoSaveLangSource;
     bErase.Enabled             := bEraseAllowed;
     FErase                     := False;
+     // Setup the editor
+    gMain.Cells[IColIdx_Name,  0] := 'Constant name';
+    gMain.Cells[IColIdx_Value, 0] := 'Constant value';
      // Copy the constans into the editor
-    for i := 0 to FConsts.Count-1 do vleMain.Strings.Add(FConsts[i].sName+'='+EncodeControlChars(FConsts[i].sValue));
+    EntryCount := FConsts.Count;
+    for i := 0 to FConsts.Count-1 do begin
+      EntryNames [i]        := FConsts[i].sName;
+      EntryValues[i, False] := FConsts[i].wsValue;
+    end;
      // Update count info
     UpdateCount;
+  end;
+
+  function TdDKL_ConstEditor.IsRowEmpty(iRow: Integer): Boolean;
+  begin
+    Result := (Trim(gMain.Cells[IColIdx_Name, iRow])='') and (Trim(gMain.Cells[IColIdx_Value, iRow])='');
   end;
 
   procedure TdDKL_ConstEditor.LoadSettings;
@@ -177,10 +353,17 @@ uses Registry;
       if (rBounds.Left<MaxInt) and (rBounds.Top<MaxInt) and (rBounds.Right<MaxInt) and (rBounds.Bottom<MaxInt) then
         BoundsRect := rBounds;
        // Load other settings
-      vleMain.ColWidths[0] := rif.ReadInteger('', 'NameColWidth', vleMain.ClientWidth div 2);
+      gMain.ColWidths[IColIdx_Name] := rif.ReadInteger('', 'NameColWidth', gMain.ClientWidth div 2);
+      UpdateGridColumnWidths;
     finally
       rif.Free;
     end;
+  end;
+
+  procedure TdDKL_ConstEditor.Resize;
+  begin
+    inherited Resize;
+    UpdateGridColumnWidths;
   end;
 
   procedure TdDKL_ConstEditor.SaveSettings;
@@ -197,20 +380,51 @@ uses Registry;
       rif.WriteInteger('', 'Right',        rBounds.Right);
       rif.WriteInteger('', 'Bottom',       rBounds.Bottom);
        // Store other settings
-      rif.WriteInteger('', 'NameColWidth', vleMain.ColWidths[0]);
+      rif.WriteInteger('', 'NameColWidth', gMain.ColWidths[IColIdx_Name]);
     finally
       rif.Free;
     end;
   end;
 
-  procedure TdDKL_ConstEditor.UpdateCount;
+  procedure TdDKL_ConstEditor.SetEntryCount(iCount: Integer);
   begin
-    lCount.Caption := Format('%d constants', [vleMain.Strings.Count]);
+    gMain.RowCount := iCount+2; // One for the header, one more for the virtual row
+     // Cleanup the virtual row
+    gMain.Cells[IColIdx_Name,  iCount+1] := '';
+    gMain.Cells[IColIdx_Value, iCount+1] := '';
   end;
 
-  procedure TdDKL_ConstEditor.vleMainStringsChange(Sender: TObject);
+  procedure TdDKL_ConstEditor.SetEntryNames(Index: Integer; const sValue: String);
   begin
-    UpdateCount;
+    CheckEntryIndexValidity(Index);
+    gMain.Cells[IColIdx_Name, Index+1] := sValue; // One more row to skip the header
+  end;
+
+  procedure TdDKL_ConstEditor.SetEntryValues(Index: Integer; bEncoded: Boolean; const wsValue: WideString);
+  var ws: WideString;
+  begin
+    CheckEntryIndexValidity(Index);
+    ws := wsValue;
+    if not bEncoded then ws := EncodeControlChars(ws);
+    gMain.Cells[IColIdx_Value, Index+1] := ws; // One more row to skip the header
+  end;
+
+  procedure TdDKL_ConstEditor.UpdateCount;
+  begin
+    lCount.Caption := Format('%d constants', [EntryCount]);
+  end;
+
+  procedure TdDKL_ConstEditor.UpdateGridColumnWidths;
+  var iwClient, iwName: Integer;
+  begin
+    iwClient := gMain.ClientWidth;
+    iwName   := gMain.ColWidths[IColIdx_Name];
+     // Do not allow columns be narrower than 20 pixels
+    if iwName<20 then iwName := 20
+    else if iwName>iwClient-20 then iwName := iwClient-22;
+     // Update column widths
+    gMain.ColWidths[IColIdx_Name]  := iwName;
+    gMain.ColWidths[IColIdx_Value] := iwClient-iwName-2;
   end;
 
 end.

@@ -1,7 +1,7 @@
 object dDKL_ConstEditor: TdDKL_ConstEditor
-  Left = 540
-  Top = 205
-  ActiveControl = vleMain
+  Left = 357
+  Top = 191
+  ActiveControl = gMain
   AutoScroll = False
   BorderIcons = [biSystemMenu, biMaximize]
   Caption = 'DKLang Constant Editor'
@@ -17,8 +17,6 @@ object dDKL_ConstEditor: TdDKL_ConstEditor
   Font.Style = []
   OldCreateOrder = False
   Position = poScreenCenter
-  OnClose = FormClose
-  OnShow = FormShow
   DesignSize = (
     592
     435)
@@ -32,22 +30,33 @@ object dDKL_ConstEditor: TdDKL_ConstEditor
     Anchors = [akLeft, akBottom]
     Caption = '<count>'
   end
-  object vleMain: TValueListEditor
+  object lDeleteHint: TLabel
+    Left = 8
+    Top = 368
+    Width = 213
+    Height = 13
+    Anchors = [akLeft, akBottom]
+    Caption = 'Use Ctrl+Delete to delete the current entry.'
+  end
+  object gMain: TTntStringGrid
     Left = 8
     Top = 8
-    Width = 575
-    Height = 373
+    Width = 577
+    Height = 357
     Anchors = [akLeft, akTop, akRight, akBottom]
-    KeyOptions = [keyEdit, keyAdd, keyDelete, keyUnique]
-    Options = [goFixedVertLine, goFixedHorzLine, goVertLine, goHorzLine, goColSizing, goEditing, goTabs, goAlwaysShowEditor, goThumbTracking]
+    ColCount = 2
+    DefaultRowHeight = 18
+    FixedCols = 0
+    RowCount = 2
+    Options = [goFixedVertLine, goFixedHorzLine, goVertLine, goHorzLine, goColSizing, goEditing, goAlwaysShowEditor, goThumbTracking]
+    ScrollBars = ssVertical
     TabOrder = 0
-    TitleCaptions.Strings = (
-      'Constant name'
-      'Constant value')
-    OnStringsChange = vleMainStringsChange
+    OnKeyDown = gMainKeyDown
+    OnMouseUp = gMainMouseUp
+    OnSelectCell = gMainSelectCell
     ColWidths = (
-      236
-      333)
+      286
+      284)
   end
   object bOK: TButton
     Left = 188

@@ -1,5 +1,5 @@
 //**********************************************************************************************************************
-//  $Id: Main.pas,v 1.3 2005-06-19 19:25:29 dale Exp $
+//  $Id: Main.pas,v 1.4 2006-08-05 21:42:34 dale Exp $
 //----------------------------------------------------------------------------------------------------------------------
 //  DKLang Localization Package
 //  Copyright (c)DK Software, http://www.dk-soft.org/
@@ -9,26 +9,22 @@ unit Main;
 interface
 
 uses
-  Windows, Messages, SysUtils, Variants, Classes, Graphics, Controls, Forms,
-  Dialogs, ExtCtrls, StdCtrls, DKLang;
+  Windows, Messages, SysUtils, Variants, Classes, Graphics, Controls, Forms, TntForms,
+  Dialogs, ExtCtrls, StdCtrls, DKLang, TntStdCtrls, TntExtCtrls;
 
 type
-  TfMain = class(TForm)
-    bCascade: TButton;
-    bNewWindow: TButton;
-    bTile: TButton;
-    cbLanguage: TComboBox;
+  TfMain = class(TTntForm)
+    bCascade: TTntButton;
+    bNewWindow: TTntButton;
+    bTile: TTntButton;
+    cbLanguage: TTntComboBox;
     lcMain: TDKLanguageController;
-    pTop: TPanel;
+    pTop: TTntPanel;
     procedure bCascadeClick(Sender: TObject);
     procedure bNewWindowClick(Sender: TObject);
     procedure bTileClick(Sender: TObject);
     procedure cbLanguageChange(Sender: TObject);
     procedure FormCreate(Sender: TObject);
-  private
-    { Private declarations }
-  public
-    { Public declarations }
   end;
 
 var

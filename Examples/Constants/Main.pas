@@ -1,5 +1,5 @@
 //**********************************************************************************************************************
-//  $Id: Main.pas,v 1.6 2006-06-17 04:19:28 dale Exp $
+//  $Id: Main.pas,v 1.7 2006-08-05 21:42:34 dale Exp $
 //----------------------------------------------------------------------------------------------------------------------
 //  DKLang Localization Package
 //  Copyright 2002-2006 DK Software, http://www.dk-soft.org
@@ -9,15 +9,15 @@ unit Main;
 interface
 
 uses
-  Windows, Messages, SysUtils, Variants, Classes, Graphics, Controls, Forms,
-  Dialogs, StdCtrls, DKLang;
+  Windows, Messages, SysUtils, Variants, Classes, Graphics, Controls, Forms, TntForms,
+  Dialogs, StdCtrls, DKLang, TntStdCtrls;
 
 type
-  TfMain = class(TForm)
-    bTest: TButton;
-    cbLanguage: TComboBox;
+  TfMain = class(TTntForm)
+    bTest: TTntButton;
+    cbLanguage: TTntComboBox;
     lcMain: TDKLanguageController;
-    lSampleMessage: TLabel;
+    lSampleMessage: TTntLabel;
     procedure bTestClick(Sender: TObject);
     procedure cbLanguageChange(Sender: TObject);
     procedure FormCreate(Sender: TObject);
@@ -26,16 +26,16 @@ type
 var
   fMain: TfMain;
 
-resourcestring
-  STestMessage    = 'This is a test message';
-  SMessageCaption = 'Message';
-
 implementation
 {$R *.dfm}
 
   procedure TfMain.bTestClick(Sender: TObject);
   begin
-    Application.MessageBox(PChar(STestMessage), PChar(SMessageCaption), MB_ICONINFORMATION or MB_OK);
+    MessageBoxW(
+      Application.Handle,
+      PWideChar(LangManager.ConstantValue['STestMessage']),
+      PWideChar(LangManager.ConstantValue['SMessageCaption']),
+      MB_ICONINFORMATION or MB_OK);
   end;
 
   procedure TfMain.cbLanguageChange(Sender: TObject);

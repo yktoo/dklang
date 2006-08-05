@@ -15,14 +15,14 @@ object fMain: TfMain
   OnCreate = FormCreate
   PixelsPerInch = 96
   TextHeight = 13
-  object lSampleMessage: TLabel
+  object lSampleMessage: TTntLabel
     Left = 20
     Top = 44
     Width = 123
     Height = 13
     Caption = 'This is a sample message.'
   end
-  object bCancel: TButton
+  object bCancel: TTntButton
     Left = 104
     Top = 76
     Width = 75
@@ -30,7 +30,7 @@ object fMain: TfMain
     Caption = 'Cancel'
     TabOrder = 0
   end
-  object cbLanguage: TComboBox
+  object cbLanguage: TTntComboBox
     Left = 8
     Top = 8
     Width = 261
@@ -41,8 +41,6 @@ object fMain: TfMain
     OnChange = cbLanguageChange
   end
   object lcMain: TDKLanguageController
-    IgnoreList.Strings = (
-      '*.Font.Name')
     Left = 240
     Top = 48
     LangData = {

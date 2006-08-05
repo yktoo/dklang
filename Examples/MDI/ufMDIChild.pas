@@ -1,5 +1,5 @@
 //**********************************************************************************************************************
-//  $Id: ufMDIChild.pas,v 1.2 2005-06-19 12:31:38 dale Exp $
+//  $Id: ufMDIChild.pas,v 1.3 2006-08-05 21:42:34 dale Exp $
 //----------------------------------------------------------------------------------------------------------------------
 //  DKLang Localization Package
 //  Copyright (c)DK Software, http://www.dk-soft.org/
@@ -10,20 +10,16 @@ unit ufMDIChild;
 interface
 
 uses
-  Windows, Messages, SysUtils, Variants, Classes, Graphics, Controls, Forms, Dialogs,
-  DKLang, StdCtrls;
+  Windows, Messages, SysUtils, Variants, Classes, Graphics, Controls, Forms, Dialogs, TntForms,
+  DKLang, StdCtrls, TntStdCtrls;
 
 type
-  TfMDIChild = class(TForm)
-    bCancel: TButton;
+  TfMDIChild = class(TTntForm)
+    bCancel: TTntButton;
     lcMain: TDKLanguageController;
-    lSampleMessage: TLabel;
+    lSampleMessage: TTntLabel;
     procedure FormClose(Sender: TObject; var Action: TCloseAction);
     procedure FormCreate(Sender: TObject);
-  private
-    { Private declarations }
-  public
-    { Public declarations }
   end;
 
 implementation

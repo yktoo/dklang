@@ -15,7 +15,7 @@ object fMain: TfMain
   OnCreate = FormCreate
   PixelsPerInch = 96
   TextHeight = 13
-  object pTop: TPanel
+  object pTop: TTntPanel
     Left = 0
     Top = 0
     Width = 461
@@ -25,7 +25,7 @@ object fMain: TfMain
     DesignSize = (
       461
       61)
-    object cbLanguage: TComboBox
+    object cbLanguage: TTntComboBox
       Left = 4
       Top = 4
       Width = 453
@@ -36,7 +36,7 @@ object fMain: TfMain
       TabOrder = 0
       OnChange = cbLanguageChange
     end
-    object bNewWindow: TButton
+    object bNewWindow: TTntButton
       Left = 4
       Top = 32
       Width = 75
@@ -45,7 +45,7 @@ object fMain: TfMain
       TabOrder = 1
       OnClick = bNewWindowClick
     end
-    object bTile: TButton
+    object bTile: TTntButton
       Left = 84
       Top = 32
       Width = 75
@@ -54,7 +54,7 @@ object fMain: TfMain
       TabOrder = 2
       OnClick = bTileClick
     end
-    object bCascade: TButton
+    object bCascade: TTntButton
       Left = 164
       Top = 32
       Width = 75
@@ -65,8 +65,6 @@ object fMain: TfMain
     end
   end
   object lcMain: TDKLanguageController
-    IgnoreList.Strings = (
-      '*.Font.Name')
     Left = 412
     Top = 32
     LangData = {

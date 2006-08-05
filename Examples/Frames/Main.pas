@@ -1,5 +1,5 @@
 //**********************************************************************************************************************
-//  $Id: Main.pas,v 1.3 2005-06-19 19:25:29 dale Exp $
+//  $Id: Main.pas,v 1.4 2006-08-05 21:42:34 dale Exp $
 //----------------------------------------------------------------------------------------------------------------------
 //  DKLang Localization Package
 //  Copyright (c)DK Software, http://www.dk-soft.org/
@@ -9,27 +9,25 @@ unit Main;
 interface
 
 uses
-  Windows, Messages, SysUtils, Variants, Classes, Graphics, Controls, Forms,
-  Dialogs, StdCtrls, DKLang, ufrFontSettings;
+  Windows, Messages, SysUtils, Variants, Classes, Graphics, Controls, Forms, TntForms,
+  Dialogs, StdCtrls, DKLang, ufrFontSettings, TntStdCtrls;
 
 type
-  TfMain = class(TForm)
-    bCancel: TButton;
-    bOK: TButton;
-    cbLanguage: TComboBox;
+  TfMain = class(TTntForm)
+    bCancel: TTntButton;
+    bOK: TTntButton;
+    cbLanguage: TTntComboBox;
     frFontSettings_Interface: TfrFontSettings;
     frFontSettings_Table: TfrFontSettings;
     frFontSettings_Toolbar: TfrFontSettings;
     lcMain: TDKLanguageController;
-    lLanguage: TLabel;
+    lLanguage: TTntLabel;
     procedure cbLanguageChange(Sender: TObject);
     procedure FormCreate(Sender: TObject);
     procedure lcMainLanguageChanged(Sender: TObject);
   private
      // Updates the localizable font editor frame titles
     procedure UpdateFrameTitles;
-  public
-    { Public declarations }
   end;
 
 var

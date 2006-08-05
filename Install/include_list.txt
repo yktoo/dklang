@@ -2,9 +2,11 @@
 
 ..\Packages\*.*
 
+..\Examples\Ansi\*.*
 ..\Examples\Constants\*.*
 ..\Examples\Frames\*.*
 ..\Examples\MDI\*.*
+..\Examples\Notepad\*.*
 ..\Examples\Resource\*.*
 ..\Examples\Resource\LangFiles\*.*
 ..\Examples\Simple\*.*

@@ -3,27 +3,27 @@ unit ufrFontSettings;
 interface
 
 uses
-  Windows, Messages, SysUtils, Variants, Classes, Graphics, Controls, Forms, 
-  Dialogs, DKLang, StdCtrls, ExtCtrls;
+  Windows, Messages, SysUtils, Variants, Classes, Graphics, Controls, Forms, TntForms,
+  Dialogs, DKLang, StdCtrls, ExtCtrls, TntStdCtrls, TntExtCtrls;
 
 type
-  TfrFontSettings = class(TFrame)
-    bSelectFont: TButton;
-    gbMain: TGroupBox;
+  TfrFontSettings = class(TTntFrame)
+    bSelectFont: TTntButton;
+    gbMain: TTntGroupBox;
     lcMain: TDKLanguageController;
-    pSample: TPanel;
+    pSample: TTntPanel;
     procedure bSelectFontClick(Sender: TObject);
   private
      // Prop handlers
     function  GetSelectedFont: TFont;
-    function  GetTitle: String;
+    function  GetTitle: WideString;
     procedure SetSelectedFont(Value: TFont);
-    procedure SetTitle(const Value: String);
+    procedure SetTitle(const Value: WideString);
   public
      // Props
      // -- Frame title, assigned at runtime (we cannot localize it at design time since all of the controllers share the
      //    same translation in this example)
-    property Title: String read GetTitle write SetTitle;
+    property Title: WideString read GetTitle write SetTitle;
      // -- A font selected in the editor
     property SelectedFont: TFont read GetSelectedFont write SetSelectedFont;
   end;
@@ -48,7 +48,7 @@ implementation
     Result := pSample.Font;
   end;
 
-  function TfrFontSettings.GetTitle: String;
+  function TfrFontSettings.GetTitle: WideString;
   begin
     Result := gbMain.Caption;
   end;
@@ -58,7 +58,7 @@ implementation
     pSample.Font.Assign(Value);
   end;
 
-  procedure TfrFontSettings.SetTitle(const Value: String);
+  procedure TfrFontSettings.SetTitle(const Value: WideString);
   begin
     gbMain.Caption := Value;
   end;

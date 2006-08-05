@@ -19,7 +19,7 @@ object fMain: TfMain
     284)
   PixelsPerInch = 96
   TextHeight = 13
-  object lLanguage: TLabel
+  object lLanguage: TTntLabel
     Left = 12
     Top = 4
     Width = 96
@@ -27,7 +27,7 @@ object fMain: TfMain
     Caption = '&Interface language:'
     FocusControl = cbLanguage
   end
-  object bCancel: TButton
+  object bCancel: TTntButton
     Left = 254
     Top = 251
     Width = 75
@@ -36,7 +36,7 @@ object fMain: TfMain
     Caption = 'Cancel'
     TabOrder = 0
   end
-  object bOK: TButton
+  object bOK: TTntButton
     Left = 174
     Top = 251
     Width = 75
@@ -90,7 +90,7 @@ object fMain: TfMain
         4D61696E0000}
     end
   end
-  object cbLanguage: TComboBox
+  object cbLanguage: TTntComboBox
     Left = 12
     Top = 20
     Width = 313
@@ -102,7 +102,6 @@ object fMain: TfMain
   end
   object lcMain: TDKLanguageController
     IgnoreList.Strings = (
-      '*.Font.Name'
       'frFontSettings_*')
     OnLanguageChanged = lcMainLanguageChanged
     Left = 12

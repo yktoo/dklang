@@ -107,11 +107,11 @@ UseLauncher=0
 DebugCWD=
 [Version Info]
 IncludeVerInfo=1
-AutoIncBuild=0
+AutoIncBuild=1
 MajorVer=3
 MinorVer=0
 Release=0
-Build=8
+Build=14
 Debug=0
 PreRelease=0
 Special=0
@@ -122,13 +122,11 @@ CodePage=1252
 [Version Info Keys]
 CompanyName=DK Software
 FileDescription=DKLang runtime package
-FileVersion=3.0.0.8
-InternalName=dklang
+FileVersion=3.0.0.14
+InternalName=dklang7
 LegalCopyright=Copyright ©2002-2006 DK Software
 LegalTrademarks=
 OriginalFilename=dklang7.bpl
 ProductName=DKLang Localization Package
 ProductVersion=3.0
 Comments=http://www.dk-soft.org/
-[Excluded Packages]
-c:\program files\borland\delphi7\Projects\Bpl\dcldklang7.bpl=DKLang Localization Package

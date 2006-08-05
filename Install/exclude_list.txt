@@ -3,6 +3,8 @@
 *.ddp
 *.dsk
 *.exe
+*.bat
+*.pl
 Entries
 Entries.*
 Repository
