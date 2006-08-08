@@ -1,0 +1,10 @@
+﻿[fMain]
+Caption=00000001,Sample MDI Application
+bNewWindow.Caption=00000002,&New window
+bTile.Caption=00000003,&Tile
+bCascade.Caption=00000004,&Cascade
+
+[fMDIChild]
+bCancel.Caption=00000003,Cancel
+lSampleMessage.Caption=00000004,This is a sample message.
+

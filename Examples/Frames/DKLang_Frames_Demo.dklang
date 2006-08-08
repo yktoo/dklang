@@ -1,0 +1,15 @@
+﻿[fMain]
+Caption=00000001,Settings
+bCancel.Caption=00000003,Cancel
+bOK.Caption=00000004,OK
+lLanguage.Caption=00000005,&Interface language:
+
+[frFontSettings]
+bSelectFont.Caption=00000001,Select...
+pSample.Caption=00000002,This is a sample text
+
+[$CONSTANTS]
+SFontEditorTitle_Interface=Interface
+SFontEditorTitle_Table=Table
+SFontEditorTitle_Toolbar=Toolbar
+
