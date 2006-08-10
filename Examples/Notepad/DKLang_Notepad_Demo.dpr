@@ -1,5 +1,5 @@
 //**********************************************************************************************************************
-//  $Id: DKLang_Notepad_Demo.dpr,v 1.1 2006-08-05 21:33:31 dale Exp $
+//  $Id: DKLang_Notepad_Demo.dpr,v 1.2 2006-08-10 16:34:20 dale Exp $
 //----------------------------------------------------------------------------------------------------------------------
 //  DKLang Localization Package
 //  Copyright 2002-2006 DK Software, http://www.dk-soft.org
@@ -11,6 +11,7 @@ uses
   Main in 'Main.pas' {fMain};
 
 {$R *.res}
+{$R *.dkl_const.res}
 
 begin
   Application.Initialize;

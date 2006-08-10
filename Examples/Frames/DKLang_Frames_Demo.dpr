@@ -1,5 +1,5 @@
 //**********************************************************************************************************************
-//  $Id: DKLang_Frames_Demo.dpr,v 1.3 2006-06-17 04:19:28 dale Exp $
+//  $Id: DKLang_Frames_Demo.dpr,v 1.4 2006-08-10 16:34:20 dale Exp $
 //----------------------------------------------------------------------------------------------------------------------
 //  DKLang Localization Package
 //  Copyright 2002-2006 DK Software, http://www.dk-soft.org
@@ -12,6 +12,7 @@ uses
   ufrFontSettings in 'ufrFontSettings.pas' {frFontSettings: TFrame};
 
 {$R *.res}
+{$R *.dkl_const.res}
 
 begin
   Application.Initialize;
