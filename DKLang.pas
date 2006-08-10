@@ -1,5 +1,5 @@
 ///*********************************************************************************************************************
-///  $Id: DKLang.pas,v 1.33 2006-08-05 21:42:34 dale Exp $
+///  $Id: DKLang.pas,v 1.34 2006-08-10 19:15:52 dale Exp $
 ///---------------------------------------------------------------------------------------------------------------------
 ///  DKLang Localization Package
 ///  Copyright 2002-2006 DK Software, http://www.dk-soft.org/
@@ -617,11 +617,20 @@ type
   procedure DKLangError(const sMsg: String); overload;
   procedure DKLangError(const sMsg: String; const aParams: Array of const); overload;
 
+   // Shortcut to LangManager.ConstantValueW[]
+  function  DKLangConstW(const sName: String): WideString; overload;
+   // The same, but formats constant value using aParams
+  function  DKLangConstW(const sName: String; const aParams: Array of const): WideString; overload;
+   // Shortcut to LangManager.ConstantValueA[]
+  function  DKLangConstA(const sName: String): String; overload;
+   // The same, but formats constant value using aParams
+  function  DKLangConstA(const sName: String; const aParams: Array of const): String; overload;
+
 const
    // Version used for saving binary data into streams
   IDKLang_StreamVersion                = 2;
 
-   // Resource name for constant entries in the project and executable resources
+   // Resource name for constant entries in the .res file and executable resources
   SDKLang_ConstResourceName            = 'DKLANG_CONSTS';
 
    // Section name for constant entries in the language source or translation files
@@ -825,6 +834,26 @@ var
 
   begin
     raise EDKLangError.CreateFmt(sMsg, aParams) at RetAddr;
+  end;
+
+  function DKLangConstW(const sName: String): WideString;
+  begin
+    Result := LangManager.ConstantValueW[sName];
+  end;
+
+  function DKLangConstW(const sName: String; const aParams: Array of const): WideString;
+  begin
+    Result := WideFormat(DKLangConstW(sName), aParams);
+  end;
+
+  function DKLangConstA(const sName: String): String;
+  begin
+    Result := LangManager.ConstantValueA[sName];
+  end;
+
+  function DKLangConstA(const sName: String; const aParams: Array of const): String;
+  begin
+    Result := Format(DKLangConstA(sName), aParams);
   end;
 
    //===================================================================================================================
