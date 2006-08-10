@@ -1,5 +1,5 @@
 ///*********************************************************************************************************************
-///  $Id: DKL_ResFile.pas,v 1.1 2006-08-09 14:20:36 dale Exp $
+///  $Id: DKL_ResFile.pas,v 1.2 2006-08-10 13:47:21 dale Exp $
 ///---------------------------------------------------------------------------------------------------------------------
 ///  DKLang Localization Package
 ///  Copyright 2002-2006 DK Software, http://www.dk-soft.org
@@ -22,6 +22,7 @@
 ///
 ///**********************************************************************************************************************
 // Routines and classes to handle .res resource files
+// WARNING: TDKLang_ResFile only handles 32-bit resource files and does not support 16-bit ones!
 //
 unit DKL_ResFile;
 
@@ -58,7 +59,7 @@ type
    //===================================================================================================================
 
   TDKLang_ResEntry = class;
-  
+
   TDKLang_ResFile = class(TObject)
   private
      // Entry list
@@ -76,12 +77,16 @@ type
     function  AddEntry(Item: TDKLang_ResEntry): Integer;
      // Deletes the entry
     procedure DeleteEntry(Index: Integer);
+     // Removes the entry and returns index it had before the deletion
+    function  RemoveEntry(Item: TDKLang_ResEntry): Integer;
      // Clears the entry list
-    procedure ClearEntries; 
+    procedure ClearEntries;
      // Loads .res file contents from the file
     procedure LoadFromFile(const wsFileName: WideString);
      // Saves .res file contents into the file
     procedure SaveToFile(const wsFileName: WideString);
+     // Tries to find an entry by its type and name. Returns nil if not found
+    function  FindEntry(pcType, pcName: PAnsiChar): TDKLang_ResEntry;
      // Props
      // -- Entry count
     property EntryCount: Integer read GetEntryCount;
@@ -105,6 +110,8 @@ type
     FResType: WideString;
     FVersion: Cardinal;
   public
+     // Stores resource entry into the stream
+    procedure SaveToStream(Stream: TStream);
      // Props
      // -- Characteristics
     property Characteristics: Cardinal read FCharacteristics write FCharacteristics;
@@ -156,6 +163,16 @@ uses TntDialogs;
   begin
     FEntries.Free;
     inherited Destroy;
+  end;
+
+  function TDKLang_ResFile.FindEntry(pcType, pcName: PAnsiChar): TDKLang_ResEntry;
+  var i: Integer;
+  begin
+    for i := 0 to EntryCount-1 do begin
+      Result := Entries[i];
+      if (Result.ResType=IntToStr(pcType)) and (Result.Name=pcName) then Exit;
+    end;
+    Result := nil;
   end;
 
   function TDKLang_ResFile.GetEntries(Index: Integer): TDKLang_ResEntry;
@@ -215,27 +232,30 @@ uses TntDialogs;
        // Retrieve resource type and name
       wsType := RetrieveIdentifier(p);
       wsName := RetrieveIdentifier(p);
-       // Align the pointer to a 4-byte boundary
-      if (Integer(p) mod 4)<>0 then Inc(p, 4-Integer(p) mod 4);
-       // Read entry properties
-      Move(p^, EntryProps, SizeOf(EntryProps));
-       // Create an entry
-      Entry := TDKLang_ResEntry.Create;
-      try
-        Entry.ResType         := wsType;
-        Entry.Name            := wsName;
-        Entry.DataVersion     := EntryProps.cDataVersion;
-        Entry.MemoryFlags     := EntryProps.wMemoryFlags;
-        Entry.Language        := EntryProps.wLanguage;
-        Entry.Version         := EntryProps.cVersion;
-        Entry.Characteristics := EntryProps.cCharacteristics;
-        SetString(sRawData, PChar(Integer(pData)+Header.iHeaderSize), Header.iDataSize);
-        Entry.RawData         := sRawData;
-         // Register the entry in the list
-        AddEntry(Entry);
-      except
-        Entry.Free;
-        raise;
+       // Skip the dummy 32-bit indicator entry
+      if (wsType<>'0') or (wsName<>'0') then begin
+         // Align the pointer to a 4-byte boundary
+        if (Integer(p) mod 4)<>0 then Inc(p, 4-Integer(p) mod 4);
+         // Read entry properties
+        Move(p^, EntryProps, SizeOf(EntryProps));
+         // Create an entry
+        Entry := TDKLang_ResEntry.Create;
+        try
+          Entry.ResType         := wsType;
+          Entry.Name            := wsName;
+          Entry.DataVersion     := EntryProps.cDataVersion;
+          Entry.MemoryFlags     := EntryProps.wMemoryFlags;
+          Entry.Language        := EntryProps.wLanguage;
+          Entry.Version         := EntryProps.cVersion;
+          Entry.Characteristics := EntryProps.cCharacteristics;
+          SetString(sRawData, PChar(Integer(pData)+Header.iHeaderSize), Header.iDataSize);
+          Entry.RawData         := sRawData;
+           // Register the entry in the list
+          AddEntry(Entry);
+        except
+          Entry.Free;
+          raise;
+        end;
       end;
     end;
 
@@ -266,6 +286,11 @@ uses TntDialogs;
     end;
   end;
 
+  function TDKLang_ResFile.RemoveEntry(Item: TDKLang_ResEntry): Integer;
+  begin
+    Result := FEntries.Remove(Item);
+  end;
+
   procedure TDKLang_ResFile.SaveToFile(const wsFileName: WideString);
   var Stream: TStream;
   begin
@@ -278,8 +303,92 @@ uses TntDialogs;
   end;
 
   procedure TDKLang_ResFile.SaveToStream(Stream: TStream);
+  var
+    REIndicator: TDKLang_ResEntry;
+    i: Integer;
   begin
-    //!!!
+     // Write dummy 32-bit resource indicator
+    REIndicator := TDKLang_ResEntry.Create;
+    try
+      REIndicator.ResType := '0';
+      REIndicator.Name    := '0';
+      REIndicator.SaveToStream(Stream);
+    finally
+      REIndicator.Free;
+    end;
+     // Write real entries
+    for i := 0 to EntryCount-1 do Entries[i].SaveToStream(Stream);
+  end;
+
+   //===================================================================================================================
+   // TDKLang_ResEntry
+   //===================================================================================================================
+
+  procedure TDKLang_ResEntry.SaveToStream(Stream: TStream);
+  var
+    msHeaderBlock: TMemoryStream;
+    Header: TResResourceEntryHeader;
+    Props: TResResourceEntryProps;
+
+     // Writes a numeric or string identifier into the stream
+    procedure WriteIdentifier(const wsID: WideString; Stream: TStream);
+    var
+      iNumericID: Integer;
+      w: Word;
+    begin
+      iNumericID := StrToIntDef(wsID, -1);
+       // String ID
+      if iNumericID<0 then
+        Stream.WriteBuffer(wsID[1], (Length(wsID)+1)*SizeOf(WideChar))
+       // Numeric ID
+      else begin
+        w := $ffff;
+        Stream.WriteBuffer(w, SizeOf(w));
+        w := iNumericID;
+        Stream.WriteBuffer(w, SizeOf(w));
+      end;
+    end;
+
+     // Aligns the stream position to a 4-byte boundary 
+    procedure AlignStream4(Stream: TStream);
+    const IZero: Integer = 0;
+    var iMod: Integer;
+    begin
+      iMod := Stream.Position mod 4;
+      if iMod>0 then Stream.WriteBuffer(IZero, 4-iMod);
+    end;
+
+  begin
+     // Prepare header block
+    msHeaderBlock := TMemoryStream.Create;
+    try
+       // Write type and name identifiers
+      WriteIdentifier(ResType, msHeaderBlock);
+      WriteIdentifier(Name, msHeaderBlock);
+       // Align the stream pointer
+      AlignStream4(msHeaderBlock);
+       // Fill properties record
+      Props.cDataVersion     := DataVersion;
+      Props.wMemoryFlags     := MemoryFlags;
+      Props.wLanguage        := Language;
+      Props.cVersion         := Version;
+      Props.cCharacteristics := Characteristics;
+       // Write properties
+      msHeaderBlock.WriteBuffer(Props, SizeOf(Props));
+       // Fill header record
+      Header.iDataSize   := Length(FRawData);
+      Header.iHeaderSize := msHeaderBlock.Size+SizeOf(Header);
+       // Put the header record
+      Stream.WriteBuffer(Header, SizeOf(Header));
+       // Put the header block
+      Stream.CopyFrom(msHeaderBlock, 0);
+       // Put entry data
+      Stream.WriteBuffer(RawData[1], Length(RawData));  
+       // Align the stream pointer
+      AlignStream4(Stream); 
+    finally
+      msHeaderBlock.Free;
+    end;
   end;
 
 end.

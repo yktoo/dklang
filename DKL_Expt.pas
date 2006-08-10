@@ -1,5 +1,5 @@
 ///*********************************************************************************************************************
-///  $Id: DKL_Expt.pas,v 1.18 2006-08-05 21:42:34 dale Exp $
+///  $Id: DKL_Expt.pas,v 1.19 2006-08-10 13:47:21 dale Exp $
 ///---------------------------------------------------------------------------------------------------------------------
 ///  DKLang Localization Package
 ///  Copyright 2002-2006 DK Software, http://www.dk-soft.org
@@ -40,13 +40,15 @@ type
     function  GetVerbCount: Integer; override;
   end;
 
+const
+  SDKLExpt_ConstantResFileEnding     = '.dkl_const.res';
+
 resourcestring
   SDKLExptErr_CannotObtainNTAIntf    = 'Cannot obtain INTAServices interface';
   SDKLExptErr_CannotObtainOTAIntf    = 'Cannot obtain IOTAServices interface';
   SDKLExptErr_CannotObtainModSvcIntf = 'Cannot obtain IOTAModuleServices interface';
   SDKLExptErr_CannotFindProjectMenu  = 'Cannot locate ''ProjectMenu'' submenu item';
   SDKLExptErr_CannotFindProject      = 'No active project found';
-  SDKLExptErr_CannotObtainResources  = 'Failed to get project resource interface. Check whether project is open and active, and it uses a resource file';
   SDKLExptErr_CannotSaveLangSource   = 'Failed to update project language source. Check whether project is open and active';
 
   SDKLExptMsg_LCsUpdated             = '%d language controllers have updated the project language source.';
@@ -57,7 +59,7 @@ resourcestring
 implementation //=======================================================================================================
 uses
   SysUtils, Windows, Registry, Menus, Graphics, Dialogs, DesignIntf, TypInfo, Forms, RTLConsts, 
-  DKLang, DKL_ConstEditor;
+  DKLang, DKL_ConstEditor, DKL_ResFile;
 
   {$IFNDEF VER150}
 
@@ -321,63 +323,66 @@ type
 
   function TDKLang_Expert.EditConstantsResource: Boolean;
   var
-    ProjResource: IOTAProjectResource;
-    ConstResource: IOTAResourceEntry;
+    sResFileName: String;
+    ResFile: TDKLang_ResFile;
+    ConstantResEntry: TDKLang_ResEntry;
     Consts: TDKLang_Constants;
-    sBuf: String;
     bErase: Boolean;
 
-     // Returns project resource interface or nil if none available
-    function GetProjectResource: IOTAProjectResource;
-    var
-      Proj: IOTAProject;
-      i: Integer;
+     // Returns file name for constant resource file
+    function GetResFileName: String;
     begin
-       // Iterate through project files to find the resource editor
-      Proj := GetActualProject;
-      for i := 0 to Proj.ModuleFileCount-1 do
-        if Supports(Proj.ModuleFileEditors[i], IOTAProjectResource, Result) then Exit;
-      Result := nil;
-    end;
-
-    function Pad4(i: Integer): Integer;
-    begin
-      Result := i+(i mod 4);
+      Result := ChangeFileExt(GetActualProject.FileName, SDKLExpt_ConstantResFileEnding)
     end;
 
   begin
-     // Get the project resource interface
-    ProjResource := GetProjectResource;
-    if ProjResource=nil then DKLangError(SDKLExptErr_CannotObtainResources);
-     // Create constant list object
-    Consts := TDKLang_Constants.Create(GetLangIDCallback);
+     // Determine the constant resource file name
+    sResFileName := GetResFileName;
+     // Create the resource file
+    ResFile := TDKLang_ResFile.Create;
     try
-       // Try to find the constant resource
-      ConstResource := ProjResource.FindEntry(RT_RCDATA, SDKLang_ConstResourceName);
-       // If constant resource exists, load the constant list from it
-      if ConstResource<>nil then begin
-        SetString(sBuf, PChar(ConstResource.GetData), ConstResource.DataSize);
-        Consts.AsRawString := sBuf;
+       // Load the resource file if it exists
+      if FileExists(sResFileName) then ResFile.LoadFromFile(sResFileName);
+       // Create constant list object
+      Consts := TDKLang_Constants.Create(GetLangIDCallback);
+      try
+         // Try to find the constant resource entry
+        ConstantResEntry := ResFile.FindEntry(RT_RCDATA, SDKLang_ConstResourceName);
+         // If constant resource exists, load the constant list from it
+        if ConstantResEntry<>nil then Consts.AsRawString := ConstantResEntry.RawData;
+        bErase := ConstantResEntry<>nil;
+        Result := EditConstants(Consts, bErase);
+         // If changes made
+        if Result then
+           // If user clicked 'Erase'
+          if bErase then begin
+            if ConstantResEntry<>nil then ResFile.RemoveEntry(ConstantResEntry);
+           // Else save the constants back to the resources
+          end else begin
+             // Create an entry if it didn't exist
+            if ConstantResEntry=nil then begin
+              ConstantResEntry := TDKLang_ResEntry.Create;
+              try
+                ConstantResEntry.ResType := RT_RCDATA;
+                ConstantResEntry.Name    := SDKLang_ConstResourceName;
+                ResFile.AddEntry(ConstantResEntry);
+              except
+                ConstantResEntry.Free;
+                raise;
+              end;
+            end;
+             // Update the data
+            ConstantResEntry.RawData := Consts.AsRawString;
+             // Save the resource file
+            ResFile.SaveToFile(sResFileName);
+             // Update the project language source file if needed
+            if Consts.AutoSaveLangSource and not UpdateProjectLangSource(Consts) then DKLangError(SDKLExptErr_CannotSaveLangSource);
+          end;
+      finally
+        Consts.Free;
       end;
-      bErase := ConstResource<>nil;
-      Result := EditConstants(Consts, bErase);
-       // If changes made
-      if Result then
-         // If user clicked 'Erase'
-        if bErase then begin
-          if ConstResource<>nil then ProjResource.DeleteEntry(ConstResource.GetEntryHandle);
-         // Else save the constants back to the resources
-        end else begin
-          if ConstResource=nil then ConstResource := ProjResource.CreateEntry(RT_RCDATA, SDKLang_ConstResourceName, 0, 0, 0, 0, 0);
-          sBuf := Consts.AsRawString;
-          ConstResource.DataSize := Pad4(Length(sBuf));
-          FillChar(ConstResource.GetData^, ConstResource.DataSize, 0);
-          Move(sBuf[1], ConstResource.GetData^, Length(sBuf));
-           // Update the project language source file if needed
-          if Consts.AutoSaveLangSource and not UpdateProjectLangSource(Consts) then DKLangError(SDKLExptErr_CannotSaveLangSource);
-        end;
     finally
-      Consts.Free;
+      ResFile.Free;
     end;
   end;
 
