@@ -1,5 +1,5 @@
 ///*********************************************************************************************************************
-///  $Id: DKL_ResFile.pas,v 1.2 2006-08-10 13:47:21 dale Exp $
+///  $Id: DKL_ResFile.pas,v 1.3 2006-08-10 16:35:03 dale Exp $
 ///---------------------------------------------------------------------------------------------------------------------
 ///  DKLang Localization Package
 ///  Copyright 2002-2006 DK Software, http://www.dk-soft.org
@@ -86,7 +86,7 @@ type
      // Saves .res file contents into the file
     procedure SaveToFile(const wsFileName: WideString);
      // Tries to find an entry by its type and name. Returns nil if not found
-    function  FindEntry(pcType, pcName: PAnsiChar): TDKLang_ResEntry;
+    function  FindEntry(const wsType, wsName: WideString): TDKLang_ResEntry;
      // Props
      // -- Entry count
     property EntryCount: Integer read GetEntryCount;
@@ -112,6 +112,8 @@ type
   public
      // Stores resource entry into the stream
     procedure SaveToStream(Stream: TStream);
+     // Creates and returns an exact copy of the entry
+    function  Clone: TDKLang_ResEntry;
      // Props
      // -- Characteristics
     property Characteristics: Cardinal read FCharacteristics write FCharacteristics;
@@ -165,12 +167,12 @@ uses TntDialogs;
     inherited Destroy;
   end;
 
-  function TDKLang_ResFile.FindEntry(pcType, pcName: PAnsiChar): TDKLang_ResEntry;
+  function TDKLang_ResFile.FindEntry(const wsType, wsName: WideString): TDKLang_ResEntry;
   var i: Integer;
   begin
     for i := 0 to EntryCount-1 do begin
       Result := Entries[i];
-      if (Result.ResType=IntToStr(pcType)) and (Result.Name=pcName) then Exit;
+      if WideSameText(Result.ResType, wsType) and WideSameText(Result.Name, wsName) then Exit;
     end;
     Result := nil;
   end;
@@ -324,6 +326,24 @@ uses TntDialogs;
    // TDKLang_ResEntry
    //===================================================================================================================
 
+  function TDKLang_ResEntry.Clone: TDKLang_ResEntry;
+  begin
+    Result := TDKLang_ResEntry.Create;
+    try
+      Result.Characteristics := Characteristics;
+      Result.DataVersion     := DataVersion;
+      Result.Language        := Language;
+      Result.MemoryFlags     := MemoryFlags;
+      Result.Name            := Name;
+      Result.RawData         := RawData;
+      Result.ResType         := ResType;
+      Result.Version         := Version;
+    except
+      Result.Free;
+      raise;
+    end;
+  end;
+
   procedure TDKLang_ResEntry.SaveToStream(Stream: TStream);
   var
     msHeaderBlock: TMemoryStream;
@@ -376,16 +396,16 @@ uses TntDialogs;
        // Write properties
       msHeaderBlock.WriteBuffer(Props, SizeOf(Props));
        // Fill header record
-      Header.iDataSize   := Length(FRawData);
+      Header.iDataSize   := ((Length(FRawData)+3) div 4)*4;
       Header.iHeaderSize := msHeaderBlock.Size+SizeOf(Header);
        // Put the header record
       Stream.WriteBuffer(Header, SizeOf(Header));
        // Put the header block
       Stream.CopyFrom(msHeaderBlock, 0);
        // Put entry data
-      Stream.WriteBuffer(RawData[1], Length(RawData));  
+      Stream.WriteBuffer(RawData[1], Length(RawData));
        // Align the stream pointer
-      AlignStream4(Stream); 
+      AlignStream4(Stream);
     finally
       msHeaderBlock.Free;
     end;

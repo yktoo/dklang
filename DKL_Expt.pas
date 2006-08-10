@@ -1,5 +1,5 @@
 ///*********************************************************************************************************************
-///  $Id: DKL_Expt.pas,v 1.19 2006-08-10 13:47:21 dale Exp $
+///  $Id: DKL_Expt.pas,v 1.20 2006-08-10 16:35:03 dale Exp $
 ///---------------------------------------------------------------------------------------------------------------------
 ///  DKLang Localization Package
 ///  Copyright 2002-2006 DK Software, http://www.dk-soft.org
@@ -347,7 +347,7 @@ type
       Consts := TDKLang_Constants.Create(GetLangIDCallback);
       try
          // Try to find the constant resource entry
-        ConstantResEntry := ResFile.FindEntry(RT_RCDATA, SDKLang_ConstResourceName);
+        ConstantResEntry := ResFile.FindEntry(IntToStr(Integer(RT_RCDATA)), SDKLang_ConstResourceName);
          // If constant resource exists, load the constant list from it
         if ConstantResEntry<>nil then Consts.AsRawString := ConstantResEntry.RawData;
         bErase := ConstantResEntry<>nil;
@@ -363,7 +363,7 @@ type
             if ConstantResEntry=nil then begin
               ConstantResEntry := TDKLang_ResEntry.Create;
               try
-                ConstantResEntry.ResType := RT_RCDATA;
+                ConstantResEntry.ResType := IntToStr(Integer(RT_RCDATA));
                 ConstantResEntry.Name    := SDKLang_ConstResourceName;
                 ResFile.AddEntry(ConstantResEntry);
               except
