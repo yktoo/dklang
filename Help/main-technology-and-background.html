@@ -1,5 +1,5 @@
 <html>
-<!-- $Id: main-technology-and-background.html,v 1.1 2006-08-05 21:35:42 dale Exp $ -->
+<!-- $Id: main-technology-and-background.html,v 1.2 2006-08-10 19:15:05 dale Exp $ -->
 <head>
   <meta http-equiv="Content-Type" content="text/html; charset=windows-1252">
   <link rel="stylesheet" type="text/css" href="main.css">
@@ -9,6 +9,8 @@
 <h1>Technology And Background</h1>
 <div class=pagebody>
 <!--------------------------------------------------------------------------------------------------------------------->
+
+<h2>VCL integration</h2>
 
 <p>The package introduces a non-visual VCL component called <b>TDKLanguageController</b>, which is to be placed on each
   form you wish to localize. Language controller automatically maintains an internal list of all components and their
@@ -29,20 +31,39 @@
   language source</b> item. You may also select the <b>Project | Update project language source</b> main menu item, this
   will force all the contollers available for the project to update their language source in project's .dklang file.
 
-<p>The package also introduces the TDKLanguageManager class the instance of which is accessible via global function
+<h2>Language Manager</h2>
+
+<p>The package also introduces <b>TDKLanguageManager</b> class an instance of which is accessible via global function
   <b>LangManager</b>. The manager is instantiated first time the function is called. This will happen once a form having
-  a controller will be instantiated, or when you invoke the LangManager eg to scan for language files (see the
+  a controller will be instantiated, or when you invoke the LangManager e.&nbsp;g. to scan for language files (see the
   <a href="main-supplied-examples.html">provided examples</a>). Language manager performs all tasks of maintaining the
   list of available languages or switching between them.
 
-<p>There's also a possibility of having a number of string constants for the project. The constants and their values are
-  stored within the project resources; you edit them using the <b>Project | Edit project constants...</b> main menu
-  item. To obtain a constant value for the current language use the syntax:
+<h2>Understanding constants</h2>
 
-<div class=code>LangManager.ConstantValue['MyConstant']</div>
+<p><b>Constants</b> are often used to display messages, titles, labels etc. in language that should match the program
+  language. DKLang offers a simple yet functional solution of implementing constants.
+  
+<p>You define a set of constants in the default language of your project using <b>Project | Edit project
+  constants...</b> IDE menu item (a project must be open in IDE). This opens <b>DKLang Constant Editor</b> dialog
+  allowing you to review, edit, add or remove constants.
 
-<p>Afterwards you may use the supplied <b>DKLang Translation Editor</b> application to open the language source files
-  (.dklang), and to create new translations based on them.
+<p>A constant entry consists of a <i>name</i> and a <i>value</i>.<br>
+  <i>Constant name</i> must meet the standard Delphi identifier naming requirements, i.&nbsp;e. consist of alphanumric,
+  digit and underscore characters only and not start with a digit; the name must be unique (case makes no sense) over
+  the whole list.<br>
+  <i>Constant value</i> is a WideString (Unicode) value which can also be empty.
+
+<p>To read value of a constant you use its name (again, case-insensitively) and obtain an Unicode (original) or ANSI 
+  value (converted from Unicode using appropriate code pade) using these functions:
+
+<div class=code>DKLangConstW('MyConstant') // Unicode<br>
+DKLangConstA('MyConstant') // ANSI</div>
+
+<h2>Making a translation</h2>
+
+<p>You may use freeware <b>DKLang Translation Editor</b> application to open the language source files (.dklang), and to
+  create new translations (.lng files) based on them.
 
 <p><b>NB:</b> <b>Do not</b> edit .dklang files directly since the contents of these files is controlled automatically by
   language controllers and constant editor. Any changes to property mappings or constant values will be lost once the
