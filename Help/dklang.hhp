@@ -1,5 +1,5 @@
 ;***********************************************************************************************************************
-;   $Id: dklang.hhp,v 1.2 2006-08-11 05:17:22 dale Exp $
+;   $Id: dklang.hhp,v 1.3 2006-08-11 17:54:25 dale Exp $
 ;-----------------------------------------------------------------------------------------------------------------------
 ;   DKLang Translation Editor
 ;   Copyright 2002-2006 DK Software, http://www.dk-soft.org/
@@ -35,6 +35,7 @@ main-issues-drawbacks.html
 main-legal-info.html
 main-package-contents.html
 main-package-features.html
+main-release-notes-3.0.html
 main-requirements.html
 main-revision-history.html
 main-supplied-examples.html

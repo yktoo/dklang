@@ -14,6 +14,11 @@
 		</OBJECT>
 	<UL>
 		<LI> <OBJECT type="text/sitemap">
+			<param name="Name" value="Release Notes">
+			<param name="Local" value="main-release-notes-3.0.html">
+			<param name="ImageNumber" value="18">
+			</OBJECT>
+		<LI> <OBJECT type="text/sitemap">
 			<param name="Name" value="Legal Info">
 			<param name="Local" value="main-legal-info.html">
 			</OBJECT>
