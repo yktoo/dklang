@@ -1,5 +1,5 @@
 //**********************************************************************************************************************
-//  $Id: Main.pas,v 1.1 2006-08-05 21:33:31 dale Exp $
+//  $Id: Main.pas,v 1.2 2006-08-11 12:15:51 dale Exp $
 //----------------------------------------------------------------------------------------------------------------------
 //  DKLang Localization Package
 //  Copyright 2002-2006 DK Software, http://www.dk-soft.org
@@ -9,8 +9,7 @@ unit Main;
 interface
 
 uses
-  Windows, Messages, SysUtils, Variants, Classes, Graphics, Controls, Forms, Dialogs, TntSystem, TntClasses, TntForms,
-  TntSysUtils,
+  Windows, Messages, SysUtils, Variants, Classes, Graphics, Controls, Forms, Dialogs, TntForms,  
   StdCtrls, DKLang, TntDialogs, ActnList, TntActnList, Menus, TntMenus,
   TntStdCtrls, ComCtrls, TntComCtrls;
 
@@ -124,7 +123,7 @@ var
 implementation
 {$R *.dfm}
 uses
-  StrUtils
+  StrUtils, TntSystem, TntClasses, TntSysUtils
   {$IFNDEF VER140}, XPMan {$ENDIF};
 
   procedure TfMain.aEditCopyExecute(Sender: TObject);
@@ -156,7 +155,7 @@ uses
   var ws: WideString;
   begin
     ws := IntToStr(mMain.CaretPos.y+1);
-    if WideInputQuery(LangManager.ConstantValue['SDlgTitle_GoToLine'], LangManager.ConstantValue['SGoToLinePrompt'], ws) then begin
+    if WideInputQuery(DKLangConstW('SDlgTitle_GoToLine'), DKLangConstW('SGoToLinePrompt'), ws) then begin
       mMain.CaretPos := Point(0, StrToInt(ws)-1);
       mMain.Perform(EM_SCROLLCARET, 0, 0);
     end;
@@ -233,8 +232,8 @@ uses
     MessageBoxW(
       Application.Handle,
       PWideChar(WideFormat(
-        '%s v1.00'#13#10'%s', [LangManager.ConstantValue['SApplicationName'], LangManager.ConstantValue['SCopyright']])),
-      PWideChar(LangManager.ConstantValue['SDlgTitle_About']),
+        '%s v1.00'#13#10'%s', [DKLangConstW('SApplicationName'), DKLangConstW('SCopyright')])),
+      PWideChar(DKLangConstW('SDlgTitle_About')),
       MB_ICONINFORMATION or MB_OK);
   end;
 
@@ -250,8 +249,8 @@ uses
     if mMain.Modified then
       case MessageBoxW(
           Application.Handle,
-          PWideChar(WideFormat(LangManager.ConstantValue['SMsg_ConfirmFileDiscard'], [DisplayFileName])),
-          PWideChar(LangManager.ConstantValue['SDlgTitle_Warning']),
+          PWideChar(DKLangConstW('SMsg_ConfirmFileDiscard', [DisplayFileName])),
+          PWideChar(DKLangConstW('SDlgTitle_Warning')),
           MB_ICONWARNING or MB_YESNOCANCEL) of
         IDYES: Result := aFileSave.Execute and not mMain.Modified;
         IDNO:  { nothing };
@@ -283,7 +282,7 @@ uses
   function TfMain.GetDisplayFileName: WideString;
   begin
     Result := FFileName;
-    if Result='' then Result := LangManager.ConstantValue['SDefaultFileName'];
+    if Result='' then Result := DKLangConstW('SDefaultFileName');
   end;
 
   procedure TfMain.LanguageItemClick(Sender: TObject);
@@ -339,7 +338,7 @@ uses
   begin
      // Update form caption
     Caption := WideFormat(
-      '[%s%s] - %s', [DisplayFileName, awsModified[mMain.Modified], LangManager.ConstantValue['SApplicationName']]);
+      '[%s%s] - %s', [DisplayFileName, awsModified[mMain.Modified], DKLangConstW('SApplicationName')]);
     Application.Title := Caption;
      // Update language menu
     UpdateLanguageMark;

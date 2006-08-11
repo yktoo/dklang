@@ -1,6 +1,6 @@
 @echo off
 rem ********************************************************************************************************************
-rem $Id: _make_.bat,v 1.1 2006-08-11 05:16:33 dale Exp $
+rem $Id: _make_.bat,v 1.2 2006-08-11 12:16:02 dale Exp $
 rem --------------------------------------------------------------------------------------------------------------------
 rem DKLang Localization Package
 rem Copyright 2002-2006 DK Software, http://www.dk-soft.org/
@@ -41,15 +41,14 @@ if errorlevel 1 goto err
 move "%HELP_DIR%\%CHM_FILE%" "%BASE_DIR%\"
 if errorlevel 1 goto err
 
-echo [3] Archiving the files...
+echo [3] Cleaning up...
+call "%CLEANER%"
+
+echo [4] Archiving the files...
 cd "%INSTALL_DIR%"
 rem -m3    = compression normal
 rem -afzip = create zip archive
 "%ARCHIVER%" a -m3 -afzip "%ARCHIVE_FILE%" @include_list.txt -x@exclude_list.txt >nul
-if errorlevel 1 goto err
-
-echo [4] Cleaning up...
-call "%CLEANER%"
 if errorlevel 1 goto err
 
 goto ok

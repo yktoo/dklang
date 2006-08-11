@@ -1,5 +1,5 @@
 //**********************************************************************************************************************
-//  $Id: Main.pas,v 1.6 2006-08-05 21:42:34 dale Exp $
+//  $Id: Main.pas,v 1.7 2006-08-11 12:15:51 dale Exp $
 //----------------------------------------------------------------------------------------------------------------------
 //  DKLang Localization Package
 //  Copyright (c)DK Software, http://www.dk-soft.org/
@@ -9,8 +9,8 @@ unit Main;
 interface
 
 uses
-  Windows, Messages, SysUtils, Variants, Classes, Graphics, Controls, Forms, TntForms,
-  Dialogs, StdCtrls, DKLang, TntStdCtrls;
+  Windows, Messages, SysUtils, Variants, Classes, Graphics, Controls, Forms, Dialogs, TntForms,
+  StdCtrls, DKLang, TntStdCtrls;
 
 type
   TfMain = class(TTntForm)
@@ -27,6 +27,7 @@ var
 
 implementation
 {$R *.dfm}
+uses TntSystem, TntSysUtils;
 
   procedure TfMain.cbLanguageChange(Sender: TObject);
   var iIndex: Integer;
@@ -40,7 +41,7 @@ implementation
   var i: Integer;
   begin
      // Scan for language files in the app directory and register them in the LangManager object
-    LangManager.ScanForLangFiles(ExtractFileDir(ParamStr(0)), '*.lng', False);
+    LangManager.ScanForLangFiles(WideExtractFileDir(WideParamStr(0)), '*.lng', False);
      // Fill cbLanguage with available languages
     for i := 0 to LangManager.LanguageCount-1 do cbLanguage.Items.Add(LangManager.LanguageNames[i]);
      // Index=0 always means the default language

@@ -12,6 +12,7 @@ object fMain: TfMain
   Font.Style = []
   Menu = mmMain
   OldCreateOrder = False
+  Position = poScreenCenter
   OnCloseQuery = TntFormCloseQuery
   OnCreate = TntFormCreate
   PixelsPerInch = 96

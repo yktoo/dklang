@@ -1,5 +1,5 @@
 //**********************************************************************************************************************
-//  $Id: Main.pas,v 1.3 2006-08-05 21:42:34 dale Exp $
+//  $Id: Main.pas,v 1.4 2006-08-11 12:15:51 dale Exp $
 //----------------------------------------------------------------------------------------------------------------------
 //  DKLang Localization Package
 //  Copyright (c)DK Software, http://www.dk-soft.org/
@@ -27,6 +27,7 @@ var
 
 implementation
 {$R *.dfm}
+uses TntSystem, TntSysUtils;
 
 {$R LangFiles.res} // Notice this resource inclusion! 
 
@@ -45,7 +46,7 @@ implementation
     LangManager.RegisterLangResource(HInstance, 'LNG_RUSSIAN', 1049);
     LangManager.RegisterLangResource(HInstance, 'LNG_GERMAN',  1031);
      // Additionally, you can scan for language files in the app directory, uncomment the next line to do this
-    //LangManager.ScanForLangFiles(ExtractFileDir(ParamStr(0)), '*.lng', False);
+    //LangManager.ScanForLangFiles(WideExtractFileDir(WideParamStr(0)), '*.lng', False);
      // Fill cbLanguage with available languages
     for i := 0 to LangManager.LanguageCount-1 do cbLanguage.Items.Add(LangManager.LanguageNames[i]);
      // Index=0 always means the default language
