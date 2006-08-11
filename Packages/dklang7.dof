@@ -111,7 +111,7 @@ AutoIncBuild=1
 MajorVer=3
 MinorVer=0
 Release=0
-Build=15
+Build=16
 Debug=0
 PreRelease=0
 Special=0
@@ -122,7 +122,7 @@ CodePage=1252
 [Version Info Keys]
 CompanyName=DK Software
 FileDescription=DKLang runtime package
-FileVersion=3.0.0.15
+FileVersion=3.0.0.16
 InternalName=dklang7
 LegalCopyright=Copyright ©2002-2006 DK Software
 LegalTrademarks=

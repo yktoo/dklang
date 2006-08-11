@@ -1,5 +1,5 @@
 ///*********************************************************************************************************************
-///  $Id: DKLang.pas,v 1.35 2006-08-11 06:16:56 dale Exp $
+///  $Id: DKLang.pas,v 1.36 2006-08-11 06:59:45 dale Exp $
 ///---------------------------------------------------------------------------------------------------------------------
 ///  DKLang Localization Package
 ///  Copyright 2002-2006 DK Software, http://www.dk-soft.org/
@@ -589,10 +589,7 @@ type
     property LanguageCount: Integer read GetLanguageCount;
      // -- LangIDs of languages (language resources) registered, index ranged 0 to LanguageCount-1
     property LanguageIDs[Index: Integer]: LANGID read GetLanguageIDs;
-     // -- Names of languages (language resources) registered, index ranged 0 to LanguageCount-1; Unicode version only
-     //    (no need to create an ANSI version converting from Unicode using specific code page because language names
-     //    should be displayed beyound all languages and the most correct display is with default code page used for
-     //    non-Unicode applications, i.e. with default Delphi WideString-to-String conversion)
+     // -- Names of languages (language resources) registered, index ranged 0 to LanguageCount-1, Unicode version only
     property LanguageNames[Index: Integer]: WideString read GetLanguageNames;
      // -- Language resources registered, index ranged 0 to LanguageCount-1. Always nil for Index=0, ie. for default
      //    language
@@ -605,8 +602,6 @@ type
    // Encoding/decoding of control characters in backslashed (escaped) form (CRLF -> \n, TAB -> \t, \ -> \\ etc)
   function  EncodeControlChars(const ws: WideString): WideString; // Raw string -> Escaped string
   function  DecodeControlChars(const ws: WideString): WideString; // Escaped string -> Raw string
-   // Translates LANGID into language name
-  function  GetLangIDName(wLangID: LANGID): WideString;
    // Finds and updates the corresponding section in Strings (which appear as language source file). If no appropriate
    //   section found, appends the lines to the end of Strings
   procedure UpdateLangSourceStrings(Strings: TWideStrings; LSObject: IDKLang_LanguageSourceObject; StateFilter: TDKLang_TranslationStates);
@@ -748,13 +743,6 @@ var
       if not bEscape then Result := Result+wc;
       Inc(i);
     end;
-  end;
-
-  function GetLangIDName(wLangID: LANGID): WideString;
-  var acBuf: Array[0..255] of WideChar;
-  begin
-    GetLocaleInfoW(wLangID, LOCALE_SLANGUAGE, acBuf, 255);
-    Result := acBuf;
   end;
 
   procedure UpdateLangSourceStrings(Strings: TWideStrings; LSObject: IDKLang_LanguageSourceObject; StateFilter: TDKLang_TranslationStates);
@@ -2551,13 +2539,15 @@ var
   end;
 
   function TDKLanguageManager.GetLanguageNames(Index: Integer): WideString;
+  var wLangID: LANGID;
   begin
     FSynchronizer.BeginRead;
     try
-      Result := GetLangIDName(GetLanguageIDs(Index));
+      wLangID := GetLanguageIDs(Index);
     finally
       FSynchronizer.EndRead;
     end;
+    Result := WideGetLocaleStr(wLangID, LOCALE_SLANGUAGE, IntToStr(wLangID));
   end;
 
   function TDKLanguageManager.GetLanguageResources(Index: Integer): PDKLang_LangResource;
