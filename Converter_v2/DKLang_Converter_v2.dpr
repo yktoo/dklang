@@ -1,4 +1,4 @@
-program DKLang_Converter_v2_to_v3;
+program DKLang_Converter_v2;
 
 uses
   Forms,

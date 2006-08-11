@@ -43,14 +43,13 @@ object fMain: TfMain
     object lInfo: TLabel
       Left = 12
       Top = 12
-      Width = 431
+      Width = 439
       Height = 39
       Caption = 
         'This program converts DKLang constant resources from library ver' +
-        'sion 2.x to version 3.x:'#13#10'  - Version 2.x constants were stored ' +
-        'inside project'#39's resource file <project_name>.res'#13#10'  - Version 3' +
-        '.x stores constants in a separate resource file <project_name>.d' +
-        'kl_const.res'
+        'sion 2.x:'#13#10'  - Version 2.x constants were stored inside project'#39 +
+        's resource file <project_name>.res'#13#10'  - Version 3.0+ stores cons' +
+        'tants in a separate resource file <project_name>.dkl_const.res'
     end
     object lProjectFile: TLabel
       Left = 12

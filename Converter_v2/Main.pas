@@ -11,6 +11,7 @@ type
     bBrowseOutputFile: TButton;
     bGo: TButton;
     bProjectFileBrowse: TButton;
+    cbRemoveFromProject: TCheckBox;
     eOutputFile: TEdit;
     eProjectFile: TEdit;
     lConversionLog: TLabel;
@@ -18,15 +19,14 @@ type
     lOutputFile: TLabel;
     lProjectFile: TLabel;
     mConversionLog: TMemo;
-    pMain: TPanel;
     odProjectFile: TOpenDialog;
+    pMain: TPanel;
     sdOutputFile: TSaveDialog;
-    cbRemoveFromProject: TCheckBox;
-    procedure bProjectFileBrowseClick(Sender: TObject);
     procedure bBrowseOutputFileClick(Sender: TObject);
     procedure bGoClick(Sender: TObject);
-    procedure eProjectFileChange(Sender: TObject);
+    procedure bProjectFileBrowseClick(Sender: TObject);
     procedure eOutputFileChange(Sender: TObject);
+    procedure eProjectFileChange(Sender: TObject);
   private
     procedure UpdateState;
   end;
