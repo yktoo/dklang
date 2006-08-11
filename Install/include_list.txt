@@ -10,3 +10,5 @@
 ..\Examples\Resource\*.*
 ..\Examples\Resource\LangFiles\*.*
 ..\Examples\Simple\*.*
+
+..\Converter_v2\*.*
