@@ -1,0 +1,46 @@
+<html>
+<!-- $Id: main-upgrading.html,v 1.1 2006-08-11 06:16:56 dale Exp $ -->
+<head>
+  <meta http-equiv="Content-Type" content="text/html; charset=windows-1252">
+  <link rel="stylesheet" type="text/css" href="main.css">
+  <title>Upgrading from previous versions</title>
+<head>
+<body>
+<h1>Upgrading from previous versions</h1>
+<div class=pagebody>
+<!--------------------------------------------------------------------------------------------------------------------->
+
+<h2>Upgrading from 2.x</h2>
+
+<p>The following moments should be considered:
+<ol>
+  <li>DKLang starting with version 3.0 outputs language source files (.dklang) solely in Unicode. It is also preferable
+      to use Unicode translation files (.lng) as well, but the package still can read ANSI files produced by version
+      2.x. It uses LANGID parameter value to properly convert file contents into Unicode, so loading a translation takes
+      a bit longer because the loading occurs twice (first time to determine the language ID, and second time to load
+      the file with a correct code page).<br>
+      To be able to load Unicode .dklang and save Unicode .lng files you have to upgrade DKLang Translation Editor to
+      version 3.0 or later (if available). The program will warn you if you will try to save ANSI translation based on
+      an Unicode source, and vice versa.
+  <li>DKLang starting with version 3.0 stores constants in a separate resource file (<i>project_name</i>.dkl_const.res)
+      instead of project resource file (<i>project_name</i>.res). This allows editing constants in Delphi 2005 and later
+      thus overcoming inaccessibility of project resource interface (IOTAProjectResource) in those IDEs (this bug was
+      introduced in BDS 2005 and still persists in BDS 2006).<br>
+      If you were using DKLang 2.x constants, you should convert all your projects using the
+      <a href="#converter_v2">Converter</a>, and add the following line to project source files (.dpr):<br>
+      <div class=code>{$R *.dkl_const.res}</div>
+</ol>
+
+<h3><a name="converter_v2"></a>Converter from 2.x</h3>
+
+<p>File: <b>Converter_v2\DKLang_Converter_v2.dpr</b>
+
+<p>Compile the converter using your IDE (most recent DKLang version must be installed before) and use it to split
+  project resource file <i>project_name</i>.res to DKLang constant resource file <i>project_name</i>.dkl_const.res, and
+  optionally to remove constant resources from the project file (you must remove it or duplicate resource name will be
+  reported).
+
+<!--------------------------------------------------------------------------------------------------------------------->
+</div>
+</body>
+</html>

@@ -1,5 +1,5 @@
 <html>
-<!-- $Id: main-revision-history.html,v 1.1 2006-08-05 21:35:42 dale Exp $ -->
+<!-- $Id: main-revision-history.html,v 1.2 2006-08-11 06:16:56 dale Exp $ -->
 <head>
   <meta http-equiv="Content-Type" content="text/html; charset=windows-1252">
   <link rel="stylesheet" type="text/css" href="main.css">
@@ -10,7 +10,7 @@
 <div class=pagebody>
 <!--------------------------------------------------------------------------------------------------------------------->
 
-<table border=0 cellspacing=0 cellpadding=4>
+<table>
   <tr>
     <td bgcolor=#f0f0f0 nowrap>DKLang 3.0<br>
       [xxx xx, xxxx]</td>
@@ -21,13 +21,15 @@
             <ul>
               <li><b>String</b> values became <b>WideString</b> (component property values, constants and all others
                   except component, property and constant names).
-              <li>Added new TDKLanguageManager properties: CodePage, ConstantValueA[], ConstantValueW[],
-                  LanguageNamesA[], LanguageNamesW[].
+              <li>Added new TDKLanguageManager properties: CodePage, ConstantValueA[], ConstantValueW[].
               <li>Added new TDKLanguageController options: dklcoIgnoreNonAlphaProps (ignore all properties with no alpha
                   characters), dklcoIgnoreFontProps (ignore all TFont properties).
+              <li>Added new global functions for retrieving constant values: DKLangConstW(), DKLangConstA().
               <li>Converted all readme files into single .chm including API reference.
             </ul>
-        <li>New example: Notepad.
+        <li>Constants are no longer stored in project resource file (.res). Instead, they are stored in a separate
+            resource file (.dkl_const.res).
+        <li>New examples: Ansi, Notepad.
         <li>Added support for BDS 2006.
       </ul>
     </td>
@@ -40,7 +42,7 @@
         <li>Added property TDKLanguageController.SectionName which allows customizing section which stores language
             data.
         <li>Added properties TDKLanguageManager.LanguageIndex, TDKLanguageManager.LanguageResources[].
-        <li>Bugfix: TDKLanguageManager.IndexOfLanguageID() returned value less by 1 than correct value for non-default
+        <li>Bug fix: TDKLanguageManager.IndexOfLanguageID() returned value less by 1 than correct value for non-default
             languages.
         <li>New examples: Frames, MDI, Resource.
       </ul>

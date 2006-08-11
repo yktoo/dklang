@@ -1,4 +1,4 @@
-/* $Id: main.css,v 1.1 2006-08-05 21:35:42 dale Exp $ */
+/* $Id: main.css,v 1.2 2006-08-11 06:16:56 dale Exp $ */
 
 body {
   font-family: Verdana,Arial,serif;
@@ -46,6 +46,12 @@ h2 {
   text-align: left;
   border-bottom: 1px solid silver;
 }
+h3 {
+  font-size: 8pt;
+  font-weight: bold;
+  text-align: left;
+  padding-bottom: 3px;
+}
 a {
   color: blue;
   text-decoration: none;
@@ -55,6 +61,7 @@ a:hover {
 }
 div.code {
   font-family: monospace;
+  margin: 5px;
   padding: 12px;
   background-color: #f0f0ff;
   border: 1px dotted gray;

@@ -1,5 +1,5 @@
 ///*********************************************************************************************************************
-///  $Id: DKLang.pas,v 1.34 2006-08-10 19:15:52 dale Exp $
+///  $Id: DKLang.pas,v 1.35 2006-08-11 06:16:56 dale Exp $
 ///---------------------------------------------------------------------------------------------------------------------
 ///  DKLang Localization Package
 ///  Copyright 2002-2006 DK Software, http://www.dk-soft.org/
@@ -154,7 +154,7 @@ type
      // File loading in plaintext (ini-file-like) format
     procedure Text_LoadFromFile(const wsFileName: WideString; bParamsOnly: Boolean = False);
      // File storing in plaintext (ini-file-like) format:
-     //   bUnicode          - if False, stores the data in Ansi encoding; if True, stores them in Unicode
+     //   bUnicode          - if False, stores the data in ANSI encoding; if True, stores them in Unicode
      //   bSkipUntranslated - if True, untranslated values are eliminated from the file
     procedure Text_SaveToFile(const wsFileName: WideString; bUnicode, bSkipUntranslated: Boolean);
      // Resource loading
@@ -163,7 +163,7 @@ type
      // Props
      // -- Constant entries
     property Constants: TDKLang_Constants read FConstants;
-     // -- True if last loading from text file/stream detected that it used Unicode encoding; False if it was Ansi
+     // -- True if last loading from text file/stream detected that it used Unicode encoding; False if it was ANSI
     property IsStreamUnicode: Boolean read FIsStreamUnicode;
      // -- Component translations by index
     property Items[Index: Integer]: TDKLang_CompTranslation read GetItems; default;
@@ -326,7 +326,7 @@ type
    // List of constants (sorted by name, case-insensitively)
    //-------------------------------------------------------------------------------------------------------------------
 
-   // Callback function called when there's a need to determine language of constants being converted from Ansi to
+   // Callback function called when there's a need to determine language of constants being converted from ANSI to
    //   Unicode
   TDKLang_GetLangIDCallback = function: LANGID of object;
 
@@ -563,7 +563,7 @@ type
      // Scans the specified directory for language files using given file mask. If bRecursive=True, also searches in the
      //   subdirectories of sDir. Returns the number of files successfully registered. Examples that scan the
      //   application directory for files with '.lng' extension:
-     //     ScanForLangFiles(ExtractFileDir(ParamStr(0)), '*.lng', False); // Ansi version, not always correct
+     //     ScanForLangFiles(ExtractFileDir(ParamStr(0)), '*.lng', False); // ANSI version, not always correct
      //     ScanForLangFiles(WideExtractFileDir(WideParamStr(0)), '*.lng', False); // Unicode version, requires Tnt
      //                                                                            // Unicode Controls
     function  ScanForLangFiles(const wsDir, wsMask: WideString; bRecursive: Boolean): Integer;
@@ -574,7 +574,7 @@ type
     property CodePage: Cardinal read FCodePage;
      // -- Constant values by name, Unicode version
     property ConstantValue[const sName: String]: WideString read GetConstantValue;
-     // -- Constant values by name, Ansi version
+     // -- Constant values by name, ANSI version
     property ConstantValueA[const sName: String]: String read GetConstantValueA;
      // -- Constant values by name, Unicode version; the same as ConstantValue[]
     property ConstantValueW[const sName: String]: WideString read GetConstantValue;
@@ -590,7 +590,7 @@ type
      // -- LangIDs of languages (language resources) registered, index ranged 0 to LanguageCount-1
     property LanguageIDs[Index: Integer]: LANGID read GetLanguageIDs;
      // -- Names of languages (language resources) registered, index ranged 0 to LanguageCount-1; Unicode version only
-     //    (no need to create an Ansi version converting from Unicode using specific code page because language names
+     //    (no need to create an ANSI version converting from Unicode using specific code page because language names
      //    should be displayed beyound all languages and the most correct display is with default code page used for
      //    non-Unicode applications, i.e. with default Delphi WideString-to-String conversion)
     property LanguageNames[Index: Integer]: WideString read GetLanguageNames;
@@ -1160,7 +1160,7 @@ var
       Result := False;
       iEqPos := Pos('=', wsLine);
       if iEqPos=0 then Exit;
-      sName   := Trim(Copy(wsLine, 1, iEqPos-1)); // Convert name to Ansi
+      sName   := Trim(Copy(wsLine, 1, iEqPos-1)); // Convert name to ANSI
       wsValue := Trim(Copy(wsLine, iEqPos+1, MaxInt));
       if sName='' then Exit;
       Result := True;
@@ -1181,7 +1181,7 @@ var
         end;
     end;
 
-     // Loads List from Stream, either Ansi or Unicode
+     // Loads List from Stream, either ANSI or Unicode
     procedure LoadStreamIntoStringList(List: TTntStringList);
     var
       i64Pos: Int64;
@@ -1194,7 +1194,7 @@ var
       Stream.Position := i64Pos;
        // Load the stream contents into the list
       List.LoadFromStream(Stream);
-       // If this is an Ansi stream
+       // If this is an ANSI stream
       if not FIsStreamUnicode then begin
          // Get code page corresponding to the language from the loaded translations
         cCodePage := LCIDToCodePage(RetrieveLangID(List));
@@ -1523,7 +1523,7 @@ var
           wsTranslation := '';
       end;
 
-       // The same but return translation in Ansi encoding
+       // The same but return translation in ANSI encoding
       function GetTranslationAnsi(const sPropName: String; out sTranslation: String): Boolean;
       var ws: WideString;
       begin

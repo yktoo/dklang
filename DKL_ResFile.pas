@@ -1,5 +1,5 @@
 ///*********************************************************************************************************************
-///  $Id: DKL_ResFile.pas,v 1.3 2006-08-10 16:35:03 dale Exp $
+///  $Id: DKL_ResFile.pas,v 1.4 2006-08-11 06:16:56 dale Exp $
 ///---------------------------------------------------------------------------------------------------------------------
 ///  DKLang Localization Package
 ///  Copyright 2002-2006 DK Software, http://www.dk-soft.org
@@ -21,7 +21,7 @@
 /// The initial developer of the original code is Dmitry Kann, http://www.dk-soft.org/
 ///
 ///**********************************************************************************************************************
-// Routines and classes to handle .res resource files
+// Routines and classes to handle .res resource files.
 // WARNING: TDKLang_ResFile only handles 32-bit resource files and does not support 16-bit ones!
 //
 unit DKL_ResFile;

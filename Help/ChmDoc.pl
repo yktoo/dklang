@@ -1,6 +1,6 @@
 #!/usr/bin/perl
 #****************************************************************
-#  $Id: ChmDoc.pl,v 1.1 2006-08-05 21:35:42 dale Exp $
+#  $Id: ChmDoc.pl,v 1.2 2006-08-11 06:16:56 dale Exp $
 #****************************************************************
 # Requires the following environment variables to be set:
 #   CHM_API_FILE_PREFIX
@@ -368,7 +368,7 @@ sub writeHTML{
     qq|List of <b>$usr_short_name</b> units in alphabetical order - <a href="$typeidx_file">Type Index</a>|);
    # Выводим заголовок таблицы модулей
   print FHTOC
-    "<table class=framed cellspacing=0 align=center>\n".
+    "<table class=framed align=center>\n".
     "<tr><th>Unit</th><th>Size</th><th>Description</th></tr>\n";
   my $idx_unit = 0;
   foreach my $unitname(sort keys %units) {
@@ -418,7 +418,7 @@ sub writeObj {
     $refobj->{COMMENT});
      # Цикл по атрибутам объекта
     my $idx_attr = 0;
-    print FHO "<table class=framed cellspacing=0 align=center>\n";
+    print FHO "<table class=framed align=center>\n";
     foreach my $attrname(sort keys %{$refobj->{ATTRS}}) {
       my $refattr = $refobj->{ATTRS}->{$attrname};
       my $attr_color = $idx_attr%2?' bgcolor=#f0f0f0':'';
@@ -446,7 +446,7 @@ sub writeTypeIndex {
   writeFileHeader(\*FHTI, 'Type Index', qq|<a href="$toc_file">$usr_short_name</a> / Type Index|, "List of all $usr_short_name types in alphabetical order");
    # Выводим заголовок таблицы типов
   print FHTI
-    "<table class=framed cellspacing=0 align=center>\n".
+    "<table class=framed align=center>\n".
     "<tr><th>Type</th><th>Object</th><th>Unit</th><th>Comments</th></tr>\n";
   my $idx_type = 0;
   foreach my $typename(sort keys %allobjs) {
@@ -506,7 +506,7 @@ sub writeUnit {
      # Если есть объекты текущего типа - выводим
     if ($obj_html) {
       print FHU
-        qq|<table class=framed cellspacing=0 align=center>\n|.
+        qq|<table class=framed align=center>\n|.
         qq|<tr><th colspan=2><a name=$typechar></a>$reftype->{NAME}</th></tr>\n|.
         qq|$obj_html|.
         qq|</table>\n|;
