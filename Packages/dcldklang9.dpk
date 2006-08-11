@@ -24,17 +24,24 @@ package dcldklang9;
 {$IMAGEBASE $25200000}
 {$DESCRIPTION 'DKLang Localization Package'}
 {$DESIGNONLY}
-{$IMPLICITBUILD OFF}
+{$IMPLICITBUILD ON}
 
 requires
   rtl,
   designide,
   dklang9,
-  vcl;
+  vcl,
+  TntUnicodeVcl_R90,
+  vclactnband,
+  vclx,
+  dsnap,
+  dbrtl,
+  vcldb;
 
 contains
   DKLangReg in '..\DKLangReg.pas',
   DKL_Expt in '..\DKL_Expt.pas',
-  DKL_ConstEditor in '..\DKL_ConstEditor.pas' {dDKL_ConstEditor};
+  DKL_ConstEditor in '..\DKL_ConstEditor.pas' {dDKL_ConstEditor},
+  DKL_ResFile in '..\DKL_ResFile.pas';
 
 end.

@@ -24,10 +24,11 @@ package dklang9;
 {$IMAGEBASE $25100000}
 {$DESCRIPTION 'DKLang Localization Package'}
 {$RUNONLY}
-{$IMPLICITBUILD OFF}
+{$IMPLICITBUILD ON}
 
 requires
-  rtl;
+  rtl,
+  TntUnicodeVcl_R90;
 
 contains
   DKLang in '..\DKLang.pas';
