@@ -10,7 +10,7 @@ DCC = $(ROOT)\bin\dcc32.exe $**
 BRCC = $(ROOT)\bin\brcc32.exe $**
 #------------------------------------------------------------------------------
 PROJECTS = dklang7.bpl dcldklang7.bpl DKLang_Ansi_Demo.exe DKLang_Constants_Demo.exe DKLang_Frames_Demo.exe \
-  DKLang_MDI_Demo.exe DKLang_Notepad_Demo.exe DKLang_Resource_Demo.exe DKLang_Simple_Demo.exe
+  DKLang_MDI_Demo.exe DKLang_Notepad_Demo.exe DKLang_Resource_Demo.exe DKLang_Simple_Demo.exe DKLang_Converter_v2.exe
 #------------------------------------------------------------------------------
 default: $(PROJECTS)
 #------------------------------------------------------------------------------
@@ -40,6 +40,9 @@ DKLang_Simple_Demo.exe: ..\Examples\Simple\DKLang_Simple_Demo.dpr
   $(DCC)
 
 DKLang_Ansi_Demo.exe: ..\Examples\Ansi\DKLang_Ansi_Demo.dpr
+  $(DCC)
+
+DKLang_Converter_v2.exe: ..\Converter_v2\DKLang_Converter_v2.dpr
   $(DCC)
 
 
