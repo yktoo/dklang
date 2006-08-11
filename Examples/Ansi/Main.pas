@@ -1,5 +1,5 @@
 //**********************************************************************************************************************
-//  $Id: Main.pas,v 1.1 2006-08-05 21:34:10 dale Exp $
+//  $Id: Main.pas,v 1.2 2006-08-11 07:00:08 dale Exp $
 //----------------------------------------------------------------------------------------------------------------------
 //  DKLang Localization Package
 //  Copyright (c)DK Software, http://www.dk-soft.org/
@@ -41,9 +41,8 @@ implementation
   begin
      // Scan for language files in the app directory and register them in the LangManager object
     LangManager.ScanForLangFiles(ExtractFileDir(ParamStr(0)), '*.lng', False);
-     // Fill cbLanguage with available languages. Note that Unicode-to-Ansi conversion will be performed here
-    for i := 0 to LangManager.LanguageCount-1 do
-      cbLanguage.Items.Add(LangManager.LanguageNames[i]);
+     // Fill cbLanguage with available languages. Notice that implicit Unicode-to-ANSI conversion will take place here 
+    for i := 0 to LangManager.LanguageCount-1 do cbLanguage.Items.Add(LangManager.LanguageNames[i]);
      // Index=0 always means the default language
     cbLanguage.ItemIndex := 0; 
   end;

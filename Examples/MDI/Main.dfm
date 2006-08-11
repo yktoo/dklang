@@ -8,7 +8,7 @@ object fMain: TfMain
   Font.Charset = DEFAULT_CHARSET
   Font.Color = clWindowText
   Font.Height = -11
-  Font.Name = 'MS Shell Dlg 2'
+  Font.Name = 'Tahoma'
   Font.Style = []
   FormStyle = fsMDIForm
   OldCreateOrder = False
