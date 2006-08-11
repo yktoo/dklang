@@ -15,34 +15,34 @@ PROJECTS = dklang7.bpl dcldklang7.bpl DKLang_Ansi_Demo.exe DKLang_Constants_Demo
 default: $(PROJECTS)
 #------------------------------------------------------------------------------
 
-dklang7.bpl: dklang7.dpk
+dklang7.bpl: Packages\dklang7.dpk
   $(DCC)
 
-dcldklang7.bpl: dcldklang7.dpk
+dcldklang7.bpl: Packages\dcldklang7.dpk
   $(DCC)
 
-DKLang_Constants_Demo.exe: ..\Examples\Constants\DKLang_Constants_Demo.dpr
+DKLang_Constants_Demo.exe: Examples\Constants\DKLang_Constants_Demo.dpr
   $(DCC)
 
-DKLang_Frames_Demo.exe: ..\Examples\Frames\DKLang_Frames_Demo.dpr
+DKLang_Frames_Demo.exe: Examples\Frames\DKLang_Frames_Demo.dpr
   $(DCC)
 
-DKLang_MDI_Demo.exe: ..\Examples\MDI\DKLang_MDI_Demo.dpr
+DKLang_MDI_Demo.exe: Examples\MDI\DKLang_MDI_Demo.dpr
   $(DCC)
 
-DKLang_Notepad_Demo.exe: ..\Examples\Notepad\DKLang_Notepad_Demo.dpr
+DKLang_Notepad_Demo.exe: Examples\Notepad\DKLang_Notepad_Demo.dpr
   $(DCC)
 
-DKLang_Resource_Demo.exe: ..\Examples\Resource\DKLang_Resource_Demo.dpr
+DKLang_Resource_Demo.exe: Examples\Resource\DKLang_Resource_Demo.dpr
   $(DCC)
 
-DKLang_Simple_Demo.exe: ..\Examples\Simple\DKLang_Simple_Demo.dpr
+DKLang_Simple_Demo.exe: Examples\Simple\DKLang_Simple_Demo.dpr
   $(DCC)
 
-DKLang_Ansi_Demo.exe: ..\Examples\Ansi\DKLang_Ansi_Demo.dpr
+DKLang_Ansi_Demo.exe: Examples\Ansi\DKLang_Ansi_Demo.dpr
   $(DCC)
 
-DKLang_Converter_v2.exe: ..\Converter_v2\DKLang_Converter_v2.dpr
+DKLang_Converter_v2.exe: Converter_v2\DKLang_Converter_v2.dpr
   $(DCC)
 
 

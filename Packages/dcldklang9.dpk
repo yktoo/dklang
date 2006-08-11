@@ -27,16 +27,9 @@ package dcldklang9;
 {$IMPLICITBUILD ON}
 
 requires
-  rtl,
   designide,
-  dklang9,
-  vcl,
   TntUnicodeVcl_R90,
-  vclactnband,
-  vclx,
-  dsnap,
-  dbrtl,
-  vcldb;
+  dklang9;
 
 contains
   DKLangReg in '..\DKLangReg.pas',

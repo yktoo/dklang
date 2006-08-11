@@ -1,4 +1,4 @@
-package dklang7;
+package dcldklang10;
 
 {$R *.res}
 {$ALIGN 8}
@@ -21,17 +21,20 @@ package dklang7;
 {$VARSTRINGCHECKS ON}
 {$WRITEABLECONST OFF}
 {$MINENUMSIZE 1}
-{$IMAGEBASE $25100000}
+{$IMAGEBASE $25200000}
 {$DESCRIPTION 'DKLang Localization Package'}
-{$RUNONLY}
+{$DESIGNONLY}
 {$IMPLICITBUILD ON}
 
 requires
-  vcl,
-  rtl,
-  TntUnicodeVcl_R70;
+  designide,
+  TntUnicodeVcl_R100,
+  dklang10;
 
 contains
-  DKLang in '..\DKLang.pas';
+  DKLangReg in '..\DKLangReg.pas',
+  DKL_Expt in '..\DKL_Expt.pas',
+  DKL_ConstEditor in '..\DKL_ConstEditor.pas' {dDKL_ConstEditor},
+  DKL_ResFile in '..\DKL_ResFile.pas';
 
 end.

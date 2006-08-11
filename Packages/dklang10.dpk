@@ -1,4 +1,4 @@
-package dklang7;
+package dklang10;
 
 {$R *.res}
 {$ALIGN 8}
@@ -29,7 +29,7 @@ package dklang7;
 requires
   vcl,
   rtl,
-  TntUnicodeVcl_R70;
+  TntUnicodeVcl_R100;
 
 contains
   DKLang in '..\DKLang.pas';

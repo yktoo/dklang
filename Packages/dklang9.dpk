@@ -27,6 +27,7 @@ package dklang9;
 {$IMPLICITBUILD ON}
 
 requires
+  vcl,
   rtl,
   TntUnicodeVcl_R90;
 
