@@ -1,6 +1,6 @@
 @echo off
 rem ********************************************************************************************************************
-rem $Id: make_distrib.bat,v 1.11 2006-08-05 21:42:34 dale Exp $
+rem $Id: _make_.bat,v 1.1 2006-08-11 05:16:33 dale Exp $
 rem --------------------------------------------------------------------------------------------------------------------
 rem DKLang Localization Package
 rem Copyright 2002-2006 DK Software, http://www.dk-soft.org/
@@ -24,12 +24,13 @@ set HELP_COMPILER=C:\Program Files\HTML Help Workshop\hhc.exe
 set CHM_API_MAKER=%HELP_DIR%\ChmDoc.pl
 set CHM_API_FILE_PREFIX=__chmdoc__
 set ARCHIVER=C:\Program Files\WinRAR\rar.exe
+set CLEANER=%BASE_DIR%\_cleanup_.bat
 
 rem --------------------------------------------------------------------------------------------------------------------
 rem  Let's start here
 rem --------------------------------------------------------------------------------------------------------------------
 
-echo [1] Cleaning up...
+echo [1] Removing old files...
 if exist "%ARCHIVE_FILE%" del "%ARCHIVE_FILE%"
 if exist "%BASE_DIR%\%CHM_FILE%" del "%BASE_DIR%\%CHM_FILE%"
 
@@ -45,6 +46,10 @@ cd "%INSTALL_DIR%"
 rem -m3    = compression normal
 rem -afzip = create zip archive
 "%ARCHIVER%" a -m3 -afzip "%ARCHIVE_FILE%" @include_list.txt -x@exclude_list.txt >nul
+if errorlevel 1 goto err
+
+echo [4] Cleaning up...
+call "%CLEANER%"
 if errorlevel 1 goto err
 
 goto ok
