@@ -1,6 +1,6 @@
 @echo off
 rem ********************************************************************************************************************
-rem $Id: _make_.bat,v 1.2 2006-08-11 12:16:02 dale Exp $
+rem $Id: _make_.bat,v 1.3 2006-08-15 13:03:59 dale Exp $
 rem --------------------------------------------------------------------------------------------------------------------
 rem DKLang Localization Package
 rem Copyright 2002-2006 DK Software, http://www.dk-soft.org/
@@ -11,7 +11,7 @@ rem ----------------------------------------------------------------------------
 rem  Variable declaration
 rem --------------------------------------------------------------------------------------------------------------------
 
-set VERSION=3.0
+set VERSION=3.01
 
 set BASE_DIR=C:\Delphi\CVS projects\dale\DKLang
 set INSTALL_DIR=%BASE_DIR%\Install
@@ -23,7 +23,7 @@ set CHM_FILE=dklang.chm
 set HELP_COMPILER=C:\Program Files\HTML Help Workshop\hhc.exe
 set CHM_API_MAKER=%HELP_DIR%\ChmDoc.pl
 set CHM_API_FILE_PREFIX=__chmdoc__
-set ARCHIVER=C:\Program Files\WinRAR\rar.exe
+set ARCHIVER=C:\Progra~1\WinRAR\winrar.exe
 set CLEANER=%BASE_DIR%\_cleanup_.bat
 
 rem --------------------------------------------------------------------------------------------------------------------
@@ -48,7 +48,7 @@ echo [4] Archiving the files...
 cd "%INSTALL_DIR%"
 rem -m3    = compression normal
 rem -afzip = create zip archive
-"%ARCHIVER%" a -m3 -afzip "%ARCHIVE_FILE%" @include_list.txt -x@exclude_list.txt >nul
+start /w %ARCHIVER% a -m3 -afzip "%ARCHIVE_FILE%" @include_list.txt -x@exclude_list.txt >nul
 if errorlevel 1 goto err
 
 goto ok
