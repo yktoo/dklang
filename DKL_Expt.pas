@@ -1,5 +1,5 @@
 ///*********************************************************************************************************************
-///  $Id: DKL_Expt.pas,v 1.20 2006-08-10 16:35:03 dale Exp $
+///  $Id: DKL_Expt.pas,v 1.21 2006-08-22 13:17:35 dale Exp $
 ///---------------------------------------------------------------------------------------------------------------------
 ///  DKLang Localization Package
 ///  Copyright 2002-2006 DK Software, http://www.dk-soft.org
@@ -24,6 +24,8 @@
 // Declarations of the core IDE integration component - DKLang Expert
 //
 unit DKL_Expt;
+
+{$INCLUDE TntCompilers.inc}
 
 interface
 uses Classes, ToolsAPI, DesignEditors;
@@ -61,7 +63,7 @@ uses
   SysUtils, Windows, Registry, Menus, Graphics, Dialogs, DesignIntf, TypInfo, Forms, RTLConsts, 
   DKLang, DKL_ConstEditor, DKL_ResFile;
 
-  {$IFNDEF VER150}
+  {$IFNDEF COMPILER_7_UP}
 
      // The below functions were introduced only in Delphi 7
 

@@ -1,5 +1,5 @@
 ///*********************************************************************************************************************
-///  $Id: DKLang.pas,v 1.36 2006-08-11 06:59:45 dale Exp $
+///  $Id: DKLang.pas,v 1.37 2006-08-22 13:17:35 dale Exp $
 ///---------------------------------------------------------------------------------------------------------------------
 ///  DKLang Localization Package
 ///  Copyright 2002-2006 DK Software, http://www.dk-soft.org/
@@ -27,8 +27,18 @@
 //
 unit DKLang;
 
+{$INCLUDE TntCompilers.inc}
+
 interface
-uses Windows, SysUtils, Classes, Contnrs, Masks, TntClasses, TntWideStrings;
+uses
+  Windows, SysUtils, Classes, Contnrs, Masks, TntClasses,
+   // TntWideStrings shouldn't be used in BDS 2006+ as those IDEs correctly implement default WideStrings
+  {$IFDEF COMPILER_10_UP}
+  WideStrings
+  {$ELSE}
+  TntWideStrings
+  {$ENDIF}
+  ;
 
 type
    // Error

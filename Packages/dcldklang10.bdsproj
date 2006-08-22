@@ -10,7 +10,7 @@
 	</PersonalityInfo>
 	<Delphi.Personality>
 		<Source>
-			<Source Name="MainSource">dcldklang9.dpk</Source>
+			<Source Name="MainSource">dcldklang10.dpk</Source>
 		</Source>
 		<FileVersion>
 			<FileVersion Name="Version">7.0</FileVersion>
@@ -161,10 +161,10 @@
 			<VersionInfoKeys Name="CompanyName">DK Software</VersionInfoKeys>
 			<VersionInfoKeys Name="FileDescription">DKLang designtime package</VersionInfoKeys>
 			<VersionInfoKeys Name="FileVersion">3.0.0.16</VersionInfoKeys>
-			<VersionInfoKeys Name="InternalName">dcldklang9</VersionInfoKeys>
+			<VersionInfoKeys Name="InternalName">dcldklang10</VersionInfoKeys>
 			<VersionInfoKeys Name="LegalCopyright">Copyright ©2002-2006 DK Software</VersionInfoKeys>
 			<VersionInfoKeys Name="LegalTrademarks"></VersionInfoKeys>
-			<VersionInfoKeys Name="OriginalFilename">dcldklang9.bpl</VersionInfoKeys>
+			<VersionInfoKeys Name="OriginalFilename">dcldklang10.bpl</VersionInfoKeys>
 			<VersionInfoKeys Name="ProductName">DKLang Localization Package</VersionInfoKeys>
 			<VersionInfoKeys Name="ProductVersion">3.0</VersionInfoKeys>
 			<VersionInfoKeys Name="Comments">http://www.dk-soft.org/</VersionInfoKeys>

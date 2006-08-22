@@ -1,6 +1,6 @@
 @echo off
 rem ********************************************************************************************************************
-rem $Id: _make_.bat,v 1.3 2006-08-15 13:03:59 dale Exp $
+rem $Id: _make_.bat,v 1.4 2006-08-22 13:17:35 dale Exp $
 rem --------------------------------------------------------------------------------------------------------------------
 rem DKLang Localization Package
 rem Copyright 2002-2006 DK Software, http://www.dk-soft.org/
@@ -46,9 +46,9 @@ call "%CLEANER%"
 
 echo [4] Archiving the files...
 cd "%INSTALL_DIR%"
-rem -m3    = compression normal
+rem -m5    = compression best
 rem -afzip = create zip archive
-start /w %ARCHIVER% a -m3 -afzip "%ARCHIVE_FILE%" @include_list.txt -x@exclude_list.txt >nul
+start /w %ARCHIVER% a -m5 -afzip "%ARCHIVE_FILE%" @include_list.txt -x@exclude_list.txt >nul
 if errorlevel 1 goto err
 
 goto ok

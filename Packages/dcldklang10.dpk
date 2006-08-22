@@ -28,7 +28,7 @@ package dcldklang10;
 
 requires
   designide,
-  TntUnicodeVcl_R100,
+  TntUnicodeVcl,
   dklang10;
 
 contains

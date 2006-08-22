@@ -1,10 +1,12 @@
 //**********************************************************************************************************************
-//  $Id: Main.pas,v 1.2 2006-08-11 12:15:51 dale Exp $
+//  $Id: Main.pas,v 1.3 2006-08-22 13:17:35 dale Exp $
 //----------------------------------------------------------------------------------------------------------------------
 //  DKLang Localization Package
 //  Copyright 2002-2006 DK Software, http://www.dk-soft.org
 //**********************************************************************************************************************
 unit Main;
+
+{$INCLUDE TntCompilers.inc}
 
 interface
 
@@ -124,7 +126,10 @@ implementation
 {$R *.dfm}
 uses
   StrUtils, TntSystem, TntClasses, TntSysUtils
-  {$IFNDEF VER140}, XPMan {$ENDIF};
+  {$IFDEF COMPILER_7_UP}
+    , XPMan
+  {$ENDIF}
+  ;
 
   procedure TfMain.aEditCopyExecute(Sender: TObject);
   begin
