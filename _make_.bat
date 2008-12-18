@@ -11,9 +11,9 @@ rem ----------------------------------------------------------------------------
 rem  Variable declaration
 rem --------------------------------------------------------------------------------------------------------------------
 
-set VERSION=3.01
+set VERSION=4.0RC1
 
-set BASE_DIR=C:\Delphi\CVS projects\dale\DKLang
+set BASE_DIR=C:\Dev\DKLang
 set INSTALL_DIR=%BASE_DIR%\Install
 set HELP_DIR=%BASE_DIR%\Help
 
@@ -36,7 +36,7 @@ if exist "%BASE_DIR%\%CHM_FILE%" del "%BASE_DIR%\%CHM_FILE%"
 
 echo [2] Generating and compiling CHM docs...
 cd "%HELP_DIR%"
-"%CHM_API_MAKER%"
+perl "%CHM_API_MAKER%"
 if errorlevel 1 goto err
 move "%HELP_DIR%\%CHM_FILE%" "%BASE_DIR%\"
 if errorlevel 1 goto err

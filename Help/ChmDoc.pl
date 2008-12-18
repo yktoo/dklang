@@ -13,8 +13,8 @@ use locale;
  # Declare constants
 my $usr_short_name        = 'DKLang API';
 
-my $src_path              = 'C:/Delphi/CVSpro~1/dale/DKLang';
-my $out_path              = 'C:/Delphi/CVSpro~1/dale/DKLang/Help';
+my $src_path              = 'C:/Dev/DKLang';
+my $out_path              = 'C:/Dev/DKLang/Help';
 my $file_prefix           = $ENV{'CHM_API_FILE_PREFIX'};
 my $css_file              = 'main.css';
 my $toc_file              = $file_prefix.'index.html';
