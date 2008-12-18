@@ -14,11 +14,6 @@
 		</OBJECT>
 	<UL>
 		<LI> <OBJECT type="text/sitemap">
-			<param name="Name" value="Release Notes">
-			<param name="Local" value="main-release-notes-3.0.html">
-			<param name="ImageNumber" value="18">
-			</OBJECT>
-		<LI> <OBJECT type="text/sitemap">
 			<param name="Name" value="Legal Info">
 			<param name="Local" value="main-legal-info.html">
 			</OBJECT>
@@ -41,7 +36,7 @@
 			<param name="Local" value="main-package-features.html">
 			</OBJECT>
 		<LI> <OBJECT type="text/sitemap">
-			<param name="Name" value="Technology And Background">
+			<param name="Name" value="Technology and Background">
 			<param name="Local" value="main-technology-and-background.html">
 			</OBJECT>
 		<LI> <OBJECT type="text/sitemap">
@@ -85,10 +80,6 @@
 		<LI> <OBJECT type="text/sitemap">
 			<param name="Name" value="Simple">
 			<param name="Local" value="example-simple.html">
-			</OBJECT>
-		<LI> <OBJECT type="text/sitemap">
-			<param name="Name" value="Ansi">
-			<param name="Local" value="example-ansi.html">
 			</OBJECT>
 		<LI> <OBJECT type="text/sitemap">
 			<param name="Name" value="Constants">

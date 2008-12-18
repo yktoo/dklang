@@ -16,14 +16,14 @@
       See the <a href="main-supplied-examples.html">included examples</a> to learn the details.
   <li>Full integration with Delphi VCL component library. A possibility of automated change tracking in structure or
       properties of forms, frames, data modules etc., and owned components. 
-  <li>Complete <b>Unicode</b> support (on a robust basement of Tnt Delphi Unicode Controls).
-  <li>Storing property values for <b>String</b> (AnsiString), <b>ShortString</b> and <b>WideString</b> properties.
-      Storing property values of class <b>TStrings</b>, <b>TWideStrings</b>, <b>TCollection</b> item properties and
-      property values of <b>TPersistent</b> descendants. Only the properties recognized by Delphi streaming mechanism as
+  <li>Complete <b>Unicode</b> support.
+  <li>Storing property values for <b>String</b> (UnicodeString), <b>AnsiString</b>, <b>ShortString</b> and <b>WideString</b> properties.
+      Storing property values of class <b>TStrings</b>, <b>TCollection</b> item properties and
+      property values of <b>TPersistent</b> descendants. Only the properties recognized by the Delphi streaming mechanism as
       <i>stored</i> are processed to avoid storing excessive data.
   <li>A possibility for defining a set of string constants for a project. A constant is referred to by its name (binary
       name search is implemented). See the <a href="example-constants.html">Constants Example</a>.
-  <li>Storing translations in plain-text (ANSI or Unicode) files, which can be edited with any text editor. However,
+  <li>Storing translations in plain-text files, which can be edited with any text editor. However,
       there's a much more convenient tool available for creating the translations,
       <a href="http://www.dk-soft.org/redir.php?product=dktraned&action=viewinfo" target=_blank>DKLang Translation
       Editor</a>.
@@ -34,7 +34,7 @@
       stored. Both lists are formed using name masks (eg, *.Font.Name).
   <li>Automated saving the localization data for the whole project into a so-called language source file (a file having
       .dklang extension).
-  <li>A possibility of using the localization mechanism when no visual forms instantiated (for localizing constants
+  <li>A possibility of using the localization mechanism when no visual forms are instantiated (for localizing constants
       only). A possibility of building the project with DKLang runtime package.
   <li>A thread-safe design allowing for proper functioning in multithreaded environment. This allows non-blocking data
       read access with a number of threads at once. 

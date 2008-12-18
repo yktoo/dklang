@@ -10,6 +10,23 @@
 <div class=pagebody>
 <!--------------------------------------------------------------------------------------------------------------------->
 
+<h2>Upgrading from 3.x</h2>
+
+<p>Starting with Delphi 2009 the VCL now natively supports Unicode, so it no longer makes sense to use TntUnicode
+   (or its successor TMS Unicode) within DKLang.  So the TntUnicode requirement has been removed.  Keeping either 
+   component package in your applications should be possible, but it is not no long necessary to use either set to 
+   get full Unicode capabilities.</p>
+
+<p>No changes have been made to the internal storage mechanisms that require conversion of your projects or language
+   files.  Some functions that return AnsiStrings have been removed. You should now be able to use the 'W' version 
+   instead of the 'A' version without issue. The following functions have been eliminated:
+<ul>
+  <li>TDKLanguageManager.DKLangConstA[]</li>
+  <li>DKLangConstA()</li>
+</ul>
+</p>  
+  
+
 <h2>Upgrading from 2.x</h2>
 
 <p>The following moments should be considered:

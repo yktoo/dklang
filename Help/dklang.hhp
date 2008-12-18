@@ -13,12 +13,11 @@ Default topic=index.html
 Display compile notes=No
 Display compile progress=No
 Full-text search=Yes
-Language=0x409 Английский (США)
+Language=0x409 English (USA)
 Title=DKLang Localization Package Help
 
 
 [FILES]
-example-ansi.html
 example-constants.html
 example-frames.html
 example-mdi.html
@@ -35,7 +34,6 @@ main-issues-drawbacks.html
 main-legal-info.html
 main-package-contents.html
 main-package-features.html
-main-release-notes-3.0.html
 main-requirements.html
 main-revision-history.html
 main-supplied-examples.html

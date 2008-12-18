@@ -3,10 +3,10 @@
 <head>
   <meta http-equiv="Content-Type" content="text/html; charset=windows-1252">
   <link rel="stylesheet" type="text/css" href="main.css">
-  <title>Technology And Background</title>
+  <title>Technology and Background</title>
 <head>
 <body>
-<h1>Technology And Background</h1>
+<h1>Technology and Background</h1>
 <div class=pagebody>
 <!--------------------------------------------------------------------------------------------------------------------->
 
@@ -57,11 +57,9 @@
   the whole list.<br>
   <i>Constant value</i> is a WideString (Unicode) value which can also be empty.
 
-<p>To read value of a constant you use its name (again, case-insensitively) and obtain an Unicode (original) or ANSI 
-  value (converted from Unicode using appropriate code pade) using these functions:
+<p>To read value of a constant you use its name (again, case-insensitively) and obtain a Unicode value using the function:
 
-<div class=code>DKLangConstW('MyConstant') // Unicode<br>
-DKLangConstA('MyConstant') // ANSI</div>
+<div class=code>DKLangConstW('MyConstant') // Unicode</div>
 
 <h2>Making a translation</h2>
 
@@ -69,7 +67,7 @@ DKLangConstA('MyConstant') // ANSI</div>
   Translation Editor</a> application to open the language source files (.dklang), and to create new translations (.lng
   files) based on them.
 
-<p><b>NB:</b> <b>Do not</b> edit .dklang files directly since the contents of these files is controlled automatically by
+<p><b>NB:</b> <b>Do not</b> edit .dklang files directly since the contents of these files are controlled automatically by
   language controllers and constant editor. Any changes to property mappings or constant values will be lost once the
   file is updated!<br>
   Nevertheless, you can add your custom comments (each line starting with a semicolon) at the top of the file. The
