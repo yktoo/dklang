@@ -16,14 +16,14 @@ object fMain: TfMain
   OnCreate = FormCreate
   PixelsPerInch = 96
   TextHeight = 13
-  object lSampleMessage: TTntLabel
+  object lSampleMessage: TLabel
     Left = 20
     Top = 44
     Width = 123
     Height = 13
     Caption = 'This is a sample message.'
   end
-  object bTest: TTntButton
+  object bTest: TButton
     Left = 104
     Top = 76
     Width = 75
@@ -32,7 +32,7 @@ object fMain: TfMain
     TabOrder = 0
     OnClick = bTestClick
   end
-  object cbLanguage: TTntComboBox
+  object cbLanguage: TComboBox
     Left = 8
     Top = 8
     Width = 261

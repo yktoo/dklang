@@ -6,24 +6,24 @@ object fMain: TfMain
   ClientHeight = 119
   ClientWidth = 280
   Color = clBtnFace
-  Font.Charset = DEFAULT_CHARSET
+  Font.Charset = ANSI_CHARSET
   Font.Color = clWindowText
   Font.Height = -11
-  Font.Name = 'Tahoma'
+  Font.Name = 'Arial Unicode MS'
   Font.Style = []
   OldCreateOrder = False
   Position = poScreenCenter
   OnCreate = FormCreate
   PixelsPerInch = 96
-  TextHeight = 13
-  object lSampleMessage: TTntLabel
+  TextHeight = 15
+  object lSampleMessage: TLabel
     Left = 20
     Top = 44
-    Width = 123
-    Height = 13
+    Width = 128
+    Height = 15
     Caption = 'This is a sample message.'
   end
-  object bCancel: TTntButton
+  object bCancel: TButton
     Left = 104
     Top = 76
     Width = 75
@@ -31,13 +31,13 @@ object fMain: TfMain
     Caption = 'Cancel'
     TabOrder = 0
   end
-  object cbLanguage: TTntComboBox
+  object cbLanguage: TComboBox
     Left = 8
     Top = 8
     Width = 261
-    Height = 21
+    Height = 23
     Style = csDropDownList
-    ItemHeight = 13
+    ItemHeight = 15
     TabOrder = 1
     OnChange = cbLanguageChange
   end

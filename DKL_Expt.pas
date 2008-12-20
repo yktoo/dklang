@@ -1,8 +1,8 @@
 ///*********************************************************************************************************************
-///  $Id: DKL_Expt.pas,v 1.21 2006-08-22 13:17:35 dale Exp $
+///  $Id: DKL_Expt.pas,v 1.21 2006/08/22 13:17:35 dale Exp $
 ///---------------------------------------------------------------------------------------------------------------------
 ///  DKLang Localization Package
-///  Copyright 2002-2006 DK Software, http://www.dk-soft.org
+///  Copyright 2002-2008 DK Software, http://www.dk-soft.org
 ///*********************************************************************************************************************
 ///
 /// The contents of this package are subject to the Mozilla Public License
@@ -20,12 +20,12 @@
 ///
 /// The initial developer of the original code is Dmitry Kann, http://www.dk-soft.org/
 ///
+/// Upgraded to Delphi 2009 by Bruce J. Miller, rules-of-thumb.com Dec 2008
+///
 ///**********************************************************************************************************************
 // Declarations of the core IDE integration component - DKLang Expert
 //
 unit DKL_Expt;
-
-{$INCLUDE TntCompilers.inc}
 
 interface
 uses Classes, ToolsAPI, DesignEditors;
@@ -38,7 +38,7 @@ type
   TDKLangControllerEditor = class(TComponentEditor)
   public
     procedure ExecuteVerb(Index: Integer); override;
-    function  GetVerb(Index: Integer): string; override;
+    function  GetVerb(Index: Integer): String; override;
     function  GetVerbCount: Integer; override;
   end;
 
@@ -63,29 +63,6 @@ uses
   SysUtils, Windows, Registry, Menus, Graphics, Dialogs, DesignIntf, TypInfo, Forms, RTLConsts, 
   DKLang, DKL_ConstEditor, DKL_ResFile;
 
-  {$IFNDEF COMPILER_7_UP}
-
-     // The below functions were introduced only in Delphi 7
-
-    function GetActiveProjectGroup: IOTAProjectGroup;
-    var
-      ModuleServices: IOTAModuleServices;
-      i: Integer;
-    begin
-      ModuleServices := BorlandIDEServices as IOTAModuleServices;
-      for i := 0 to ModuleServices.ModuleCount-1 do
-        if Supports(ModuleServices.Modules[i], IOTAProjectGroup, Result) then Exit;
-      Result := nil;
-    end;
-
-    function GetActiveProject: IOTAProject;
-    var ProjectGroup: IOTAProjectGroup;
-    begin
-      ProjectGroup := GetActiveProjectGroup;
-      if ProjectGroup=nil then Result := nil else Result := ProjectGroup.ActiveProject;
-    end;
-    
-  {$ENDIF}
 
    // Returns the current active project, if any; raises an exception otherwise
   function GetActualProject: IOTAProject;
@@ -142,7 +119,7 @@ type
      // IOTAFormNotifier
     procedure FormActivated;
     procedure FormSaving;
-    procedure ComponentRenamed(ComponentHandle: TOTAHandle; const OldName, NewName: String);
+    procedure ComponentRenamed(ComponentHandle: TOTAHandle; const OldName, NewName: UnicodeString);
   public
     constructor Create(AModule: IOTAModule);
   end;
@@ -156,7 +133,7 @@ type
      // Expert owner
     FExpert: TDKLang_Expert;
      // IOTAIDENotifier
-    procedure FileNotification(NotifyCode: TOTAFileNotification; const FileName: string; var Cancel: Boolean);
+    procedure FileNotification(NotifyCode: TOTAFileNotification; const FileName: UnicodeString; var Cancel: Boolean);
     procedure BeforeCompile(const Project: IOTAProject; var Cancel: Boolean);
     procedure AfterCompile(Succeeded: Boolean);
   public
@@ -181,7 +158,7 @@ type
     FItem_EditConstants: TMenuItem;
     FItem_UpdateLangSource: TMenuItem;
      // Adds and returns a menu item
-    function  NewMenuItem(const sCaption: String; Menu: TMenuItem; AOnClick: TNotifyEvent): TMenuItem;
+    function  NewMenuItem(const wsCaption: UnicodeString; Menu: TMenuItem; AOnClick: TNotifyEvent): TMenuItem;
      // Menu item click events
     procedure ItemClick_EditConstants(Sender: TObject);
     procedure ItemClick_UpdateLangSource(Sender: TObject);
@@ -191,8 +168,8 @@ type
      // Callback function for obtaining current language ID
     function  GetLangIDCallback: LANGID;
      // IOTAWizard
-    function  GetIDString: string;
-    function  GetName: string;
+    function  GetIDString: UnicodeString;
+    function  GetName: UnicodeString;
     function  GetState: TWizardState;
     procedure Execute;
   public
@@ -204,7 +181,7 @@ type
    // TDKLang_FormNotifier
    //===================================================================================================================
 
-  procedure TDKLang_FormNotifier.ComponentRenamed(ComponentHandle: TOTAHandle; const OldName, NewName: String);
+  procedure TDKLang_FormNotifier.ComponentRenamed(ComponentHandle: TOTAHandle; const OldName, NewName: UnicodeString);
   begin
     { stub }
   end;
@@ -259,7 +236,7 @@ type
     FExpert := AExpert;
   end;
 
-  procedure TDKLang_OTAIDENotifier.FileNotification(NotifyCode: TOTAFileNotification; const FileName: string; var Cancel: Boolean);
+  procedure TDKLang_OTAIDENotifier.FileNotification(NotifyCode: TOTAFileNotification; const FileName: UnicodeString; var Cancel: Boolean);
   var
     Module: IOTAModule;
     OTAFormEditor: IOTAFormEditor;
@@ -325,33 +302,34 @@ type
 
   function TDKLang_Expert.EditConstantsResource: Boolean;
   var
-    sResFileName: String;
+    wsResFileName: UnicodeString;
     ResFile: TDKLang_ResFile;
     ConstantResEntry: TDKLang_ResEntry;
     Consts: TDKLang_Constants;
     bErase: Boolean;
 
      // Returns file name for constant resource file
-    function GetResFileName: String;
+    function GetResFileName: UnicodeString;
     begin
       Result := ChangeFileExt(GetActualProject.FileName, SDKLExpt_ConstantResFileEnding)
     end;
 
   begin
      // Determine the constant resource file name
-    sResFileName := GetResFileName;
+    wsResFileName := GetResFileName;
      // Create the resource file
     ResFile := TDKLang_ResFile.Create;
     try
        // Load the resource file if it exists
-      if FileExists(sResFileName) then ResFile.LoadFromFile(sResFileName);
+      if FileExists(wsResFileName) then ResFile.LoadFromFile(wsResFileName);
        // Create constant list object
       Consts := TDKLang_Constants.Create(GetLangIDCallback);
       try
          // Try to find the constant resource entry
         ConstantResEntry := ResFile.FindEntry(IntToStr(Integer(RT_RCDATA)), SDKLang_ConstResourceName);
          // If constant resource exists, load the constant list from it
-        if ConstantResEntry<>nil then Consts.AsRawString := ConstantResEntry.RawData;
+        if ConstantResEntry<>nil then
+          Consts.AsRawString := ConstantResEntry.RawData;
         bErase := ConstantResEntry<>nil;
         Result := EditConstants(Consts, bErase);
          // If changes made
@@ -376,7 +354,7 @@ type
              // Update the data
             ConstantResEntry.RawData := Consts.AsRawString;
              // Save the resource file
-            ResFile.SaveToFile(sResFileName);
+            ResFile.SaveToFile(wsResFileName);
              // Update the project language source file if needed
             if Consts.AutoSaveLangSource and not UpdateProjectLangSource(Consts) then DKLangError(SDKLExptErr_CannotSaveLangSource);
           end;
@@ -393,7 +371,7 @@ type
     { stub }
   end;
 
-  function TDKLang_Expert.GetIDString: string;
+  function TDKLang_Expert.GetIDString: UnicodeString;
   begin
     Result := 'DKSoftware.DKLang_IDE_Expert';
   end;
@@ -403,7 +381,7 @@ type
     Result := GetThreadLocale; // Implicit LCID to LANGID conversion 
   end;
 
-  function TDKLang_Expert.GetName: string;
+  function TDKLang_Expert.GetName: UnicodeString;
   begin
     Result := 'DKLang IDE Expert';
   end;
@@ -445,11 +423,11 @@ type
     ShowMessage(Format(SDKLExptMsg_LCsUpdated, [iLCUpdated]));
   end;
 
-  function TDKLang_Expert.NewMenuItem(const sCaption: String; Menu: TMenuItem; AOnClick: TNotifyEvent): TMenuItem;
+  function TDKLang_Expert.NewMenuItem(const wsCaption: UnicodeString; Menu: TMenuItem; AOnClick: TNotifyEvent): TMenuItem;
   begin
     Result := TMenuItem.Create(FMenuOwner);
     with Result do begin
-      Caption      := sCaption;
+      Caption      := wsCaption;
       OnClick      := AOnClick;
     end;
     Menu.Add(Result);
@@ -481,7 +459,7 @@ type
     end;
   end;
 
-  function TDKLangControllerEditor.GetVerb(Index: Integer): string;
+  function TDKLangControllerEditor.GetVerb(Index: Integer): UnicodeString;
   begin
     case Index of
       0:   Result := 'Save data to pro&ject language source';

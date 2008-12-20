@@ -18,14 +18,14 @@ object fMDIChild: TfMDIChild
   OnCreate = FormCreate
   PixelsPerInch = 96
   TextHeight = 13
-  object lSampleMessage: TTntLabel
+  object lSampleMessage: TLabel
     Left = 12
     Top = 12
     Width = 123
     Height = 13
     Caption = 'This is a sample message.'
   end
-  object bCancel: TTntButton
+  object bCancel: TButton
     Left = 104
     Top = 76
     Width = 75
@@ -45,3 +45,4 @@ object fMDIChild: TfMDIChild
       000004000000070043617074696F6E00}
   end
 end
+

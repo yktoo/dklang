@@ -1,5 +1,5 @@
 //**********************************************************************************************************************
-//  $Id: Main.pas,v 1.8 2006-08-11 12:15:50 dale Exp $
+//  $Id: Main.pas,v 1.8 2006/08/11 12:15:50 dale Exp $
 //----------------------------------------------------------------------------------------------------------------------
 //  DKLang Localization Package
 //  Copyright 2002-2006 DK Software, http://www.dk-soft.org
@@ -9,15 +9,15 @@ unit Main;
 interface
 
 uses
-  Windows, Messages, SysUtils, Variants, Classes, Graphics, Controls, Forms, Dialogs, TntForms,
-  DKLang, StdCtrls, TntStdCtrls;
+  Windows, Messages, Variants, Classes, Graphics, Controls, Forms, Dialogs,
+  DKLang, StdCtrls;
 
 type
-  TfMain = class(TTntForm)
-    bTest: TTntButton;
-    cbLanguage: TTntComboBox;
+  TfMain = class(TForm)
+    bTest: TButton;
+    cbLanguage: TComboBox;
     lcMain: TDKLanguageController;
-    lSampleMessage: TTntLabel;
+    lSampleMessage: TLabel;
     procedure bTestClick(Sender: TObject);
     procedure cbLanguageChange(Sender: TObject);
     procedure FormCreate(Sender: TObject);
@@ -28,14 +28,14 @@ var
 
 implementation
 {$R *.dfm}
-uses TntSystem, TntSysUtils;
+uses SysUtils;
 
   procedure TfMain.bTestClick(Sender: TObject);
   begin
     MessageBoxW(
       Application.Handle,
-      PWideChar(DKLangConstW('STestMessage')),
-      PWideChar(DKLangConstW('SMessageCaption')),
+      PChar(DKLangConstW('STestMessage')),
+      PChar(DKLangConstW('SMessageCaption')),
       MB_ICONINFORMATION or MB_OK);
   end;
 
@@ -51,11 +51,11 @@ uses TntSystem, TntSysUtils;
   var i: Integer;
   begin
      // Scan for language files in the app directory and register them in the LangManager object
-    LangManager.ScanForLangFiles(WideExtractFileDir(WideParamStr(0)), '*.lng', False);
+    LangManager.ScanForLangFiles(ExtractFileDir(ParamStr(0)), '*.lng', False);
      // Fill cbLanguage with available languages
     for i := 0 to LangManager.LanguageCount-1 do cbLanguage.Items.Add(LangManager.LanguageNames[i]);
      // Index=0 always means the default language
-    cbLanguage.ItemIndex := 0; 
+    cbLanguage.ItemIndex := 0;
   end;
 
 end.

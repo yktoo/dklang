@@ -1,9 +1,9 @@
 object fMain: TfMain
   Left = 321
   Top = 170
-  Width = 640
-  Height = 464
   Caption = '<>'
+  ClientHeight = 430
+  ClientWidth = 632
   Color = clBtnFace
   Font.Charset = DEFAULT_CHARSET
   Font.Color = clWindowText
@@ -13,24 +13,25 @@ object fMain: TfMain
   Menu = mmMain
   OldCreateOrder = False
   Position = poScreenCenter
-  OnCloseQuery = TntFormCloseQuery
-  OnCreate = TntFormCreate
+  OnCloseQuery = FormCloseQuery
+  OnCreate = FormCreate
   PixelsPerInch = 96
   TextHeight = 13
-  object TheStatusBar: TTntStatusBar
+  object TheStatusBar: TStatusBar
     Left = 0
-    Top = 396
+    Top = 411
     Width = 632
     Height = 19
     AutoHint = True
     Panels = <>
     SimplePanel = True
+    ExplicitTop = 396
   end
-  object mMain: TTntMemo
+  object mMain: TMemo
     Left = 0
     Top = 0
     Width = 632
-    Height = 396
+    Height = 411
     Align = alClient
     Font.Charset = DEFAULT_CHARSET
     Font.Color = clWindowText
@@ -42,139 +43,140 @@ object fMain: TfMain
     TabOrder = 1
     WordWrap = False
     OnChange = UpdateStateNotify
+    ExplicitHeight = 396
   end
-  object mmMain: TTntMainMenu
+  object mmMain: TMainMenu
     Left = 108
     Top = 32
-    object smFile: TTntMenuItem
+    object smFile: TMenuItem
       Caption = '&File'
-      object iFileNew: TTntMenuItem
+      object iFileNew: TMenuItem
         Action = aFileNew
       end
-      object iFileOpen: TTntMenuItem
+      object iFileOpen: TMenuItem
         Action = aFileOpen
       end
-      object iFileSave: TTntMenuItem
+      object iFileSave: TMenuItem
         Action = aFileSave
       end
-      object iFileSaveAs: TTntMenuItem
+      object iFileSaveAs: TMenuItem
         Action = aFileSaveAs
       end
-      object iSepFileExit: TTntMenuItem
+      object iSepFileExit: TMenuItem
         Caption = '-'
       end
-      object iFileExit: TTntMenuItem
+      object iFileExit: TMenuItem
         Action = aFileExit
       end
     end
-    object smEdit: TTntMenuItem
+    object smEdit: TMenuItem
       Caption = '&Edit'
-      object iEditUndo: TTntMenuItem
+      object iEditUndo: TMenuItem
         Action = aEditUndo
       end
-      object iSepEditCut: TTntMenuItem
+      object iSepEditCut: TMenuItem
         Caption = '-'
       end
-      object iEditCut: TTntMenuItem
+      object iEditCut: TMenuItem
         Action = aEditCut
       end
-      object iEditCopy: TTntMenuItem
+      object iEditCopy: TMenuItem
         Action = aEditCopy
       end
-      object iEditPaste: TTntMenuItem
+      object iEditPaste: TMenuItem
         Action = aEditPaste
       end
-      object iSepEditFind: TTntMenuItem
+      object iSepEditFind: TMenuItem
         Caption = '-'
       end
-      object iEditFind: TTntMenuItem
+      object iEditFind: TMenuItem
         Action = aEditFind
       end
-      object iEditFindNext: TTntMenuItem
+      object iEditFindNext: TMenuItem
         Action = aEditFindNext
       end
-      object iEditReplace: TTntMenuItem
+      object iEditReplace: TMenuItem
         Action = aEditReplace
       end
-      object iEditGoToLine: TTntMenuItem
+      object iEditGoToLine: TMenuItem
         Action = aEditGoToLine
       end
-      object iSepEditSelectAll: TTntMenuItem
+      object iSepEditSelectAll: TMenuItem
         Caption = '-'
       end
-      object iEditSelectAll: TTntMenuItem
+      object iEditSelectAll: TMenuItem
         Action = aEditSelectAll
       end
-      object iEditDateAndTime: TTntMenuItem
+      object iEditDateAndTime: TMenuItem
         Action = aEditDateAndTime
       end
     end
-    object smFormat: TTntMenuItem
+    object smFormat: TMenuItem
       Caption = 'Fo&rmat'
-      object iFormatWordWrap: TTntMenuItem
+      object iFormatWordWrap: TMenuItem
         Action = aFormatWordWrap
       end
-      object iFormatFont: TTntMenuItem
+      object iFormatFont: TMenuItem
         Action = aFormatFont
       end
     end
-    object smView: TTntMenuItem
+    object smView: TMenuItem
       Caption = '&View'
-      object iViewStatusBar: TTntMenuItem
+      object iViewStatusBar: TMenuItem
         Action = aViewStatusBar
       end
-      object iSepViewLanguage: TTntMenuItem
+      object iSepViewLanguage: TMenuItem
         Caption = '-'
       end
-      object smViewLanguage: TTntMenuItem
+      object smViewLanguage: TMenuItem
         Caption = '&Language'
       end
     end
-    object smHelp: TTntMenuItem
+    object smHelp: TMenuItem
       Caption = '&Help'
-      object iHelpAbout: TTntMenuItem
+      object iHelpAbout: TMenuItem
         Action = aHelpAbout
       end
     end
   end
-  object alMain: TTntActionList
+  object alMain: TActionList
     Left = 68
     Top = 32
-    object aFileNew: TTntAction
+    object aFileNew: TAction
       Category = 'File'
       Caption = '&New'
       Hint = 'New|Clear editor contents'
       ShortCut = 16462
       OnExecute = aFileNewExecute
     end
-    object aFileOpen: TTntAction
+    object aFileOpen: TAction
       Category = 'File'
       Caption = '&Open...'
       Hint = 'Open...|Open an existing file'
       ShortCut = 16463
       OnExecute = aFileOpenExecute
     end
-    object aFileSave: TTntAction
+    object aFileSave: TAction
       Category = 'File'
       Caption = '&Save'
       Hint = 'Save|Save the text into the current file'
       ShortCut = 16467
       OnExecute = aFileSaveExecute
     end
-    object aFileSaveAs: TTntAction
+    object aFileSaveAs: TAction
       Category = 'File'
       Caption = 'Save &as...'
       Hint = 'Save as...|Save the text into another file'
       ShortCut = 123
       OnExecute = aFileSaveAsExecute
     end
-    object aFileExit: TTntAction
+    object aFileExit: TAction
       Category = 'File'
       Caption = 'E&xit'
       Hint = 'Exit|Exit the program'
       OnExecute = aFileExitExecute
     end
-    object aEditUndo: TTntAction
+    object aEditUndo: TAction
       Category = 'Edit'
       Caption = '&Undo'
       Hint = 'Undo|Undo or redo the last change'
@@ -183,7 +185,7 @@ object fMain: TfMain
         'Alt+Backspace')
       OnExecute = aEditUndoExecute
     end
-    object aEditCut: TTntAction
+    object aEditCut: TAction
       Category = 'Edit'
       Caption = '&Cut'
       Hint = 'Cut|Cut selected text into the clipboard'
@@ -192,7 +194,7 @@ object fMain: TfMain
         'Shift+Del')
       OnExecute = aEditCutExecute
     end
-    object aEditCopy: TTntAction
+    object aEditCopy: TAction
       Category = 'Edit'
       Caption = 'Cop&y'
       Hint = 'Copy|Copy selected text into the clipboard'
@@ -201,7 +203,7 @@ object fMain: TfMain
         'Ctrl+Ins')
       OnExecute = aEditCopyExecute
     end
-    object aEditPaste: TTntAction
+    object aEditPaste: TAction
       Category = 'Edit'
       Caption = '&Paste'
       Hint = 'Paste|Paste text from the clipboard'
@@ -210,67 +212,67 @@ object fMain: TfMain
         'Shift+Ins')
       OnExecute = aEditPasteExecute
     end
-    object aEditFind: TTntAction
+    object aEditFind: TAction
       Category = 'Edit'
       Caption = '&Find...'
       Hint = 'Find...|Open Find text dialog'
       ShortCut = 16454
       OnExecute = aEditFindExecute
     end
-    object aEditFindNext: TTntAction
+    object aEditFindNext: TAction
       Category = 'Edit'
       Caption = 'Find &next'
       Hint = 'Find next|Repeat the last search'
       ShortCut = 114
       OnExecute = aEditFindNextExecute
     end
-    object aEditReplace: TTntAction
+    object aEditReplace: TAction
       Category = 'Edit'
       Caption = '&Replace...'
       Hint = 'Replace...|Open Replace text dialog'
       ShortCut = 16456
       OnExecute = aEditReplaceExecute
     end
-    object aEditGoToLine: TTntAction
+    object aEditGoToLine: TAction
       Category = 'Edit'
       Caption = '&Go to line...'
       Hint = 'Go to line...|Locate a particular text line'
       ShortCut = 16455
       OnExecute = aEditGoToLineExecute
     end
-    object aEditSelectAll: TTntAction
+    object aEditSelectAll: TAction
       Category = 'Edit'
       Caption = '&Select all'
       Hint = 'Select all|Select the whole text'
       ShortCut = 16449
       OnExecute = aEditSelectAllExecute
     end
-    object aEditDateAndTime: TTntAction
+    object aEditDateAndTime: TAction
       Category = 'Edit'
       Caption = '&Date and time'
       Hint = 'Date and time|Paste current date and time'
       ShortCut = 116
       OnExecute = aEditDateAndTimeExecute
     end
-    object aFormatWordWrap: TTntAction
+    object aFormatWordWrap: TAction
       Category = 'Format'
       Caption = '&Word wrap'
       Hint = 'Word wrap|Toggle word wrap'
       OnExecute = aFormatWordWrapExecute
     end
-    object aFormatFont: TTntAction
+    object aFormatFont: TAction
       Category = 'Format'
       Caption = '&Font...'
       Hint = 'Font...|Select editor font'
       OnExecute = aFormatFontExecute
     end
-    object aViewStatusBar: TTntAction
+    object aViewStatusBar: TAction
       Category = 'View'
       Caption = '&Status bar'
       Hint = 'Status bar|Toggle the status bar'
       OnExecute = aViewStatusBarExecute
     end
-    object aHelpAbout: TTntAction
+    object aHelpAbout: TAction
       Category = 'Help'
       Caption = '&About...'
       Hint = 'About...|Show version and copyright info'
@@ -278,7 +280,7 @@ object fMain: TfMain
       OnExecute = aHelpAboutExecute
     end
   end
-  object odMain: TTntOpenDialog
+  object odMain: TOpenDialog
     DefaultExt = 'txt'
     Filter = 'Text files (*.txt;*.log)|*.txt;*.log|All files (*.*)|*.*'
     Options = [ofHideReadOnly, ofPathMustExist, ofFileMustExist, ofEnableSizing]
@@ -286,7 +288,7 @@ object fMain: TfMain
     Left = 152
     Top = 32
   end
-  object sdMain: TTntSaveDialog
+  object sdMain: TSaveDialog
     DefaultExt = 'txt'
     Filter = 'ANSI text files (*.txt)|*.txt|Unicode text files (*.txt)|*.txt'
     Options = [ofOverwritePrompt, ofHideReadOnly, ofPathMustExist, ofEnableSizing]

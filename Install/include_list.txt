@@ -2,7 +2,6 @@
 
 ..\Packages\*.*
 
-..\Examples\Ansi\*.*
 ..\Examples\Constants\*.*
 ..\Examples\Frames\*.*
 ..\Examples\MDI\*.*

@@ -6,8 +6,10 @@
 *.bat
 *.pl
 *.bpg
+*.*.local
 Entries
 Entries.*
 Repository
 Root
 CVS
+.svn

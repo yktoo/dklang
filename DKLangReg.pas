@@ -1,8 +1,8 @@
 ///*********************************************************************************************************************
-///  $Id: DKLangReg.pas,v 1.6 2006-06-17 04:19:28 dale Exp $
+///  $Id: DKLangReg.pas,v 1.6 2006/06/17 04:19:28 dale Exp $
 ///---------------------------------------------------------------------------------------------------------------------
 ///  DKLang Localization Package
-///  Copyright 2002-2006 DK Software, http://www.dk-soft.org
+///  Copyright 2002-2008 DK Software, http://www.dk-soft.org
 ///*********************************************************************************************************************
 ///
 /// The contents of this package are subject to the Mozilla Public License
@@ -19,6 +19,8 @@
 /// specific language governing rights and limitations under the License.
 ///
 /// The initial developer of the original code is Dmitry Kann, http://www.dk-soft.org/
+///
+/// Upgraded to Delphi 2009 by Bruce J. Miller, rules-of-thumb.com Dec 2008
 ///
 ///**********************************************************************************************************************
 // Component, expert and component editor registration routines

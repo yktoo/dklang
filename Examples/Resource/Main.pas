@@ -1,5 +1,5 @@
 //**********************************************************************************************************************
-//  $Id: Main.pas,v 1.4 2006-08-11 12:15:51 dale Exp $
+//  $Id: Main.pas,v 1.4 2006/08/11 12:15:51 dale Exp $
 //----------------------------------------------------------------------------------------------------------------------
 //  DKLang Localization Package
 //  Copyright (c)DK Software, http://www.dk-soft.org/
@@ -9,15 +9,15 @@ unit Main;
 interface
 
 uses
-  Windows, Messages, SysUtils, Variants, Classes, Graphics, Controls, Forms, TntForms,
-  Dialogs, DKLang, StdCtrls, TntStdCtrls;
+  Windows, Messages, Variants, Classes, Graphics, Controls, Forms,
+  Dialogs, DKLang, StdCtrls;
 
 type
-  TfMain = class(TTntForm)
-    bCancel: TTntButton;
-    cbLanguage: TTntComboBox;
+  TfMain = class(TForm)
+    bCancel: TButton;
+    cbLanguage: TComboBox;
     lcMain: TDKLanguageController;
-    lSampleMessage: TTntLabel;
+    lSampleMessage: TLabel;
     procedure cbLanguageChange(Sender: TObject);
     procedure FormCreate(Sender: TObject);
   end;
@@ -27,9 +27,9 @@ var
 
 implementation
 {$R *.dfm}
-uses TntSystem, TntSysUtils;
+uses SysUtils;
 
-{$R LangFiles.res} // Notice this resource inclusion! 
+{$R LangFiles.res} 
 
   procedure TfMain.cbLanguageChange(Sender: TObject);
   var iIndex: Integer;

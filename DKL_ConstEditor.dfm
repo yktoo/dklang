@@ -2,7 +2,6 @@ object dDKL_ConstEditor: TdDKL_ConstEditor
   Left = 357
   Top = 191
   ActiveControl = gMain
-  AutoScroll = False
   BorderIcons = [biSystemMenu, biMaximize]
   Caption = 'DKLang Constant Editor'
   ClientHeight = 435
@@ -38,7 +37,7 @@ object dDKL_ConstEditor: TdDKL_ConstEditor
     Anchors = [akLeft, akBottom]
     Caption = 'Use Ctrl+Delete to delete the current entry.'
   end
-  object gMain: TTntStringGrid
+  object gMain: TStringGrid
     Left = 8
     Top = 8
     Width = 577

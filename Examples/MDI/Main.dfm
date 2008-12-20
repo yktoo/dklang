@@ -1,9 +1,9 @@
 object fMain: TfMain
   Left = 438
   Top = 199
-  Width = 469
-  Height = 324
   Caption = 'Sample MDI Application'
+  ClientHeight = 290
+  ClientWidth = 461
   Color = clBtnFace
   Font.Charset = DEFAULT_CHARSET
   Font.Color = clWindowText
@@ -16,7 +16,7 @@ object fMain: TfMain
   OnCreate = FormCreate
   PixelsPerInch = 96
   TextHeight = 13
-  object pTop: TTntPanel
+  object pTop: TPanel
     Left = 0
     Top = 0
     Width = 461
@@ -26,7 +26,7 @@ object fMain: TfMain
     DesignSize = (
       461
       61)
-    object cbLanguage: TTntComboBox
+    object cbLanguage: TComboBox
       Left = 4
       Top = 4
       Width = 453
@@ -37,7 +37,7 @@ object fMain: TfMain
       TabOrder = 0
       OnChange = cbLanguageChange
     end
-    object bNewWindow: TTntButton
+    object bNewWindow: TButton
       Left = 4
       Top = 32
       Width = 75
@@ -46,7 +46,7 @@ object fMain: TfMain
       TabOrder = 1
       OnClick = bNewWindowClick
     end
-    object bTile: TTntButton
+    object bTile: TButton
       Left = 84
       Top = 32
       Width = 75
@@ -55,7 +55,7 @@ object fMain: TfMain
       TabOrder = 2
       OnClick = bTileClick
     end
-    object bCascade: TTntButton
+    object bCascade: TButton
       Left = 164
       Top = 32
       Width = 75

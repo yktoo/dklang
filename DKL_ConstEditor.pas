@@ -1,8 +1,8 @@
 ///*********************************************************************************************************************
-///  $Id: DKL_ConstEditor.pas,v 1.13 2006-08-05 21:42:34 dale Exp $
+///  $Id: DKL_ConstEditor.pas,v 1.13 2006/08/05 21:42:34 dale Exp $
 ///---------------------------------------------------------------------------------------------------------------------
 ///  DKLang Localization Package
-///  Copyright 2002-2006 DK Software, http://www.dk-soft.org
+///  Copyright 2002-2008 DK Software, http://www.dk-soft.org
 ///*********************************************************************************************************************
 ///
 /// The contents of this package are subject to the Mozilla Public License
@@ -20,6 +20,8 @@
 ///
 /// The initial developer of the original code is Dmitry Kann, http://www.dk-soft.org/
 ///
+/// Upgraded to Delphi 2009 by Bruce J. Miller, rules-of-thumb.com Dec 2008
+///
 ///**********************************************************************************************************************
 // Designtime project constant editor dialog declaration
 //
@@ -28,9 +30,8 @@ unit DKL_ConstEditor;
 interface
 
 uses
-  Windows, Messages, SysUtils, Variants, Classes, Graphics, Controls, Forms, Dialogs, TntDialogs, DKLang,
-  StdCtrls, 
-  TntGrids, Grids;
+  Windows, Messages, SysUtils, Variants, Classes, Graphics, Controls, Forms, Dialogs, DKLang,
+  StdCtrls, Grids;
 
 type
   TdDKL_ConstEditor = class(TForm)
@@ -40,7 +41,7 @@ type
     bOK: TButton;
     bSave: TButton;
     cbSaveToLangSource: TCheckBox;
-    gMain: TTntStringGrid;
+    gMain: TStringGrid;
     lCount: TLabel;
     lDeleteHint: TLabel;
     procedure bEraseClick(Sender: TObject);
@@ -76,11 +77,11 @@ type
     procedure DeleteEntry(iIndex: Integer);
      // Prop handlers
     function  GetEntryCount: Integer;
-    function  GetEntryNames(Index: Integer): String;
-    function  GetEntryValues(Index: Integer; bEncoded: Boolean): WideString;
+    function  GetEntryNames(Index: Integer): UnicodeString;
+    function  GetEntryValues(Index: Integer; bEncoded: Boolean): UnicodeString;
     procedure SetEntryCount(iCount: Integer);
-    procedure SetEntryNames(Index: Integer; const sValue: String);
-    procedure SetEntryValues(Index: Integer; bEncoded: Boolean; const wsValue: WideString);
+    procedure SetEntryNames(Index: Integer; const wsValue: UnicodeString);
+    procedure SetEntryValues(Index: Integer; bEncoded: Boolean; const wsValue: UnicodeString);
   protected
     procedure DoClose(var Action: TCloseAction); override;
     procedure DoShow; override;
@@ -90,10 +91,10 @@ type
      // -- Entry (constant) count
     property EntryCount: Integer read GetEntryCount write SetEntryCount;
      // -- Constant names by index
-    property EntryNames[Index: Integer]: String read GetEntryNames write SetEntryNames;
+    property EntryNames[Index: Integer]: UnicodeString read GetEntryNames write SetEntryNames;
      // -- Constant names by index. If bEncoded=True, the constant value is represented 'encoded', with no literal
      //    control chars; if bEncoded=False, the value is represented 'as is', with linebreaks, tabs, etc. in it
-    property EntryValues[Index: Integer; bEncoded: Boolean]: WideString read GetEntryValues write SetEntryValues;
+    property EntryValues[Index: Integer; bEncoded: Boolean]: UnicodeString read GetEntryValues write SetEntryValues;
   end;
 
 const
@@ -107,7 +108,7 @@ const
 
 implementation
 {$R *.dfm}
-uses Registry, TntClasses;
+uses Registry;
 
 const
    // gMain's column indexes
@@ -140,12 +141,12 @@ const
 
   procedure TdDKL_ConstEditor.bLoadClick(Sender: TObject);
 
-    procedure DoLoad(const wsFileName: WideString);
+    procedure DoLoad(const wsFileName: UnicodeString);
     var
-      SL: TTntStringList;
+      SL: TStringList;
       i: Integer;
     begin
-      SL := TTntStringList.Create;
+      SL := TStringList.Create;
       try
         SL.LoadFromFile(wsFileName);
         EntryCount := SL.Count;
@@ -159,7 +160,7 @@ const
     end;
 
   begin
-    with TTntOpenDialog.Create(Self) do
+    with TOpenDialog.Create(Self) do
       try
         DefaultExt := 'txt';
         Filter     := 'All files (*.*)|*.*';
@@ -185,12 +186,12 @@ const
 
   procedure TdDKL_ConstEditor.bSaveClick(Sender: TObject);
 
-    procedure DoSave(const wsFileName: WideString);
+    procedure DoSave(const wsFileName: UnicodeString);
     var
-      SL: TTntStringList;
+      SL: TStringList;
       i: Integer;
     begin
-      SL := TTntStringList.Create;
+      SL := TStringList.Create;
       try
         for i := 0 to EntryCount-1 do SL.Add(EntryNames[i]+'='+EntryValues[i, True]);
         SL.SaveToFile(wsFileName);
@@ -200,7 +201,7 @@ const
     end;
 
   begin
-    with TTntSaveDialog.Create(Self) do
+    with TSaveDialog.Create(Self) do
       try
         DefaultExt := 'txt';
         Filter     := 'All files (*.*)|*.*';
@@ -219,18 +220,18 @@ const
 
   procedure TdDKL_ConstEditor.CheckNamesValid;
   var
-    SL: TStringList; // No need to deal with wide strings here
-    s: String;
+    SL: TStringList;
+    ws: UnicodeString;
     i: Integer;
   begin
     SL := TStringList.Create;
     try
       SL.Sorted := True;
       for i := 0 to EntryCount-1 do begin
-        s := EntryNames[i];
-        if s='' then DKLangError('Constant name cannot be empty');
-        if not IsValidIdent(s) then DKLangError('Invalid constant name: "%s"', [s]);
-        if SL.IndexOf(s)<0 then SL.Add(s) else DKLangError('Duplicate constant name: "%s"', [s]);
+        ws := EntryNames[i];
+        if ws='' then DKLangError('Constant name cannot be empty');
+        if not IsValidIdent(ws) then DKLangError('Invalid constant name: "%s"', [ws]);
+        if SL.IndexOf(ws)<0 then SL.Add(ws) else DKLangError('Duplicate constant name: "%s"', [ws]);
       end;
     finally
       SL.Free;
@@ -277,13 +278,13 @@ const
     Result := gMain.RowCount-2; // One for the header, one more for the virtual row
   end;
 
-  function TdDKL_ConstEditor.GetEntryNames(Index: Integer): String;
+  function TdDKL_ConstEditor.GetEntryNames(Index: Integer): UnicodeString;
   begin
     CheckEntryIndexValidity(Index);
     Result := Trim(gMain.Cells[IColIdx_Name, Index+1]); // One more row to skip the header
   end;
 
-  function TdDKL_ConstEditor.GetEntryValues(Index: Integer; bEncoded: Boolean): WideString;
+  function TdDKL_ConstEditor.GetEntryValues(Index: Integer; bEncoded: Boolean): UnicodeString;
   begin
     CheckEntryIndexValidity(Index);
     Result := Trim(gMain.Cells[IColIdx_Value, Index+1]); // One more row to skip the header
@@ -324,7 +325,7 @@ const
      // Copy the constans into the editor
     EntryCount := FConsts.Count;
     for i := 0 to FConsts.Count-1 do begin
-      EntryNames [i]        := FConsts[i].sName;
+      EntryNames [i]        := FConsts[i].wsName;
       EntryValues[i, False] := FConsts[i].wsValue;
     end;
      // Update count info
@@ -394,14 +395,14 @@ const
     gMain.Cells[IColIdx_Value, iCount+1] := '';
   end;
 
-  procedure TdDKL_ConstEditor.SetEntryNames(Index: Integer; const sValue: String);
+  procedure TdDKL_ConstEditor.SetEntryNames(Index: Integer; const wsValue: UnicodeString);
   begin
     CheckEntryIndexValidity(Index);
-    gMain.Cells[IColIdx_Name, Index+1] := sValue; // One more row to skip the header
+    gMain.Cells[IColIdx_Name, Index+1] := wsValue; // One more row to skip the header
   end;
 
-  procedure TdDKL_ConstEditor.SetEntryValues(Index: Integer; bEncoded: Boolean; const wsValue: WideString);
-  var ws: WideString;
+  procedure TdDKL_ConstEditor.SetEntryValues(Index: Integer; bEncoded: Boolean; const wsValue: UnicodeString);
+  var ws: UnicodeString;
   begin
     CheckEntryIndexValidity(Index);
     ws := wsValue;

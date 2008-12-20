@@ -1,8 +1,8 @@
 ///*********************************************************************************************************************
-///  $Id: DKLang.pas,v 1.37 2006-08-22 13:17:35 dale Exp $
+///  $Id: DKLang.pas,v 1.37 2006/08/22 13:17:35 dale Exp $
 ///---------------------------------------------------------------------------------------------------------------------
 ///  DKLang Localization Package
-///  Copyright 2002-2006 DK Software, http://www.dk-soft.org/
+///  Copyright 2002-2008 DK Software, http://www.dk-soft.org/
 ///*********************************************************************************************************************
 ///
 /// The contents of this package are subject to the Mozilla Public License
@@ -19,26 +19,29 @@
 /// specific language governing rights and limitations under the License.
 ///
 /// The initial developer of the original code is Dmitry Kann, http://www.dk-soft.org/
-/// Unicode support was initially developed by Bruce J. Miller <bjmiller-at-gmail.com>
+/// Unicode support was initially developed by Bruce J. Miller.
+///
+/// Upgraded to Delphi 2009 by Bruce J. Miller, rules-of-thumb.com Dec 2008
 ///
 ///*********************************************************************************************************************
 // The main unit (and the only required runtime unit) of the package. Contains all the
 // basic class and component declarations
 //
-unit DKLang;
+// Requires Delphi 2009 or higher.
+//
+//
 
-{$INCLUDE TntCompilers.inc}
+
+unit DKLang;
 
 interface
 uses
-  Windows, SysUtils, Classes, Contnrs, Masks, TntClasses,
-   // TntWideStrings shouldn't be used in BDS 2006+ as those IDEs correctly implement default WideStrings
-  {$IFDEF COMPILER_10_UP}
-  WideStrings
-  {$ELSE}
-  TntWideStrings
-  {$ENDIF}
-  ;
+  Windows, SysUtils, Classes, Contnrs, Masks;
+
+const
+  { Each Unicode stream should begin with the code U+FEFF,  }   // from TntSystem
+  {   which the standard defines as the *byte order mark*.  }
+  UNICODE_BOM = WideChar($FEFF);
 
 type
    // Error
@@ -62,17 +65,17 @@ type
     function  CanStore: Boolean;
      // Must append the language source lines (Strings) with its own data. If an entry states intersect with
      //   StateFilter, the entry should be skipped
-    procedure StoreLangSource(Strings: TWideStrings; StateFilter: TDKLang_TranslationStates);
+    procedure StoreLangSource(Strings: TStrings; StateFilter: TDKLang_TranslationStates);
      // Prop handlers
-    function  GetSectionName: WideString;
+    function  GetSectionName: UnicodeString;
      // Props
      // -- The name of the section corresponding to object language source data (without square brackets)
-    property SectionName: WideString read GetSectionName;
+    property SectionName: UnicodeString read GetSectionName;
   end;
 
    //-------------------------------------------------------------------------------------------------------------------
    // A list of masks capable of testing an arbitrary string for matching. A string is considered matching when it
-   //   matches any mask from the list  
+   //   matches any mask from the list
    //-------------------------------------------------------------------------------------------------------------------
 
   TDKLang_MaskList = class(TObjectList)
@@ -82,7 +85,7 @@ type
      // Creates and fills the list from Strings
     constructor Create(MaskStrings: TStrings);
      // Returns True if s matches any mask from the list
-    function  Matches(const s: String): Boolean;
+    function  Matches(const ws: UnicodeString): Boolean;
      // Props
      // -- Masks by index
     property Items[Index: Integer]: TMask read GetItems; default;
@@ -95,7 +98,7 @@ type
   PDKLang_PropValueTranslation = ^TDKLang_PropValueTranslation;
   TDKLang_PropValueTranslation = record
     iID:        Integer;                   // An entry ID, form-wide unique and permanent
-    wsValue:    WideString;                // The property value translation
+    wsValue:    UnicodeString;             // The property value translation
     TranStates: TDKLang_TranslationStates; // Translation states
   end;
 
@@ -107,15 +110,15 @@ type
   TDKLang_CompTranslation = class(TList)
   private
      // Prop storage
-    FComponentName: String;
+    FComponentName: UnicodeString;
      // Prop handlers
     function  GetItems(Index: Integer): PDKLang_PropValueTranslation;
   protected
     procedure Notify(Ptr: Pointer; Action: TListNotification); override;
   public
-    constructor Create(const sComponentName: String);
+    constructor Create(const wsComponentName: UnicodeString);
      // Adds an entry into the list and returns the index of the newly added entry
-    function  Add(iID: Integer; const wsValue: WideString; TranStates: TDKLang_TranslationStates): Integer;
+    function  Add(iID: Integer; const wsValue: UnicodeString; TranStates: TDKLang_TranslationStates): Integer;
      // Returns index of entry by its ID; -1 if not found
     function  IndexOfID(iID: Integer): Integer;
      // Tries to find the entry by property ID; returns True, if succeeded, and its index in iIndex; otherwise returns
@@ -125,7 +128,7 @@ type
     function  FindPropByID(iID: Integer): PDKLang_PropValueTranslation;
      // Props
      // -- Root component's name for which the translations in the list are (form, frame, datamodule etc)
-    property ComponentName: String read FComponentName;
+    property ComponentName: UnicodeString read FComponentName;
      // -- Translations by index
     property Items[Index: Integer]: PDKLang_PropValueTranslation read GetItems; default;
   end;
@@ -139,7 +142,7 @@ type
      // Prop storage
     FConstants: TDKLang_Constants;
     FIsStreamUnicode: Boolean;
-    FParams: TWideStrings;
+    FParams: TStrings;
      // Callback function for obtaining current language ID
     function  GetLangIDCallback: LANGID;
      // Prop handlers
@@ -153,22 +156,22 @@ type
      // Adds an item to the list and returns the index of the newly added entry
     function  Add(Item: TDKLang_CompTranslation): Integer;
      // Returns index of entry by component name; -1 if not found
-    function  IndexOfComponentName(const sComponentName: String): Integer;
+    function  IndexOfComponentName(const wsComponentName: UnicodeString): Integer;
      // Returns component translation entry by component name; nil if not found
-    function  FindComponentName(const sComponentName: String): TDKLang_CompTranslation;
+    function  FindComponentName(const wsComponentName: UnicodeString): TDKLang_CompTranslation;
      // Stream loading and storing in plaintext (ini-file-like) format. bParamsOnly tells the object to load only the
      //   sectionless parameters and not to load components nor constants. This may be used to evaluate the translation
      //   parameters only (eg. its language)
     procedure Text_LoadFromStream(Stream: TStream; bParamsOnly: Boolean = False);
     procedure Text_SaveToStream(Stream: TStream; bUnicode, bSkipUntranslated: Boolean);
      // File loading in plaintext (ini-file-like) format
-    procedure Text_LoadFromFile(const wsFileName: WideString; bParamsOnly: Boolean = False);
+    procedure Text_LoadFromFile(const wsFileName: UnicodeString; bParamsOnly: Boolean = False);
      // File storing in plaintext (ini-file-like) format:
      //   bUnicode          - if False, stores the data in ANSI encoding; if True, stores them in Unicode
      //   bSkipUntranslated - if True, untranslated values are eliminated from the file
-    procedure Text_SaveToFile(const wsFileName: WideString; bUnicode, bSkipUntranslated: Boolean);
+    procedure Text_SaveToFile(const wsFileName: UnicodeString; bUnicode, bSkipUntranslated: Boolean);
      // Resource loading
-    procedure Text_LoadFromResource(Instance: HINST; const wsResName: WideString; bParamsOnly: Boolean = False); overload;
+    procedure Text_LoadFromResource(Instance: HINST; const wsResName: UnicodeString; bParamsOnly: Boolean = False); overload;
     procedure Text_LoadFromResource(Instance: HINST; iResID: Integer; bParamsOnly: Boolean = False); overload;
      // Props
      // -- Constant entries
@@ -178,7 +181,7 @@ type
      // -- Component translations by index
     property Items[Index: Integer]: TDKLang_CompTranslation read GetItems; default;
      // -- Simple parameters stored in a translation file BEFORE the first section (ie. sectionless)
-    property Params: TWideStrings read FParams;
+    property Params: TStrings read FParams;
   end;
 
    //-------------------------------------------------------------------------------------------------------------------
@@ -187,10 +190,10 @@ type
 
   PDKLang_PropEntry = ^TDKLang_PropEntry;
   TDKLang_PropEntry = record
-    iID:            Integer;    // An entry ID, form-wide unique and permanent
-    sPropName:      String;     // Component's property name to which the entry is applied
-    wsDefLangValue: WideString; // The property's value for the default language, represented as a widestring
-    bValidated:     Boolean;    // Validation flag, used internally in TDKLang_CompEntry.UpdateEntries
+    iID:            Integer;        // An entry ID, form-wide unique and permanent
+    wsPropName:     UnicodeString;  // Component's property name to which the entry is applied
+    wsDefLangValue: UnicodeString;  // The property's value for the default language, represented as a UnicodeString
+    bValidated:     Boolean;        // Validation flag, used internally in TDKLang_CompEntry.UpdateEntries
   end;
 
    //-------------------------------------------------------------------------------------------------------------------
@@ -212,16 +215,16 @@ type
   public
      // Add an entry into the list (returns True) or replaces the property value with sDefLangValue if property with
      //   this name already exists (and returns False). Also sets bValidated to True
-    function  Add(iID: Integer; const sPropName: String; const wsDefLangValue: WideString): Boolean;
+    function  Add(iID: Integer; const wsPropName: UnicodeString; const wsDefLangValue: UnicodeString): Boolean;
      // Returns index of entry by its ID; -1 if not found
     function  IndexOfID(iID: Integer): Integer;
      // Returns index of entry by property name; -1 if not found
-    function  IndexOfPropName(const sPropName: String): Integer;
+    function  IndexOfPropName(const wsPropName: UnicodeString): Integer;
      // Tries to find the entry by property name; returns True, if succeeded, and its index in iIndex; otherwise returns
      //   False and its adviced insertion-point index in iIndex
-    function  FindPropName(const sPropName: String; out iIndex: Integer): Boolean;
+    function  FindPropName(const wsPropName: UnicodeString; out iIndex: Integer): Boolean;
      // Returns entry by property name; nil if not found
-    function  FindPropByName(const sPropName: String): PDKLang_PropEntry;
+    function  FindPropByName(const wsPropName: UnicodeString): PDKLang_PropEntry;
      // Stream loading and storing
     procedure LoadFromDFMResource(Stream: TStream);
     procedure SaveToDFMResource(Stream: TStream);
@@ -243,7 +246,7 @@ type
      // Owned component entries
     FOwnedCompEntries: TDKLang_CompEntries;
      // Prop storage
-    FName: String;
+    FName: UnicodeString;
     FComponent: TComponent;
     FOwner: TDKLang_CompEntry;
      // Recursively calls PropEntries.Invalidate for each component
@@ -257,10 +260,10 @@ type
      //   Required to be called after loading from the stream
     procedure BindComponents(CurComponent: TComponent);
      // Recursively appends property data as a language source format into Strings
-    procedure StoreLangSource(Strings: TWideStrings);
+    procedure StoreLangSource(Strings: TStrings);
      // Prop handlers
-    function  GetName: String;
-    function  GetComponentNamePath(bIncludeRoot: Boolean): String;
+    function  GetName: UnicodeString;
+    function  GetComponentNamePath(bIncludeRoot: Boolean): UnicodeString;
   public
     constructor Create(AOwner: TDKLang_CompEntry);
     destructor Destroy; override;
@@ -281,9 +284,9 @@ type
     property Component: TComponent read FComponent;
      // -- Returns component name path in the form 'owner1.owner2.name'. If bIncludeRoot=False, excludes the top-level
      //    owner name
-    property ComponentNamePath[bIncludeRoot: Boolean]: String read GetComponentNamePath;
+    property ComponentNamePath[bIncludeRoot: Boolean]: UnicodeString read GetComponentNamePath;
      // -- Component name in the IDE
-    property Name: String read GetName;
+    property Name: UnicodeString read GetName;
      // -- Owner entry, can be nil
     property Owner: TDKLang_CompEntry read FOwner;
   end;
@@ -305,7 +308,7 @@ type
      // Add an entry into the list; returns the index of the newly added entry
     function  Add(Item: TDKLang_CompEntry): Integer;
      // Returns index of entry by component name; -1 if not found
-    function  IndexOfCompName(const sCompName: String): Integer;
+    function  IndexOfCompName(const wsCompName: UnicodeString): Integer;
      // Returns index of entry by component reference; -1 if not found
     function  IndexOfComponent(CompReference: TComponent): Integer;
      // Returns entry for given component reference; nil if not found
@@ -326,10 +329,10 @@ type
 
   PDKLang_Constant = ^TDKLang_Constant;
   TDKLang_Constant = record
-    sName:      String;                    // Constant name, written obeying standard rules for identifier naming
-    wsValue:    WideString;                // Constant value
-    wsDefValue: WideString;                // Default constant value (in the default language; initially the same as wsValue)
-    TranStates: TDKLang_TranslationStates; // Translation states
+    wsName:     UnicodeString;                // Constant name, written obeying standard rules for identifier naming
+    wsValue:    UnicodeString;                // Constant value
+    wsDefValue: UnicodeString;                // Default constant value (in the default language; initially the same as wsValue)
+    TranStates: TDKLang_TranslationStates;    // Translation states
   end;
 
    //-------------------------------------------------------------------------------------------------------------------
@@ -355,48 +358,48 @@ type
     procedure IDKLang_LanguageSourceObject.StoreLangSource = LSO_StoreLangSource;
     function  IDKLang_LanguageSourceObject.GetSectionName  = LSO_GetSectionName;
     function  LSO_CanStore: Boolean;
-    procedure LSO_StoreLangSource(Strings: TWideStrings; StateFilter: TDKLang_TranslationStates);
-    function  LSO_GetSectionName: WideString;
+    procedure LSO_StoreLangSource(Strings: TStrings; StateFilter: TDKLang_TranslationStates);
+    function  LSO_GetSectionName: UnicodeString;
      // Prop handlers
-    function  GetAsRawString: String;
+    function  GetAsRawString: RawByteString;                                              // bjm 12 dec 2008  "String"->"RawByteString"
     function  GetItems(Index: Integer): PDKLang_Constant;
-    function  GetItemsByName(const sName: String): PDKLang_Constant;
-    function  GetValues(const sName: String): WideString;
-    procedure SetAsRawString(const Value: String);
-    procedure SetValues(const sName: String; const wsValue: WideString);
+    function  GetItemsByName(const wsName: UnicodeString): PDKLang_Constant;
+    function  GetValues(const wsName: UnicodeString): UnicodeString;
+    procedure SetAsRawString(const Value: RawByteString);                                 // bjm 12 dec 2008  "String"->"RawByteString"
+    procedure SetValues(const wsName: UnicodeString; const wsValue: UnicodeString);
   protected
     procedure Notify(Ptr: Pointer; Action: TListNotification); override;
   public
     constructor Create(AGetLangIDCallback: TDKLang_GetLangIDCallback);
      // Add an entry into the list; returns the index of the newly inserted entry
-    function  Add(const sName: String; const wsValue: WideString; TranStates: TDKLang_TranslationStates): Integer;
+    function  Add(const wsName: UnicodeString; const wsValue: UnicodeString; TranStates: TDKLang_TranslationStates): Integer;
      // Returns index of entry by name; -1 if not found
-    function  IndexOfName(const sName: String): Integer;
+    function  IndexOfName(const wsName: UnicodeString): Integer;
      // Tries to find the entry by name; returns True, if succeeded, and its index in iIndex; otherwise returns False
      //   and its adviced insertion-point index in iIndex
-    function  FindName(const sName: String; out iIndex: Integer): Boolean;
+    function  FindName(const wsName: UnicodeString; out iIndex: Integer): Boolean;
      // Finds the constant by name; returns nil if not found
-    function  FindConstName(const sName: String): PDKLang_Constant;
+    function  FindConstName(const wsName: UnicodeString): PDKLang_Constant;
      // Stream loading/storing
     procedure LoadFromStream(Stream: TStream);
     procedure SaveToStream(Stream: TStream);
      // Loads the constants from binary resource with the specified name. Returns True if resource existed, False
      //   otherwise
-    function  LoadFromResource(Instance: HINST; const wsResName: WideString): Boolean;
+    function  LoadFromResource(Instance: HINST; const wsResName: UnicodeString): Boolean;
      // Updates the values for existing names from Constants. If Constants=nil, reverts the values to their defaults
      //   (wsDefValue)
     procedure TranslateFrom(Constants: TDKLang_Constants);
      // Props
-     // -- Binary list representation as raw data 
-    property AsRawString: String read GetAsRawString write SetAsRawString;
+     // -- Binary list representation as raw data
+    property AsRawString: RawByteString read GetAsRawString write SetAsRawString;
      // -- If True (default), the list will be automatically saved into the Project's language resource file (*.dklang)
     property AutoSaveLangSource: Boolean read FAutoSaveLangSource write FAutoSaveLangSource;
      // -- Constants by index
     property Items[Index: Integer]: PDKLang_Constant read GetItems; default;
      // -- Constants by name. If no constant of that name exists, an Exception is raised
-    property ItemsByName[const sName: String]: PDKLang_Constant read GetItemsByName;
+    property ItemsByName[const wsName: UnicodeString]: PDKLang_Constant read GetItemsByName;
      // -- Constant values, by name. If no constant of that name exists, an Exception is raised
-    property Values[const sName: String]: WideString read GetValues write SetValues;
+    property Values[const wsName: UnicodeString]: UnicodeString read GetValues write SetValues;
   end;
 
    //-------------------------------------------------------------------------------------------------------------------
@@ -422,7 +425,7 @@ type
     FOnLanguageChanging: TNotifyEvent;
     FOptions: TDKLanguageControllerOptions;
     FRootCompEntry: TDKLang_CompEntry;
-    FSectionName: WideString;
+    FSectionName: UnicodeString;
     FStoreList: TStrings;
      // Methods for LangData custom property support
     procedure LangData_Load(Stream: TStream);
@@ -432,12 +435,12 @@ type
     procedure IDKLang_LanguageSourceObject.StoreLangSource = LSO_StoreLangSource;
     function  IDKLang_LanguageSourceObject.GetSectionName  = GetActualSectionName;
     function  LSO_CanStore: Boolean;
-    procedure LSO_StoreLangSource(Strings: TWideStrings; StateFilter: TDKLang_TranslationStates);
+    procedure LSO_StoreLangSource(Strings: TStrings; StateFilter: TDKLang_TranslationStates);
      // Forces component entries to update their entries. If bModifyList=False, only default property values are
      //   initialized, no entry additions/removes are allowed
     procedure UpdateComponents(bModifyList: Boolean);
      // Prop handlers
-    function  GetActualSectionName: WideString;
+    function  GetActualSectionName: UnicodeString;
     procedure SetIgnoreList(Value: TStrings);
     procedure SetStoreList(Value: TStrings);
   protected
@@ -453,7 +456,7 @@ type
     procedure Loaded; override;
      // Props
      // -- Name of a section that is actually used to store and read language data
-    property ActualSectionName: WideString read GetActualSectionName;
+    property ActualSectionName: UnicodeString read GetActualSectionName;
      // -- The root entry, corresponding to the instance's owner
     property RootCompEntry: TDKLang_CompEntry read FRootCompEntry;
   published
@@ -463,7 +466,7 @@ type
     property Options: TDKLanguageControllerOptions read FOptions write FOptions default DKLang_DefaultControllerOptions;
      // -- Name of a section corresponding to the form or frame served by the controller. If empty (default), Owner's
      //    name is used as section name
-    property SectionName: WideString read FSectionName write FSectionName;
+    property SectionName: UnicodeString read FSectionName write FSectionName;
      // -- List of forcibly stored properties
     property StoreList: TStrings read FStoreList write SetStoreList;
      // Events
@@ -487,7 +490,7 @@ type
   TDKLang_LangResource = record
     Kind:     TDKLang_LangResourceKind; // Entry kind
     Instance: HINST;                    // Instance containing the resource (Kind=[dklrkResName, dklrkResID])
-    wsName:   WideString;               // File (Kind=dklrkFile) or resource (Kind=dklrkResName) name
+    wsName:   UnicodeString;            // File (Kind=dklrkFile) or resource (Kind=dklrkResName) name
     iResID:   Integer;                  // Resource ID (Kind=dklrkResID)
     wLangID:  LANGID;                   // Language contained in the resource
   end;
@@ -498,7 +501,7 @@ type
   protected
     procedure Notify(Ptr: Pointer; Action: TListNotification); override;
   public
-    function  Add(Kind: TDKLang_LangResourceKind; Instance: HINST; const wsName: WideString; iResID: Integer; wLangID: LANGID): Integer;
+    function  Add(Kind: TDKLang_LangResourceKind; Instance: HINST; const wsName: UnicodeString; iResID: Integer; wLangID: LANGID): Integer;
      // Returns the index of entry having the specified LangID; -1 if no such entry
     function  IndexOfLangID(wLangID: LANGID): Integer;
      // Returns the entry having the specified LangID; nil if no such entry
@@ -537,14 +540,13 @@ type
      // Updates CodePage in order to match current LanguageID. Not a thread-safe method
     procedure UpdateCodePage;
      // Prop handlers
-    function  GetConstantValue(const sName: String): WideString;
-    function  GetConstantValueA(const sName: String): String;
+    function  GetConstantValue(const wsName: UnicodeString): UnicodeString;
     function  GetDefaultLanguageID: LANGID;
     function  GetLanguageCount: Integer;
     function  GetLanguageID: LANGID;
     function  GetLanguageIDs(Index: Integer): LANGID;
     function  GetLanguageIndex: Integer;
-    function  GetLanguageNames(Index: Integer): WideString;
+    function  GetLanguageNames(Index: Integer): UnicodeString;
     function  GetLanguageResources(Index: Integer): PDKLang_LangResource;
     procedure SetDefaultLanguageID(Value: LANGID);
     procedure SetLanguageID(Value: LANGID);
@@ -562,10 +564,10 @@ type
      // Registers a translation file for specified language. Returns True if the file was a valid translation file with
      //   language specified. The file replaces any language resource for that language registered before. You can never
      //   replace the DefaultLanguage though
-    function  RegisterLangFile(const wsFileName: WideString): Boolean;
+    function  RegisterLangFile(const wsFileName: UnicodeString): Boolean;
      // Register a resource as containing translation data for specified language. The resource replaces any language
      //   resource for that language registered before. You can never replace the DefaultLanguage though
-    procedure RegisterLangResource(Instance: HINST; const wsResourceName: WideString; wLangID: LANGID); overload;
+    procedure RegisterLangResource(Instance: HINST; const wsResourceName: UnicodeString; wLangID: LANGID); overload;
     procedure RegisterLangResource(Instance: HINST; iResID: Integer; wLangID: LANGID); overload;
      // Removes language with the specified LangID from the registered language resources list. You cannot remove the
      //   DefaultLanguage
@@ -574,20 +576,19 @@ type
      //   subdirectories of sDir. Returns the number of files successfully registered. Examples that scan the
      //   application directory for files with '.lng' extension:
      //     ScanForLangFiles(ExtractFileDir(ParamStr(0)), '*.lng', False); // ANSI version, not always correct
-     //     ScanForLangFiles(WideExtractFileDir(WideParamStr(0)), '*.lng', False); // Unicode version, requires Tnt
-     //                                                                            // Unicode Controls
-    function  ScanForLangFiles(const wsDir, wsMask: WideString; bRecursive: Boolean): Integer;
+     //     ScanForLangFiles(ExtractFileDir(ParamStr(0)), '*.lng', False); // Unicode version
+     //
+    function  ScanForLangFiles(const wsDir, wsMask: UnicodeString; bRecursive: Boolean): Integer;
      // Returns the index of specified LangID, or -1 if not found
     function  IndexOfLanguageID(wLangID: LANGID): Integer;
      // Props
      // -- Code page corresponding to the current value of LanguageID
     property CodePage: Cardinal read FCodePage;
      // -- Constant values by name, Unicode version
-    property ConstantValue[const sName: String]: WideString read GetConstantValue;
-     // -- Constant values by name, ANSI version
-    property ConstantValueA[const sName: String]: String read GetConstantValueA;
+    property ConstantValue[const wsName: UnicodeString]: UnicodeString read GetConstantValue;
      // -- Constant values by name, Unicode version; the same as ConstantValue[]
-    property ConstantValueW[const sName: String]: WideString read GetConstantValue;
+     //    W version left for compatability with old code
+    property ConstantValueW[const wsName: UnicodeString]: UnicodeString read GetConstantValue;
      // -- Default language ID. The default value is US English ($409)
     property DefaultLanguageID: LANGID read GetDefaultLanguageID write SetDefaultLanguageID;
      // -- Current language ID. Initially equals to DefaultLanguageID. When being changed, affects all the registered
@@ -600,40 +601,39 @@ type
      // -- LangIDs of languages (language resources) registered, index ranged 0 to LanguageCount-1
     property LanguageIDs[Index: Integer]: LANGID read GetLanguageIDs;
      // -- Names of languages (language resources) registered, index ranged 0 to LanguageCount-1, Unicode version only
-    property LanguageNames[Index: Integer]: WideString read GetLanguageNames;
+    property LanguageNames[Index: Integer]: UnicodeString read GetLanguageNames;
      // -- Language resources registered, index ranged 0 to LanguageCount-1. Always nil for Index=0, ie. for default
      //    language
     property LanguageResources[Index: Integer]: PDKLang_LangResource read GetLanguageResources;
+     // -- Load language and translate from a stream.  Assumes stream contains contents of a translations file.
+     //    Could be used for reading in a language file from a database
+    procedure TranslateFromStream(Stream: TStream);
   end;
 
    // Returns the global language manager instance (allowed at runtime only)
   function  LangManager: TDKLanguageManager;
 
    // Encoding/decoding of control characters in backslashed (escaped) form (CRLF -> \n, TAB -> \t, \ -> \\ etc)
-  function  EncodeControlChars(const ws: WideString): WideString; // Raw string -> Escaped string
-  function  DecodeControlChars(const ws: WideString): WideString; // Escaped string -> Raw string
+  function  EncodeControlChars(const ws: UnicodeString): UnicodeString; // Raw string -> Escaped string
+  function  DecodeControlChars(const ws: UnicodeString): UnicodeString; // Escaped string -> Raw string
    // Finds and updates the corresponding section in Strings (which appear as language source file). If no appropriate
    //   section found, appends the lines to the end of Strings
-  procedure UpdateLangSourceStrings(Strings: TWideStrings; LSObject: IDKLang_LanguageSourceObject; StateFilter: TDKLang_TranslationStates);
+  procedure UpdateLangSourceStrings(Strings: TStrings; LSObject: IDKLang_LanguageSourceObject; StateFilter: TDKLang_TranslationStates);
    // The same as UpdateLangSourceStrings() but operates directly on a language source file. If no such file, a new file
    //   is created
-  procedure UpdateLangSourceFile(const wsFileName: WideString; LSObject: IDKLang_LanguageSourceObject; StateFilter: TDKLang_TranslationStates);
+  procedure UpdateLangSourceFile(const wsFileName: UnicodeString; LSObject: IDKLang_LanguageSourceObject; StateFilter: TDKLang_TranslationStates);
    // Raises exception EDKLangError
-  procedure DKLangError(const sMsg: String); overload;
-  procedure DKLangError(const sMsg: String; const aParams: Array of const); overload;
+  procedure DKLangError(const wsMsg: UnicodeString); overload;
+  procedure DKLangError(const wsMsg: UnicodeString; const aParams: Array of const); overload;
 
    // Shortcut to LangManager.ConstantValueW[]
-  function  DKLangConstW(const sName: String): WideString; overload;
+  function  DKLangConstW(const wsName: UnicodeString): UnicodeString; overload;
    // The same, but formats constant value using aParams
-  function  DKLangConstW(const sName: String; const aParams: Array of const): WideString; overload;
-   // Shortcut to LangManager.ConstantValueA[]
-  function  DKLangConstA(const sName: String): String; overload;
-   // The same, but formats constant value using aParams
-  function  DKLangConstA(const sName: String; const aParams: Array of const): String; overload;
+  function  DKLangConstW(const wsName: UnicodeString; const aParams: Array of const): UnicodeString; overload;
 
 const
    // Version used for saving binary data into streams
-  IDKLang_StreamVersion                = 2;
+  IDKLang_StreamVersion                = 3;
 
    // Resource name for constant entries in the .res file and executable resources
   SDKLang_ConstResourceName            = 'DKLANG_CONSTS';
@@ -668,7 +668,7 @@ resourcestring
   SDKLangErrMsg_StreamVersionTooHigh   = 'Stream version (%d) is greater than the current one (%d)';
 
 implementation
-uses TypInfo, Math, TntSysUtils, TntSystem;
+uses TypInfo, Math;
 
 var
   _LangManager: TDKLanguageManager = nil;
@@ -682,7 +682,16 @@ var
     Result := _LangManager;
   end;
 
-  function EncodeControlChars(const ws: WideString): WideString;
+  function DKL_AnsiToUnicodeString(const s: AnsiString; codepage: Cardinal): UnicodeString;
+  var
+    rs: RawByteString;
+  begin
+    rs := s;
+    SetCodePage(rs,codepage,false);
+    result := UnicodeString(rs);
+  end;
+
+  function EncodeControlChars(const ws: UnicodeString): UnicodeString;
   var
     i, iLen: Integer;
     wc: WideChar;
@@ -708,13 +717,13 @@ var
          // Backslash. Just duplicate it
         '\': Result := Result+'\\';
          // All control characters having no special names represent as '\00' escape sequence; add directly all others
-        else if wc<#32 then Result := Result+WideFormat('\%.2d', [Word(wc)]) else Result := Result+wc;
+        else if wc<#32 then Result := Result+Format('\%.2d', [Word(wc)]) else Result := Result+wc;
       end;
       Inc(i);
     end;
   end;
 
-  function DecodeControlChars(const ws: WideString): WideString;
+  function DecodeControlChars(const ws: UnicodeString): UnicodeString;
   var
     i, iLen: Integer;
     wc: WideChar;
@@ -729,8 +738,8 @@ var
       if (wc='\') and (i<iLen) then
         case ws[i+1] of
            // An escaped charcode '\00'
-          '0'..'9': if (i<iLen-1) and (ws[i+2] in [WideChar('0')..WideChar('9')]) then begin
-            Result := Result+WideChar((Word(ws[i+1])-Word('0'))*10+(Word(ws[i+2])-Word('0')));
+          '0'..'9': if (i<iLen-1) and (ws[i+2] >= Char('0')) and (ws[i+2] <= Char('9')) then begin
+            Result := Result+Char((Word(ws[i+1])-Word('0'))*10+(Word(ws[i+2])-Word('0')));
             Inc(i, 2);
             bEscape := True;
           end;
@@ -755,17 +764,25 @@ var
     end;
   end;
 
-  procedure UpdateLangSourceStrings(Strings: TWideStrings; LSObject: IDKLang_LanguageSourceObject; StateFilter: TDKLang_TranslationStates);
+  function LCIDToCodePage(ALcid: LCID): Cardinal;
+  var
+    Buf: array[0..6] of WideChar;
+  begin
+    GetLocaleInfo(ALcid, LOCALE_IDefaultAnsiCodePage, Buf, 6);
+    Result := StrToIntDef(Buf, GetACP);
+  end;
+
+  procedure UpdateLangSourceStrings(Strings: TStrings; LSObject: IDKLang_LanguageSourceObject; StateFilter: TDKLang_TranslationStates);
   var
     idx, i: Integer;
-    wsSectionName: WideString;
-    SLLangSrc: TTntStringList;
+    wsSectionName: UnicodeString;
+    SLLangSrc: TStringList;
   begin
     if not LSObject.CanStore then Exit;
-    SLLangSrc := TTntStringList.Create;
+    SLLangSrc := TStringList.Create;
     try
        // Put section name
-      wsSectionName := WideFormat('[%s]', [LSObject.SectionName]);
+      wsSectionName := Format('[%s]', [LSObject.SectionName]);
       SLLangSrc.Add(wsSectionName);
        // Export language source data
       LSObject.StoreLangSource(SLLangSrc, StateFilter);
@@ -796,23 +813,23 @@ var
     end;
   end;
 
-  procedure UpdateLangSourceFile(const wsFileName: WideString; LSObject: IDKLang_LanguageSourceObject; StateFilter: TDKLang_TranslationStates);
-  var SLLangSrc: TTntStringList;
+  procedure UpdateLangSourceFile(const wsFileName: UnicodeString; LSObject: IDKLang_LanguageSourceObject; StateFilter: TDKLang_TranslationStates);
+  var SLLangSrc: TStringList;
   begin
-    SLLangSrc := TTntStringList.Create;
+    SLLangSrc := TStringList.Create;
     try
        // Load language file source, if any
-      if WideFileExists(wsFileName) then SLLangSrc.LoadFromFile(wsFileName);
+      if FileExists(wsFileName) then SLLangSrc.LoadFromFile(wsFileName);
        // Store the data
       UpdateLangSourceStrings(SLLangSrc, LSObject, StateFilter);
        // Save the language source back into file
-      SLLangSrc.SaveToFile(wsFileName);
+      SLLangSrc.SaveToFile(wsFileName,TEncoding.Unicode);
     finally
       SLLangSrc.Free;
     end;
   end;
 
-  procedure DKLangError(const sMsg: String); overload;
+  procedure DKLangError(const wsMsg: UnicodeString); overload;
 
      function RetAddr: Pointer;
      asm
@@ -820,10 +837,10 @@ var
      end;
 
   begin
-    raise EDKLangError.Create(sMsg) at RetAddr;
+    raise EDKLangError.Create(wsMsg) at RetAddr;
   end;
 
-  procedure DKLangError(const sMsg: String; const aParams: Array of const); overload;
+  procedure DKLangError(const wsMsg: UnicodeString; const aParams: Array of const); overload;
 
      function RetAddr: Pointer;
      asm
@@ -831,28 +848,19 @@ var
      end;
 
   begin
-    raise EDKLangError.CreateFmt(sMsg, aParams) at RetAddr;
+    raise EDKLangError.CreateFmt(wsMsg, aParams) at RetAddr;
   end;
 
-  function DKLangConstW(const sName: String): WideString;
+  function DKLangConstW(const wsName: UnicodeString): UnicodeString;
   begin
-    Result := LangManager.ConstantValueW[sName];
+    Result := LangManager.ConstantValueW[wsName];
   end;
 
-  function DKLangConstW(const sName: String; const aParams: Array of const): WideString;
+  function DKLangConstW(const wsName: UnicodeString; const aParams: Array of const): UnicodeString;
   begin
-    Result := WideFormat(DKLangConstW(sName), aParams);
+    Result := Format(DKLangConstW(wsName), aParams);
   end;
 
-  function DKLangConstA(const sName: String): String;
-  begin
-    Result := LangManager.ConstantValueA[sName];
-  end;
-
-  function DKLangConstA(const sName: String; const aParams: Array of const): String;
-  begin
-    Result := Format(DKLangConstA(sName), aParams);
-  end;
 
    //===================================================================================================================
    //  Stream I/O
@@ -876,42 +884,49 @@ var
 
   procedure StreamWriteBool(Stream: TStream; b: Boolean);
   begin
-    Stream.WriteBuffer(b, 1);
+    StreamWriteByte(Stream,Byte(b));
   end;
 
-  procedure StreamWriteStr(Stream: TStream; const s: string);
-  var w: Word;
+  procedure StreamWriteRawByteString(Stream: TStream; s: RawByteString);
+  var
+    w: Word;
   begin
+    w := Length(s);
+    Stream.WriteBuffer(s, 2);
+    Stream.WriteBuffer(s[1], w);
+  end;
+
+  procedure StreamWriteUtf8Str(Stream: TStream; const ws: UnicodeString);
+  var
+    w: Word;
+    s: Utf8String;
+  begin
+    s := Utf8Encode(ws);
     w := Length(s);
     Stream.WriteBuffer(w, 2);
     Stream.WriteBuffer(s[1], w);
   end;
 
-  procedure StreamWriteWideStr(Stream: TStream; const ws: WideString);
-  var w: Word;
+  procedure StreamWriteUnicodeStr(Stream: TStream; const ws: UnicodeString);
+  var
+    w: Word;
   begin
     w := Length(ws);
     Stream.WriteBuffer(w, 2);
     Stream.WriteBuffer(ws[1], w*2);
   end;
 
-  procedure StreamWriteLine(Stream: TStream; const ws: WideString); overload;
-  var wsLn: WideString;
+  procedure StreamWriteUnicodeLine(Stream: TStream; const ws: UnicodeString); overload;
+  var
+    wsLn: UnicodeString;
   begin
     wsLn := ws+#13#10;
     Stream.WriteBuffer(wsLn[1], Length(wsLn)*2);
   end;
 
-  procedure StreamWriteLine(Stream: TStream; const s: String); overload;
-  var sLn: String;
+  procedure StreamWriteUnicodeLine(Stream: TStream; const ws: UnicodeString; const aParams: Array of const); overload;
   begin
-    sLn := s+#13#10;
-    Stream.WriteBuffer(sLn[1], Length(sLn));
-  end;
-
-  procedure StreamWriteLine(Stream: TStream; const ws: WideString; const aParams: Array of const); overload;
-  begin
-    StreamWriteLine(Stream, WideFormat(ws, aParams));
+    StreamWriteUnicodeLine(Stream, Format(ws, aParams));
   end;
 
    // Writes stream version number
@@ -940,10 +955,44 @@ var
 
   function StreamReadBool(Stream: TStream): Boolean;
   begin
-    Stream.ReadBuffer(Result, 1);
+    Result := StreamReadByte(Stream) <> 0;
   end;
 
-  function StreamReadStr(Stream: TStream): string;
+  function StreamReadAnsiStr(Stream: TStream): UnicodeString; overload;
+  var
+    w: Word;
+    s: AnsiString;
+  begin
+    w := StreamReadWord(Stream);
+    SetLength(s, w);
+    Stream.ReadBuffer(s[1], w);
+    result := UnicodeString(s);
+  end;
+
+  function StreamReadAnsiStr(Stream: TStream; codepage: Cardinal): UnicodeString; overload;
+  var
+    w: Word;
+    s: RawByteString;
+  begin
+    w := StreamReadWord(Stream);
+    SetLength(s, w);
+    Stream.ReadBuffer(s[1], w);
+    SetCodePage(s,codepage,false);
+    result := UnicodeString(s);
+  end;
+
+  function StreamReadUtf8Str(Stream: TStream): UnicodeString;
+  var
+    w: Word;
+    s: Utf8String;
+  begin
+    w := StreamReadWord(Stream);
+    SetLength(s, w);
+    Stream.ReadBuffer(s[1], w);
+    result := Utf8ToString(s);
+  end;
+
+  function StreamReadRawByteStr(Stream: TStream): RawByteString;
   var w: Word;
   begin
     w := StreamReadWord(Stream);
@@ -951,7 +1000,7 @@ var
     Stream.ReadBuffer(Result[1], w);
   end;
 
-  function StreamReadWideStr(Stream: TStream): WideString;
+  function StreamReadUnicodeStr(Stream: TStream): UnicodeString;
   var w: Word;
   begin
     w := StreamReadWord(Stream);
@@ -975,11 +1024,11 @@ var
     Result := TMask(Get(Index));
   end;
 
-  function TDKLang_MaskList.Matches(const s: String): Boolean;
+  function TDKLang_MaskList.Matches(const ws: UnicodeString): Boolean;
   var i: Integer;
   begin
     for i := 0 to Count-1 do
-      if Items[i].Matches(s) then begin
+      if Items[i].Matches(ws) then begin
         Result := True;
         Exit;
       end;
@@ -990,7 +1039,7 @@ var
    // TDKLang_CompTranslation
    //===================================================================================================================
 
-  function TDKLang_CompTranslation.Add(iID: Integer; const wsValue: WideString; TranStates: TDKLang_TranslationStates): Integer;
+  function TDKLang_CompTranslation.Add(iID: Integer; const wsValue: UnicodeString; TranStates: TDKLang_TranslationStates): Integer;
   var p: PDKLang_PropValueTranslation;
   begin
      // Find insertion point and check ID uniqueness
@@ -1004,10 +1053,10 @@ var
     p.TranStates := TranStates;
   end;
 
-  constructor TDKLang_CompTranslation.Create(const sComponentName: String);
+  constructor TDKLang_CompTranslation.Create(const wsComponentName: UnicodeString);
   begin
     inherited Create;
-    FComponentName := sComponentName;
+    FComponentName := wsComponentName;
   end;
 
   function TDKLang_CompTranslation.FindID(iID: Integer; out iIndex: Integer): Boolean;
@@ -1068,14 +1117,14 @@ var
     inherited Clear;
      // Clear also parameters and constants
     if FParams<>nil then FParams.Clear;
-    if FConstants<>nil then FConstants.Clear;  
+    if FConstants<>nil then FConstants.Clear;
   end;
 
   constructor TDKLang_CompTranslations.Create;
   begin
     inherited Create;
     FConstants := TDKLang_Constants.Create(GetLangIDCallback);
-    FParams    := TTntStringList.Create;
+    FParams    := TStringList.Create;
   end;
 
   destructor TDKLang_CompTranslations.Destroy;
@@ -1085,10 +1134,10 @@ var
     inherited Destroy;
   end;
 
-  function TDKLang_CompTranslations.FindComponentName(const sComponentName: String): TDKLang_CompTranslation;
+  function TDKLang_CompTranslations.FindComponentName(const wsComponentName: UnicodeString): TDKLang_CompTranslation;
   var idx: Integer;
   begin
-    idx := IndexOfComponentName(sComponentName);
+    idx := IndexOfComponentName(wsComponentName);
     if idx<0 then Result := nil else Result := GetItems(idx);
   end;
 
@@ -1102,10 +1151,10 @@ var
     Result := StrToIntDef(Params.Values[SDKLang_TranParam_LangID], ILangID_USEnglish);
   end;
 
-  function TDKLang_CompTranslations.IndexOfComponentName(const sComponentName: String): Integer;
+  function TDKLang_CompTranslations.IndexOfComponentName(const wsComponentName: UnicodeString): Integer;
   begin
     for Result := 0 to Count-1 do
-      if SameText(GetItems(Result).ComponentName, sComponentName) then Exit;
+      if SameText(GetItems(Result).ComponentName, wsComponentName) then Exit;
     Result := -1;
   end;
 
@@ -1115,10 +1164,10 @@ var
     if Action=lnDeleted then TDKLang_CompTranslation(Ptr).Free;
   end;
 
-  procedure TDKLang_CompTranslations.Text_LoadFromFile(const wsFileName: WideString; bParamsOnly: Boolean);
+  procedure TDKLang_CompTranslations.Text_LoadFromFile(const wsFileName: UnicodeString; bParamsOnly: Boolean);
   var Stream: TStream;
   begin
-    Stream := TTntFileStream.Create(wsFileName, fmOpenRead or fmShareDenyWrite);
+    Stream := TFileStream.Create(wsFileName, fmOpenRead or fmShareDenyWrite);
     try
       Text_LoadFromStream(Stream, bParamsOnly);
     finally
@@ -1126,10 +1175,10 @@ var
     end;
   end;
 
-  procedure TDKLang_CompTranslations.Text_LoadFromResource(Instance: HINST; const wsResName: WideString; bParamsOnly: Boolean = False);
+  procedure TDKLang_CompTranslations.Text_LoadFromResource(Instance: HINST; const wsResName: UnicodeString; bParamsOnly: Boolean = False);
   var Stream: TStream;
   begin
-    Stream := TTntResourceStream.Create(Instance, wsResName, PWideChar(RT_RCDATA));
+    Stream := TResourceStream.Create(Instance, wsResName, PWideChar(RT_RCDATA));
     try
       Text_LoadFromStream(Stream, bParamsOnly);
     finally
@@ -1140,7 +1189,7 @@ var
   procedure TDKLang_CompTranslations.Text_LoadFromResource(Instance: HINST; iResID: Integer; bParamsOnly: Boolean = False);
   var Stream: TStream;
   begin
-    Stream := TTntResourceStream.CreateFromID(Instance, iResID, PWideChar(RT_RCDATA));
+    Stream := TResourceStream.CreateFromID(Instance, iResID, PWideChar(RT_RCDATA));
     try
       Text_LoadFromStream(Stream, bParamsOnly);
     finally
@@ -1149,61 +1198,68 @@ var
   end;
 
   procedure TDKLang_CompTranslations.Text_LoadFromStream(Stream: TStream; bParamsOnly: Boolean = False);
-  var SL: TTntStringList;
+  var SL: TStringList;
 
      // Tries to split a line that is neither comment nor section into a name and a value and returns True if succeeded
-    function ParseValueLine(const wsLine: WideString; out sName: String; out wsValue: WideString): Boolean;
+    function ParseValueLine(const wsLine: UnicodeString; out wsName: UnicodeString; out wsValue: UnicodeString): Boolean;
     var iEqPos: Integer;
     begin
       Result := False;
       iEqPos := Pos('=', wsLine);
       if iEqPos=0 then Exit;
-      sName   := Trim(Copy(wsLine, 1, iEqPos-1)); // Convert name to ANSI
+      wsName   := Trim(Copy(wsLine, 1, iEqPos-1)); // Convert name to ANSI
       wsValue := Trim(Copy(wsLine, iEqPos+1, MaxInt));
-      if sName='' then Exit;
+      if wsName='' then Exit;
       Result := True;
     end;
 
      // Extracts and returns the language ID parameter value from the string list, or ILangID_USEnglish if failed
-    function RetrieveLangID(List: TTntStringList): LANGID;
+    function RetrieveLangID(List: TStringList): LANGID;
     var
       i: Integer;
-      sName: String;
-      wsValue: WideString;
+      wsName: UnicodeString;
+      wsValue: UnicodeString;
     begin
       Result := ILangID_USEnglish;
       for i := 0 to List.Count-1 do
-        if ParseValueLine(List[i], sName, wsValue) and SameText(sName, SDKLang_TranParam_LangID) then begin
+        if ParseValueLine(List[i], wsName, wsValue) and SameText(wsName, SDKLang_TranParam_LangID) then begin
           Result := StrToIntDef(wsValue, ILangID_USEnglish);
           Break;
         end;
     end;
 
-     // Loads List from Stream, either ANSI or Unicode
-    procedure LoadStreamIntoStringList(List: TTntStringList);
-    var
-      i64Pos: Int64;
-      cCodePage: Cardinal;
+     // Loads List from Stream, either ANSI or Unicode - BOM reading is automatic in TStrings now
+    procedure LoadStreamIntoStringList(List: TStringList);
     begin
-       // Remember the original stream position
-      i64Pos := Stream.Position;
-       // Determine whether this is an Unicode source (BEFORE any reading is done)
-      FIsStreamUnicode := AutoDetectCharacterSet(Stream)=csUnicode;
-      Stream.Position := i64Pos;
-       // Load the stream contents into the list
       List.LoadFromStream(Stream);
-       // If this is an ANSI stream
-      if not FIsStreamUnicode then begin
-         // Get code page corresponding to the language from the loaded translations
-        cCodePage := LCIDToCodePage(RetrieveLangID(List));
-         // Reload the list using this correct code page
-        Stream.Position := i64Pos;
-        List.AnsiStrings.LoadFromStreamEx(Stream, cCodePage);
-      end;
     end;
 
+// was:
+//    procedure LoadStreamIntoStringList(List: TTntStringList);
+//    var
+//      i64Pos: Int64;
+//      cCodePage: Cardinal;
+//    begin
+//       // Remember the original stream position
+//      i64Pos := Stream.Position;
+//       // Determine whether this is an Unicode source (BEFORE any reading is done)
+//      FIsStreamUnicode := AutoDetectCharacterSet(Stream)=csUnicode;
+//      Stream.Position := i64Pos;
+//       // Load the stream contents into the list
+//      List.LoadFromStream(Stream);
+//       // If this is an ANSI stream
+//      if not FIsStreamUnicode then begin
+//         // Get code page corresponding to the language from the loaded translations
+//        cCodePage := LCIDToCodePage(RetrieveLangID(List));
+//         // Reload the list using this correct code page
+//        Stream.Position := i64Pos;
+//        List.AnsiStrings.LoadFromStreamEx(Stream, cCodePage);
+//      end;
+//    end;
+
+
      // Processes the string list, line by line
-    procedure ProcessStringList(List: TTntStringList);
+    procedure ProcessStringList(List: TStringList);
     type
        // A translation part (within the Stream)
       TTranslationPart = (
@@ -1212,15 +1268,15 @@ var
         tpComponent); // A component part
     var
       i: Integer;
-      wsLine: WideString;
+      wsLine: UnicodeString;
       CT: TDKLang_CompTranslation;
       Part: TTranslationPart;
 
        // Parses strings starting with '[' and ending with ']'
-      procedure ProcessSectionLine(const wsSectionName: WideString);
+      procedure ProcessSectionLine(const wsSectionName: UnicodeString);
       begin
          // If it's a constant section
-        if WideSameText(wsSectionName, SDKLang_ConstSectionName) then
+        if SameText(wsSectionName, SDKLang_ConstSectionName) then
           Part := tpConstant
          // Else assume this a component name
         else begin
@@ -1236,21 +1292,21 @@ var
       end;
 
        // Parses a value line and applies the value if succeeded
-      procedure ProcessValueLine(const wsLine: WideString);
+      procedure ProcessValueLine(const wsLine: UnicodeString);
       var
-        sName: String;
-        wsValue: WideString;
+        wsName: UnicodeString;
+        wsValue: UnicodeString;
         iID: Integer;
       begin
          // Try to split the line to name and value
-        if ParseValueLine(wsLine, sName, wsValue) then
+        if ParseValueLine(wsLine, wsName, wsValue) then
            // Apply the parsed values
           case Part of
-            tpParam:    FParams.Values[sName] := wsValue;
-            tpConstant: FConstants.Add(sName, DecodeControlChars(wsValue), []);
+            tpParam:    FParams.Values[wsName] := wsValue;
+            tpConstant: FConstants.Add(wsName, DecodeControlChars(wsValue), []);
             tpComponent:
               if CT<>nil then begin
-                iID := StrToIntDef(sName, 0);
+                iID := StrToIntDef(wsName, 0);
                 if iID>0 then CT.Add(iID, DecodeControlChars(wsValue), []);
               end;
           end;
@@ -1285,7 +1341,7 @@ var
      // Clear all the lists
     Clear;
      // Load the stream contents into the string list
-    SL := TTntStringList.Create;
+    SL := TStringList.Create;
     try
       LoadStreamIntoStringList(SL);
        // Parse the list line-by-line
@@ -1295,11 +1351,11 @@ var
     end;
   end;
 
-  procedure TDKLang_CompTranslations.Text_SaveToFile(const wsFileName: WideString; bUnicode, bSkipUntranslated: Boolean);
+  procedure TDKLang_CompTranslations.Text_SaveToFile(const wsFileName: UnicodeString; bUnicode, bSkipUntranslated: Boolean);
   var
     Stream: TStream;
   begin
-    Stream := TTntFileStream.Create(wsFileName, fmCreate);
+    Stream := TFileStream.Create(wsFileName, fmCreate);
     try
       Text_SaveToStream(Stream, bUnicode, bSkipUntranslated);
     finally
@@ -1308,16 +1364,15 @@ var
   end;
 
   procedure TDKLang_CompTranslations.Text_SaveToStream(Stream: TStream; bUnicode, bSkipUntranslated: Boolean);
-  var cCodePage: Cardinal;
 
-    procedure DoWriteLine(const ws: WideString); overload;
+    procedure DoWriteLine(const ws: UnicodeString); overload;
     begin
-      if bUnicode then StreamWriteLine(Stream, ws) else StreamWriteLine(Stream, WideStringToStringEx(ws, cCodePage));
+      StreamWriteUnicodeLine(Stream, ws);
     end;
 
-    procedure DoWriteLine(const ws: WideString; const aParams: Array of const); overload;
+    procedure DoWriteLine(const ws: UnicodeString; const aParams: Array of const); overload;
     begin
-      DoWriteLine(WideFormat(ws, aParams));
+      DoWriteLine(Format(ws, aParams));
     end;
 
     procedure WriteParams;
@@ -1356,11 +1411,10 @@ var
       for i := 0 to FConstants.Count-1 do
         with FConstants[i]^ do
           if not bSkipUntranslated or not (dktsUntranslated in TranStates) then
-            DoWriteLine('%s=%s', [sName, EncodeControlChars(wsValue)]);
+            DoWriteLine('%s=%s', [wsName, EncodeControlChars(wsValue)]);
     end;
 
   begin
-    cCodePage := LCIDToCodePage(GetLangIDCallback);
      // If Unicode saving - mark the stream as Unicode
     if bUnicode then StreamWriteWord(Stream, Word(UNICODE_BOM));
     WriteParams;
@@ -1372,19 +1426,19 @@ var
    // TDKLang_PropEntries
    //===================================================================================================================
 
-  function TDKLang_PropEntries.Add(iID: Integer; const sPropName: String; const wsDefLangValue: WideString): Boolean;
+  function TDKLang_PropEntries.Add(iID: Integer; const wsPropName: UnicodeString; const wsDefLangValue: UnicodeString): Boolean;
   var
     p: PDKLang_PropEntry;
     idx: Integer;
   begin
      // Try to find the property by its name
-    Result := not FindPropName(sPropName, idx);
+    Result := not FindPropName(wsPropName, idx);
      // If not found, create and insert a new entry
     if Result then begin
       New(p);
       Insert(idx, p);
-      p.iID       := iID;
-      p.sPropName := sPropName;
+      p.iID        := iID;
+      p.wsPropName := wsPropName;
     end else
       p := GetItems(idx);
      // Assign entry value
@@ -1400,13 +1454,13 @@ var
       if not GetItems(i).bValidated then Delete(i);
   end;
 
-  function TDKLang_PropEntries.FindPropByName(const sPropName: String): PDKLang_PropEntry;
+  function TDKLang_PropEntries.FindPropByName(const wsPropName: UnicodeString): PDKLang_PropEntry;
   var idx: Integer;
   begin
-    if FindPropName(sPropName, idx) then Result := GetItems(idx) else Result := nil;
+    if FindPropName(wsPropName, idx) then Result := GetItems(idx) else Result := nil;
   end;
 
-  function TDKLang_PropEntries.FindPropName(const sPropName: String; out iIndex: Integer): Boolean;
+  function TDKLang_PropEntries.FindPropName(const wsPropName: UnicodeString; out iIndex: Integer): Boolean;
   var iL, iR, i: Integer;
   begin
      // Since the list is sorted by property name, implement binary search here
@@ -1416,7 +1470,7 @@ var
     while iL<=iR do begin
       i := (iL+iR) shr 1;
        // Don't use AnsiCompareText() here as property names are allowed to consist of alphanumeric chars and '_' only
-      case CompareText(GetItems(i).sPropName, sPropName) of
+      case CompareText(GetItems(i).wsPropName, wsPropName) of
         Low(Integer)..-1: iL := i+1;
         0: begin
           Result := True;
@@ -1448,9 +1502,9 @@ var
     Result := -1;
   end;
 
-  function TDKLang_PropEntries.IndexOfPropName(const sPropName: String): Integer;
+  function TDKLang_PropEntries.IndexOfPropName(const wsPropName: UnicodeString): Integer;
   begin
-    if not FindPropName(sPropName, Result) then Result := -1;
+    if not FindPropName(wsPropName, Result) then Result := -1;
   end;
 
   procedure TDKLang_PropEntries.Invalidate;
@@ -1462,13 +1516,13 @@ var
   procedure TDKLang_PropEntries.LoadFromDFMResource(Stream: TStream);
   var
     i, iID: Integer;
-    sName: String;
+    wsName: UnicodeString;
   begin
     Clear;
     for i := 0 to StreamReadInt(Stream)-1 do begin
       iID   := StreamReadInt(Stream);
-      sName := StreamReadStr(Stream);
-      Add(iID, sName, '');
+      wsName := StreamReadUtf8Str(Stream);
+      Add(iID, wsName, '');
     end;
   end;
 
@@ -1487,7 +1541,7 @@ var
     for i := 0 to Count-1 do begin
       p := GetItems(i);
       StreamWriteInt(Stream, p.iID);
-      StreamWriteStr(Stream, p.sPropName);
+      StreamWriteUtf8Str(Stream, p.wsPropName); // saving as utf-8 allows reading of old files without issue
     end;
   end;
 
@@ -1501,13 +1555,13 @@ var
     procedure TranslateProps;
 
        // Returns translation of a property value in wsTranslation and True if it is present in PropEntries
-      function GetTranslationUnicode(const sPropName: String; out wsTranslation: WideString): Boolean;
+      function GetTranslationUnicode(const wsPropName: UnicodeString; out wsTranslation: UnicodeString): Boolean;
       var
         PE: PDKLang_PropEntry;
         idxTran: Integer;
       begin
          // Try to locate prop translation entry
-        PE := FPropEntries.FindPropByName(sPropName);
+        PE := FPropEntries.FindPropByName(wsPropName);
         Result := PE<>nil;
         if Result then begin
           wsTranslation := PE.wsDefLangValue;
@@ -1521,55 +1575,44 @@ var
           wsTranslation := '';
       end;
 
-       // The same but return translation in ANSI encoding
-      function GetTranslationAnsi(const sPropName: String; out sTranslation: String): Boolean;
-      var ws: WideString;
-      begin
-        Result := GetTranslationUnicode(sPropName, ws);
-        sTranslation := WideStringToStringEx(ws, cCodePage);
-      end;
-
-      procedure ProcessObject(const sPrefix: String; Instance: TObject); forward;
+      procedure ProcessObject(const wsPrefix: UnicodeString; Instance: TObject); forward;
 
        // Processes the specified property and adds it to PropEntries if it appears suitable
-      procedure ProcessProp(const sPrefix: String; Instance: TObject; pInfo: PPropInfo);
-      const asSep: Array[Boolean] of String[1] = ('', '.');
+      procedure ProcessProp(const wsPrefix: UnicodeString; Instance: TObject; pInfo: PPropInfo);
+      const wsSep: Array[Boolean] of UnicodeString = ('', '.');
       var
         i: Integer;
         o: TObject;
-        sFullName, sTranslation: String;
-        wsTranslation: WideString;
+        wsFullName, wsTranslation: UnicodeString;
       begin
          // Test whether property is to be ignored (don't use IgnoreTest interface here)
-        if ((Instance is TComponent) and (pInfo.Name='Name')) or not (pInfo.PropType^.Kind in [tkClass, tkString, tkLString, tkWString]) then Exit;
-        sFullName := sPrefix+asSep[sPrefix<>'']+pInfo.Name;
+        if ((Instance is TComponent) and (pInfo.Name='Name')) or not (pInfo.PropType^.Kind in [tkClass, tkString, tkLString, tkWString, tkUString]) then Exit;
+        wsFullName := wsPrefix+wsSep[wsPrefix<>'']+UnicodeString(pInfo.Name);
          // Assign the new [translated] value to the property
         case pInfo.PropType^.Kind of
           tkClass:
             if Assigned(pInfo.GetProc) and Assigned(pInfo.SetProc) then begin
               o := GetObjectProp(Instance, pInfo);
               if o<>nil then
-                 // TWideStrings property
-                if o is TWideStrings then begin
-                  if GetTranslationUnicode(sFullName, wsTranslation) then TWideStrings(o).Text := wsTranslation;
                  // TStrings property
-                end else if o is TStrings then begin
-                  if GetTranslationAnsi(sFullName, sTranslation) then TStrings(o).Text := sTranslation;
+                if o is TStrings then begin
+                  if GetTranslationUnicode(wsFullName, wsTranslation) then TStrings(o).Text := wsTranslation;
                  // TCollection property
                 end else if o is TCollection then
-                  for i := 0 to TCollection(o).Count-1 do ProcessObject(sFullName+Format('[%d]', [i]), TCollection(o).Items[i])
+                  for i := 0 to TCollection(o).Count-1 do ProcessObject(wsFullName+Format('[%d]', [i]), TCollection(o).Items[i])
                  // TPersistent property. Avoid processing TComponent references which may lead to a circular loop
                 else if (o is TPersistent) and not (o is TComponent) then
-                  ProcessObject(sFullName, o);
+                  ProcessObject(wsFullName, o);
             end;
-          tkString,
-            tkLString: if GetTranslationAnsi(sFullName, sTranslation) then SetStrProp(Instance, pInfo, sTranslation);
-            tkWString: if GetTranslationUnicode(sFullName, wsTranslation) then SetWideStrProp(Instance, pInfo, wsTranslation);
+          tkString,                                                           // conversion to AnsiString should set correct codepage
+          tkLString: if GetTranslationUnicode(wsFullName, wsTranslation) then SetAnsiStrProp(Instance, pInfo, AnsiString(wsTranslation));
+          tkWString,
+          tkUString: if GetTranslationUnicode(wsFullName, wsTranslation) then SetStrProp(Instance, pInfo, wsTranslation);
         end;
       end;
 
        // Iterates through Instance's properties and add them to PropEntries. sPrefix is the object name prefix part
-      procedure ProcessObject(const sPrefix: String; Instance: TObject);
+      procedure ProcessObject(const wsPrefix: UnicodeString; Instance: TObject);
       var
         i, iPropCnt: Integer;
         pList: PPropList;
@@ -1579,7 +1622,7 @@ var
          // Iterate thru Instance's properties
         if iPropCnt>0 then
           try
-            for i := 0 to iPropCnt-1 do ProcessProp(sPrefix, Instance, pList^[i]);
+            for i := 0 to iPropCnt-1 do ProcessProp(wsPrefix, Instance, pList^[i]);
           finally
             FreeMem(pList);
           end;
@@ -1643,7 +1686,7 @@ var
     inherited Destroy;
   end;
 
-  function TDKLang_CompEntry.GetComponentNamePath(bIncludeRoot: Boolean): String;
+  function TDKLang_CompEntry.GetComponentNamePath(bIncludeRoot: Boolean): UnicodeString;
   begin
     if FOwner=nil then
       if bIncludeRoot then Result := Name else Result := ''
@@ -1662,23 +1705,23 @@ var
       for i := 0 to FOwnedCompEntries.Count-1 do Result := Max(Result, FOwnedCompEntries[i].GetMaxPropEntryID);
   end;
 
-  function TDKLang_CompEntry.GetName: String;
+  function TDKLang_CompEntry.GetName: UnicodeString;
   begin
     if FComponent=nil then Result := FName else Result := FComponent.Name;
   end;
 
   procedure TDKLang_CompEntry.InternalUpdateEntries(var iFreePropEntryID: Integer; bModifyList, bIgnoreEmptyProps, bIgnoreNonAlphaProps, bIgnoreFontProps: Boolean; IgnoreMasks, StoreMasks: TDKLang_MaskList);
-  var sCompPathPrefix: String;
+  var wsCompPathPrefix: UnicodeString;
 
      // Returns True if a property is to be stored according either to its streaming store-flag or to its matching to
      //   StoreMasks
-    function IsPropStored(Instance: TObject; pInfo: PPropInfo; const sPropFullName: String): Boolean;
+    function IsPropStored(Instance: TObject; pInfo: PPropInfo; const wsPropFullName: UnicodeString): Boolean;
     begin
-      Result := IsStoredProp(Instance, pInfo) or StoreMasks.Matches(sPropFullName);
+      Result := IsStoredProp(Instance, pInfo) or StoreMasks.Matches(wsPropFullName);
     end;
 
      // Returns True if a property value is allowed to be stored
-    function IsPropValueStored(const sFullPropName: String; const wsPropVal: WideString): Boolean;
+    function IsPropValueStored(const wsFullPropName: UnicodeString; const wsPropVal: UnicodeString): Boolean;
     var i: Integer;
     begin
        // Check whether the property value contains localizable characters
@@ -1686,7 +1729,7 @@ var
         Result := False;
         for i := 1 to Length(wsPropVal) do
           case wsPropVal[i] of
-            'A'..'Z', 'a'..'z', #161..High(WideChar): begin
+            'A'..'Z', 'a'..'z', #161..High(Char): begin
               Result := True;
               Break;
             end;
@@ -1699,19 +1742,19 @@ var
     end;
 
      // Updates the PropEntry value (creates one if needed)
-    procedure UpdatePropValue(const sFullPropName: String; const wsPropVal: WideString);
+    procedure UpdatePropValue(const wsFullPropName: UnicodeString; const wsPropVal: UnicodeString);
     var p: PDKLang_PropEntry;
     begin
-      if IsPropValueStored(sFullPropName, wsPropVal) then
+      if IsPropValueStored(wsFullPropName, wsPropVal) then
          // If modifications are allowed
         if bModifyList then begin
            // Create PropEntries if needed
           if FPropEntries=nil then FPropEntries := TDKLang_PropEntries.Create;
            // If property is added (rather than replaced), increment the iFreePropEntryID counter; validate the entry
-          if FPropEntries.Add(iFreePropEntryID, sFullPropName, wsPropVal) then Inc(iFreePropEntryID);
+          if FPropEntries.Add(iFreePropEntryID, wsFullPropName, wsPropVal) then Inc(iFreePropEntryID);
          // Otherwise only update the value, if any
         end else if FPropEntries<>nil then begin
-          p := FPropEntries.FindPropByName(sFullPropName);
+          p := FPropEntries.FindPropByName(wsFullPropName);
           if p<>nil then p.wsDefLangValue := wsPropVal;
         end;
     end;
@@ -1719,51 +1762,52 @@ var
      // Updates property entries
     procedure UpdateProps;
 
-      procedure ProcessObject(const sPrefix: String; Instance: TObject); forward;
+      procedure ProcessObject(const wsPrefix: UnicodeString; Instance: TObject); forward;
 
        // Processes the specified property and adds it to PropEntries if it appears suitable
-      procedure ProcessProp(const sPrefix: String; Instance: TObject; pInfo: PPropInfo);
-      const asSep: Array[Boolean] of String[1] = ('', '.');
+      procedure ProcessProp(const wsPrefix: UnicodeString; Instance: TObject; pInfo: PPropInfo);
+      const wsSep: Array[Boolean] of UnicodeString = ('', '.');
       var
         i: Integer;
         o: TObject;
-        sPropInCompName, sPropFullName: String;
+        wsPropInCompName, wsPropFullName: UnicodeString;
       begin
-        sPropInCompName := sPrefix+asSep[sPrefix<>'']+pInfo.Name;
-        sPropFullName   := sCompPathPrefix+sPropInCompName;
+        wsPropInCompName := wsPrefix+wsSep[wsPrefix<>'']+UnicodeString(pInfo.Name);
+        wsPropFullName   := wsCompPathPrefix+wsPropInCompName;
          // Test whether property is to be ignored
         if ((Instance is TComponent) and (pInfo.Name='Name')) or
-           not (pInfo.PropType^.Kind in [tkClass, tkString, tkLString, tkWString]) or
-           IgnoreMasks.Matches(sPropFullName) then Exit;
+           not (pInfo.PropType^.Kind in [tkClass, tkString, tkLString, tkWString, tkUString]) or
+           IgnoreMasks.Matches(wsPropFullName) then Exit;
          // Obtain and store property value
         case pInfo.PropType^.Kind of
           tkClass:
-            if Assigned(pInfo.GetProc) and Assigned(pInfo.SetProc) and IsPropStored(Instance, pInfo, sPropFullName) then begin
+            if Assigned(pInfo.GetProc) and Assigned(pInfo.SetProc) and IsPropStored(Instance, pInfo, wsPropFullName) then begin
               o := GetObjectProp(Instance, pInfo);
               if o<>nil then
-                 // TWideStrings property
-                if o is TWideStrings then
-                  UpdatePropValue(sPropInCompName, TWideStrings(o).Text)
+                 // TStrings property
+                if o is TStrings then
+                  UpdatePropValue(wsPropInCompName, TStrings(o).Text)
                  // TStrings property
                 else if o is TStrings then
-                  UpdatePropValue(sPropInCompName, TStrings(o).Text)
+                  UpdatePropValue(wsPropInCompName, TStrings(o).Text)
                  // TCollection property
                 else if o is TCollection then
-                  for i := 0 to TCollection(o).Count-1 do ProcessObject(sPropInCompName+Format('[%d]', [i]), TCollection(o).Items[i])
+                  for i := 0 to TCollection(o).Count-1 do ProcessObject(wsPropInCompName+Format('[%d]', [i]), TCollection(o).Items[i])
                  // TPersistent property. Avoid processing TComponent references which may lead to a circular loop. Also
                  //   filter TFont property values if needed (use name comparison instead of inheritance operator to
                  //   eliminate dependency on Graphics unit)
                 else if (o is TPersistent) and not (o is TComponent) and (not bIgnoreFontProps or (o.ClassName<>'TFont')) then
-                  ProcessObject(sPropInCompName, o);
+                  ProcessObject(wsPropInCompName, o);
             end;
           tkString,
-            tkLString: if IsPropStored(Instance, pInfo, sPropFullName) then UpdatePropValue(sPropInCompName, GetStrProp(Instance, pInfo));
-          tkWString:   if IsPropStored(Instance, pInfo, sPropFullName) then UpdatePropValue(sPropInCompName, GetWideStrProp(Instance, pInfo));
+          tkLString,
+          tkWString,
+          tkUstring:   if IsPropStored(Instance, pInfo, wsPropFullName) then UpdatePropValue(wsPropInCompName, GetStrProp(Instance, pInfo));
         end;
       end;
 
        // Iterates through Instance's properties and add them to PropEntries. sPrefix is the object name prefix part
-      procedure ProcessObject(const sPrefix: String; Instance: TObject);
+      procedure ProcessObject(const wsPrefix: UnicodeString; Instance: TObject);
       var
         i, iPropCnt: Integer;
         pList: PPropList;
@@ -1773,7 +1817,7 @@ var
          // Iterate thru Instance's properties
         if iPropCnt>0 then
           try
-            for i := 0 to iPropCnt-1 do ProcessProp(sPrefix, Instance, pList^[i]);
+            for i := 0 to iPropCnt-1 do ProcessProp(wsPrefix, Instance, pList^[i]);
           finally
             FreeMem(pList);
           end;
@@ -1818,7 +1862,7 @@ var
     end;
 
   begin
-    sCompPathPrefix := ComponentNamePath[False]+'.'; // Root prop names will start with '.'
+    wsCompPathPrefix := ComponentNamePath[False]+'.'; // Root prop names will start with '.'
      // Update property entries
     UpdateProps;
      // Update component entries
@@ -1836,7 +1880,7 @@ var
   procedure TDKLang_CompEntry.LoadFromDFMResource(Stream: TStream);
   begin
      // Read component name
-    FName := StreamReadStr(Stream);
+    FName := StreamReadUtf8Str(Stream);
      // Load props, if any
     if StreamReadBool(Stream) then begin
       if FPropEntries=nil then FPropEntries := TDKLang_PropEntries.Create;
@@ -1870,7 +1914,7 @@ var
   procedure TDKLang_CompEntry.SaveToDFMResource(Stream: TStream);
   begin
      // Save component name
-    StreamWriteStr(Stream, Name);
+    StreamWriteUtf8Str(Stream, Name);
      // Store component properties
     StreamWriteBool(Stream, FPropEntries<>nil);
     if FPropEntries<>nil then FPropEntries.SaveToDFMResource(Stream);
@@ -1879,21 +1923,21 @@ var
     if FOwnedCompEntries<>nil then FOwnedCompEntries.SaveToDFMResource(Stream);
   end;
 
-  procedure TDKLang_CompEntry.StoreLangSource(Strings: TWideStrings);
+  procedure TDKLang_CompEntry.StoreLangSource(Strings: TStrings);
   var
     i: Integer;
     PE: PDKLang_PropEntry;
-    sCompPath: String;
+    wsCompPath: UnicodeString;
   begin
      // Store the properties
     if FPropEntries<>nil then begin
        // Find the component path, if any
-      sCompPath := ComponentNamePath[False];
-      if sCompPath<>'' then sCompPath := sCompPath+'.';
+      wsCompPath := ComponentNamePath[False];
+      if wsCompPath<>'' then wsCompPath := wsCompPath+'.';
        // Iterate through the property entries
       for i := 0 to FPropEntries.Count-1 do begin
         PE := FPropEntries[i];
-        Strings.Add(WideFormat('%s%s=%.8d,%s', [sCompPath, PE.sPropName, PE.iID, EncodeControlChars(PE.wsDefLangValue)]));
+        Strings.Add(Format('%s%s=%.8d,%s', [wsCompPath, PE.wsPropName, PE.iID, EncodeControlChars(PE.wsDefLangValue)]));
       end;
     end;
      // Recursively call the method for owned entries
@@ -1943,11 +1987,11 @@ var
     Result := Get(Index);
   end;
 
-  function TDKLang_CompEntries.IndexOfCompName(const sCompName: String): Integer;
+  function TDKLang_CompEntries.IndexOfCompName(const wsCompName: UnicodeString): Integer;
   begin
     for Result := 0 to Count-1 do
        // Don't use AnsiSameText() here as component names are allowed to consist of alphanumeric chars and '_' only
-      if SameText(GetItems(Result).Name, sCompName) then Exit;
+      if SameText(GetItems(Result).Name, wsCompName) then Exit;
     Result := -1;
   end;
 
@@ -1988,17 +2032,17 @@ var
    // TDKLang_Constants
    //===================================================================================================================
 
-  function TDKLang_Constants.Add(const sName: String; const wsValue: WideString; TranStates: TDKLang_TranslationStates): Integer;
+  function TDKLang_Constants.Add(const wsName: UnicodeString; const wsValue: UnicodeString; TranStates: TDKLang_TranslationStates): Integer;
   var p: PDKLang_Constant;
   begin
-    if not IsValidIdent(sName) then DKLangError(SDKLangErrMsg_InvalidConstName, [sName]);
+    if not IsValidIdent(wsName) then DKLangError(SDKLangErrMsg_InvalidConstName, [wsName]);
      // Find insertion point and check name uniqueness
-    if FindName(sName, Result) then DKLangError(SDKLangErrMsg_DuplicateConstName, [sName]);
+    if FindName(wsName, Result) then DKLangError(SDKLangErrMsg_DuplicateConstName, [wsName]);
      // Create and insert a new entry
     New(p);
     Insert(Result, p);
      // Initialize entry
-    p.sName      := sName;
+    p.wsName     := wsName;
     p.wsValue    := wsValue;
     p.wsDefValue := wsValue;
     p.TranStates := TranStates;
@@ -2011,13 +2055,13 @@ var
     FGetLangIDCallback  := AGetLangIDCallback;
   end;
 
-  function TDKLang_Constants.FindConstName(const sName: String): PDKLang_Constant;
+  function TDKLang_Constants.FindConstName(const wsName: UnicodeString): PDKLang_Constant;
   var idx: Integer;
   begin
-    if FindName(sName, idx) then Result := GetItems(idx) else Result := nil;
+    if FindName(wsName, idx) then Result := GetItems(idx) else Result := nil;
   end;
 
-  function TDKLang_Constants.FindName(const sName: String; out iIndex: Integer): Boolean;
+  function TDKLang_Constants.FindName(const wsName: UnicodeString; out iIndex: Integer): Boolean;
   var iL, iR, i: Integer;
   begin
      // Since the list is sorted by constant name, implement binary search here
@@ -2026,9 +2070,9 @@ var
     iR := Count-1;
     while iL<=iR do begin
       i := (iL+iR) shr 1;
-       // Don't use AnsiCompareText()/WideCompareText() here as constant names are allowed to consist of alphanumeric
+       // Don't use AnsiCompareText()/CompareText() here as constant names are allowed to consist of alphanumeric
        //   chars and '_' only
-      case CompareText(GetItems(i).sName, sName) of
+      case CompareText(GetItems(i).wsName, wsName) of
         Low(Integer)..-1: iL := i+1;
         0: begin
           Result := True;
@@ -2041,13 +2085,16 @@ var
     iIndex := iL;
   end;
 
-  function TDKLang_Constants.GetAsRawString: String;
-  var Stream: TStringStream;
+  function TDKLang_Constants.GetAsRawString: RawByteString;
+  var
+    Stream: TMemoryStream;    // bjm  was TStringStream
   begin
-    Stream := TStringStream.Create('');
+    Stream := TMemoryStream.Create;
     try
       SaveToStream(Stream);
-      Result := Stream.DataString;
+      Stream.Position := 0;
+      SetLength(Result,Stream.Size);
+      Stream.ReadBuffer(Result[1],Stream.Size);
     finally
       Stream.Free;
     end;
@@ -2058,31 +2105,31 @@ var
     Result := Get(Index);
   end;
 
-  function TDKLang_Constants.GetItemsByName(const sName: String): PDKLang_Constant;
+  function TDKLang_Constants.GetItemsByName(const wsName: UnicodeString): PDKLang_Constant;
   var idx: Integer;
   begin
-    if not FindName(sName, idx) then DKLangError(SDKLangErrMsg_ConstantNotFound, [sName]);
+    if not FindName(wsName, idx) then DKLangError(SDKLangErrMsg_ConstantNotFound, [wsName]);
     Result := GetItems(idx);
   end;
 
-  function TDKLang_Constants.GetValues(const sName: String): WideString;
+  function TDKLang_Constants.GetValues(const wsName: UnicodeString): UnicodeString;
   begin
-    Result := ItemsByName[sName].wsValue;
+    Result := ItemsByName[wsName].wsValue;
   end;
 
-  function TDKLang_Constants.IndexOfName(const sName: String): Integer;
+  function TDKLang_Constants.IndexOfName(const wsName: UnicodeString): Integer;
   begin
-    if not FindName(sName, Result) then Result := -1;
+    if not FindName(wsName, Result) then Result := -1;
   end;
 
-  function TDKLang_Constants.LoadFromResource(Instance: HINST; const wsResName: WideString): Boolean;
+  function TDKLang_Constants.LoadFromResource(Instance: HINST; const wsResName: UnicodeString): Boolean;
   var Stream: TStream;
   begin
      // Check resource existence
     Result := FindResourceW(Instance, PWideChar(wsResName), PWideChar(RT_RCDATA))<>0;
      // If succeeded, load the list from resource
     if Result then begin
-      Stream := TTntResourceStream.Create(Instance, wsResName, PWideChar(RT_RCDATA));
+      Stream := TResourceStream.Create(Instance, wsResName, PWideChar(RT_RCDATA));
       try
         LoadFromStream(Stream);
       finally
@@ -2098,8 +2145,8 @@ var
     procedure Load_v1(bAutoSaveLangSource: Boolean);
     var
       i: Integer;
-      sName: String;
-      wsValue: WideString;
+      wsName: UnicodeString;
+      wsValue: UnicodeString;
       cCodePage: Cardinal;
     begin
       cCodePage := LCIDToCodePage(FGetLangIDCallback);
@@ -2107,9 +2154,9 @@ var
       FAutoSaveLangSource := bAutoSaveLangSource;
        // Read item count, then read the constant names and values
       for i := 0 to StreamReadInt(Stream)-1 do begin
-        sName   := StreamReadStr(Stream);
-        wsValue := StringToWideStringEx(StreamReadStr(Stream), cCodePage);
-        Add(sName, wsValue, []);
+        wsName   := StreamReadAnsiStr(Stream);
+        wsValue := StreamReadAnsiStr(Stream,cCodePage);// was StringToWideStringEx(StreamReadStr(Stream), cCodePage);  but StreamReadStr(Stream) returns widestring
+        Add(wsName, wsValue, []);
       end;
     end;
 
@@ -2117,16 +2164,33 @@ var
     procedure Load_v2;
     var
       i: Integer;
-      sName: String;
-      wsValue: WideString;
+      wsName: UnicodeString;
+      wsValue: UnicodeString;
     begin
        // Read props
       FAutoSaveLangSource := StreamReadBool(Stream);
        // Read item count, then read the constant names and values
       for i := 0 to StreamReadInt(Stream)-1 do begin
-        sName   := StreamReadStr    (Stream);
-        wsValue := StreamReadWideStr(Stream);
-        Add(sName, wsValue, []);
+        wsName   := StreamReadAnsiStr(Stream);
+        wsValue := StreamReadUnicodeStr(Stream);
+        Add(wsName, wsValue, []);
+      end;
+    end;
+
+     // Implements loading from stream of version 3
+    procedure Load_v3;
+    var
+      i: Integer;
+      wsName: UnicodeString;
+      wsValue: UnicodeString;
+    begin
+       // Read props
+      FAutoSaveLangSource := StreamReadBool(Stream);
+       // Read item count, then read the constant names and values
+      for i := 0 to StreamReadInt(Stream)-1 do begin
+        wsName   := StreamReadUnicodeStr(Stream);
+        wsValue := StreamReadUnicodeStr(Stream);
+        Add(wsName, wsValue, []);
       end;
     end;
 
@@ -2140,6 +2204,7 @@ var
        //   AutoSaveLangSource flag
       0, 1: Load_v1(b<>0);
       2:    Load_v2;
+      3:    Load_v3;
       else  DKLangError(SDKLangErrMsg_StreamVersionTooHigh, [b, IDKLang_StreamVersion]);
     end;
   end;
@@ -2149,18 +2214,18 @@ var
     Result := True;
   end;
 
-  function TDKLang_Constants.LSO_GetSectionName: WideString;
+  function TDKLang_Constants.LSO_GetSectionName: UnicodeString;
   begin
      // Constants always use the predefined section name
     Result := SDKLang_ConstSectionName;
   end;
 
-  procedure TDKLang_Constants.LSO_StoreLangSource(Strings: TWideStrings; StateFilter: TDKLang_TranslationStates);
+  procedure TDKLang_Constants.LSO_StoreLangSource(Strings: TStrings; StateFilter: TDKLang_TranslationStates);
   var i: Integer;
   begin
     for i := 0 to Count-1 do
       with GetItems(i)^ do
-        if TranStates*StateFilter=[] then Strings.Add(sName+'='+EncodeControlChars(wsValue));
+        if TranStates*StateFilter=[] then Strings.Add(wsName+'='+EncodeControlChars(wsValue));
   end;
 
   procedure TDKLang_Constants.Notify(Ptr: Pointer; Action: TListNotification);
@@ -2188,25 +2253,33 @@ var
      // Store the constants
     for i := 0 to Count-1 do begin
       p := GetItems(i);
-      StreamWriteStr    (Stream, p.sName);
-      StreamWriteWideStr(Stream, p.wsValue);
+      StreamWriteUnicodeStr(Stream, p.wsName);
+      StreamWriteUnicodeStr(Stream, p.wsValue);
     end;
   end;
 
-  procedure TDKLang_Constants.SetAsRawString(const Value: String); 
-  var Stream: TStringStream;
+  procedure TDKLang_Constants.SetAsRawString(const Value: RawByteString);
+  var
+    Stream: TMemoryStream;  //  bjm was TStringStream
+    n: Integer;
   begin
-    Stream := TStringStream.Create(Value);
-    try
-      LoadFromStream(Stream);
-    finally
-      Stream.Free;
-    end;
+      n := Length(Value);
+      if n > 0 then
+      begin
+        Stream := TMemoryStream.Create;
+        try
+          Stream.WriteBuffer(Value[1],n);
+          Stream.Position := 0;
+          LoadFromStream(Stream);
+        finally
+          Stream.Free;
+        end;
+      end;
   end;
 
-  procedure TDKLang_Constants.SetValues(const sName: String; const wsValue: WideString);
+  procedure TDKLang_Constants.SetValues(const wsName: UnicodeString; const wsValue: UnicodeString);
   begin
-    ItemsByName[sName].wsValue := wsValue;
+    ItemsByName[wsName].wsValue := wsValue;
   end;
 
   procedure TDKLang_Constants.TranslateFrom(Constants: TDKLang_Constants);
@@ -2219,7 +2292,7 @@ var
        // If Constants=nil this means reverting to defaults
       if Constants=nil then pc.wsValue := pc.wsDefValue
        // Else try to find the constant in Constants. Update the value if found
-      else if Constants.FindName(pc.sName, idx) then pc.wsValue := Constants[idx].wsValue;
+      else if Constants.FindName(pc.wsName, idx) then pc.wsValue := Constants[idx].wsValue;
     end;
   end;
 
@@ -2288,7 +2361,7 @@ var
     if Assigned(FOnLanguageChanging) then FOnLanguageChanging(Self);
   end;
 
-  function TDKLanguageController.GetActualSectionName: WideString;
+  function TDKLanguageController.GetActualSectionName: UnicodeString;
   begin
     if FSectionName='' then Result := Owner.Name else Result := FSectionName;
   end;
@@ -2323,7 +2396,7 @@ var
     if Result then UpdateComponents(True);
   end;
 
-  procedure TDKLanguageController.LSO_StoreLangSource(Strings: TWideStrings; StateFilter: TDKLang_TranslationStates);
+  procedure TDKLanguageController.LSO_StoreLangSource(Strings: TStrings; StateFilter: TDKLang_TranslationStates);
   begin
     FRootCompEntry.StoreLangSource(Strings); // StateFilter is not applicable
   end;
@@ -2366,7 +2439,7 @@ var
    // TDKLang_LangResources
    //===================================================================================================================
 
-  function TDKLang_LangResources.Add(Kind: TDKLang_LangResourceKind; Instance: HINST; const wsName: WideString; iResID: Integer; wLangID: LANGID): Integer;
+  function TDKLang_LangResources.Add(Kind: TDKLang_LangResourceKind; Instance: HINST; const wsName: UnicodeString; iResID: Integer; wLangID: LANGID): Integer;
   var p: PDKLang_LangResource;
   begin
      // First try to find the same language already registered
@@ -2485,19 +2558,14 @@ var
     inherited Destroy;
   end;
 
-  function TDKLanguageManager.GetConstantValue(const sName: String): WideString;
+  function TDKLanguageManager.GetConstantValue(const wsName: UnicodeString): UnicodeString;
   begin
     FSynchronizer.BeginRead;
     try
-      Result := FConstants.Values[sName];
+      Result := FConstants.Values[wsName];
     finally
       FSynchronizer.EndRead;
     end;
-  end;
-
-  function TDKLanguageManager.GetConstantValueA(const sName: String): String;
-  begin
-    Result := WideStringToStringEx(GetConstantValue(sName), CodePage);
   end;
 
   function TDKLanguageManager.GetDefaultLanguageID: LANGID;
@@ -2548,7 +2616,8 @@ var
     end;
   end;
 
-  function TDKLanguageManager.GetLanguageNames(Index: Integer): WideString;
+{$WARN SYMBOL_PLATFORM OFF}  // for GetLocaleStr
+  function TDKLanguageManager.GetLanguageNames(Index: Integer): UnicodeString;
   var wLangID: LANGID;
   begin
     FSynchronizer.BeginRead;
@@ -2557,8 +2626,9 @@ var
     finally
       FSynchronizer.EndRead;
     end;
-    Result := WideGetLocaleStr(wLangID, LOCALE_SLANGUAGE, IntToStr(wLangID));
+    Result := GetLocaleStr(wLangID, LOCALE_SLANGUAGE, IntToStr(wLangID));
   end;
+{$WARN SYMBOL_PLATFORM ON}
 
   function TDKLanguageManager.GetLanguageResources(Index: Integer): PDKLang_LangResource;
   begin
@@ -2604,7 +2674,7 @@ var
     end;
   end;
 
-  function TDKLanguageManager.RegisterLangFile(const wsFileName: WideString): Boolean;
+  function TDKLanguageManager.RegisterLangFile(const wsFileName: UnicodeString): Boolean;
   var
     Tran: TDKLang_CompTranslations;
     wLangID: LANGID;
@@ -2613,7 +2683,7 @@ var
     FSynchronizer.BeginWrite;
     try
        // Create and load the component translations object
-      if WideFileExists(wsFileName) then begin
+      if FileExists(wsFileName) then begin
         Tran := TDKLang_CompTranslations.Create;
         try
           Tran.Text_LoadFromFile(wsFileName, True);
@@ -2634,7 +2704,7 @@ var
     end;
   end;
 
-  procedure TDKLanguageManager.RegisterLangResource(Instance: HINST; const wsResourceName: WideString; wLangID: LANGID);
+  procedure TDKLanguageManager.RegisterLangResource(Instance: HINST; const wsResourceName: UnicodeString; wLangID: LANGID);
   begin
     FSynchronizer.BeginWrite;
     try
@@ -2664,16 +2734,16 @@ var
     end;
   end;
 
-  function TDKLanguageManager.ScanForLangFiles(const wsDir, wsMask: WideString; bRecursive: Boolean): Integer;
+  function TDKLanguageManager.ScanForLangFiles(const wsDir, wsMask: UnicodeString; bRecursive: Boolean): Integer;
   var
-    wsPath: WideString;
-    SRec: TSearchRecW;
+    wsPath: UnicodeString;
+    SRec: TSearchRec;
   begin
     Result := 0;
      // Determine the path
-    wsPath := WideIncludeTrailingPathDelimiter(wsDir);
+    wsPath := IncludeTrailingPathDelimiter(wsDir);
      // Scan the directory
-    if WideFindFirst(wsPath+wsMask, faAnyFile, SRec)=0 then
+    if FindFirst(wsPath+wsMask, faAnyFile, SRec)=0 then
       try
         repeat
            // Plain file. Try to register it
@@ -2682,9 +2752,9 @@ var
            // Directory. Recurse if needed
           end else if bRecursive and (SRec.Name[1]<>'.') then
             Inc(Result, ScanForLangFiles(wsPath+SRec.Name, wsMask, True));
-        until WideFindNext(SRec)<>0;
+        until FindNext(SRec)<>0;
       finally
-        WideFindClose(SRec);
+        FindClose(SRec);
       end;
   end;
 
@@ -2745,6 +2815,32 @@ var
       end;
     finally
       FSynchronizer.EndRead;
+    end;
+  end;
+
+  // Load Language and translate from stream
+  // Thanks to DenisDL's forum post of 16 September 2007
+  procedure TDKLanguageManager.TranslateFromStream(Stream: TStream);
+  var
+    Tran: TDKLang_CompTranslations;
+  begin
+    Tran := nil;
+    try
+      FSynchronizer.BeginWrite;
+      try
+        // Try to obtain the Translations object
+        Tran := TDKLang_CompTranslations.Create;
+        Stream.Position := 0;
+        Tran.Text_LoadFromStream(Stream, false);
+        FLanguageID := StrToIntDef(Tran.Params.Values[SDKLang_TranParam_LangID], ILangID_USEnglish);
+        UpdateCodePage;
+      finally
+        FSynchronizer.EndWrite;
+      end;
+      // Apply the language change after synchronizing ends because applying might require constants etc.
+      ApplyTran(Tran);
+    finally
+      Tran.Free;
     end;
   end;
 

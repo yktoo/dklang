@@ -1,0 +1,1 @@
+Current sources (revision 174+) are for DKLang 4.x and require Delphi 2009 as a minimum.

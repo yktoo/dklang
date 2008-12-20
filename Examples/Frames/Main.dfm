@@ -20,7 +20,7 @@ object fMain: TfMain
     284)
   PixelsPerInch = 96
   TextHeight = 13
-  object lLanguage: TTntLabel
+  object lLanguage: TLabel
     Left = 12
     Top = 4
     Width = 96
@@ -28,7 +28,7 @@ object fMain: TfMain
     Caption = '&Interface language:'
     FocusControl = cbLanguage
   end
-  object bCancel: TTntButton
+  object bCancel: TButton
     Left = 254
     Top = 251
     Width = 75
@@ -37,7 +37,7 @@ object fMain: TfMain
     Caption = 'Cancel'
     TabOrder = 0
   end
-  object bOK: TTntButton
+  object bOK: TButton
     Left = 174
     Top = 251
     Width = 75
@@ -51,8 +51,9 @@ object fMain: TfMain
     Top = 48
     Width = 312
     Height = 57
-    AutoScroll = False
     TabOrder = 2
+    ExplicitLeft = 12
+    ExplicitTop = 48
     inherited lcMain: TDKLanguageController
       LangData = {
         14006672466F6E7453657474696E67735F5461626C650001030000000B006253
@@ -66,8 +67,9 @@ object fMain: TfMain
     Top = 116
     Width = 312
     Height = 57
-    AutoScroll = False
     TabOrder = 3
+    ExplicitLeft = 12
+    ExplicitTop = 116
     inherited lcMain: TDKLanguageController
       LangData = {
         16006672466F6E7453657474696E67735F546F6F6C6261720001030000000B00
@@ -81,8 +83,9 @@ object fMain: TfMain
     Top = 184
     Width = 312
     Height = 57
-    AutoScroll = False
     TabOrder = 4
+    ExplicitLeft = 12
+    ExplicitTop = 184
     inherited lcMain: TDKLanguageController
       LangData = {
         18006672466F6E7453657474696E67735F496E74657266616365000103000000
@@ -91,7 +94,7 @@ object fMain: TfMain
         4D61696E0000}
     end
   end
-  object cbLanguage: TTntComboBox
+  object cbLanguage: TComboBox
     Left = 12
     Top = 20
     Width = 313

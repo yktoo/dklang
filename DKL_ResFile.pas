@@ -1,8 +1,8 @@
 ///*********************************************************************************************************************
-///  $Id: DKL_ResFile.pas,v 1.4 2006-08-11 06:16:56 dale Exp $
+///  $Id: DKL_ResFile.pas,v 1.4 2006/08/11 06:16:56 dale Exp $
 ///---------------------------------------------------------------------------------------------------------------------
 ///  DKLang Localization Package
-///  Copyright 2002-2006 DK Software, http://www.dk-soft.org
+///  Copyright 2002-2008 DK Software, http://www.dk-soft.org
 ///*********************************************************************************************************************
 ///
 /// The contents of this package are subject to the Mozilla Public License
@@ -20,6 +20,8 @@
 ///
 /// The initial developer of the original code is Dmitry Kann, http://www.dk-soft.org/
 ///
+/// Upgraded to Delphi 2009 by Bruce J. Miller, rules-of-thumb.com Dec 2008
+///
 ///**********************************************************************************************************************
 // Routines and classes to handle .res resource files.
 // WARNING: TDKLang_ResFile only handles 32-bit resource files and does not support 16-bit ones!
@@ -27,7 +29,7 @@
 unit DKL_ResFile;
 
 interface
-uses Windows, SysUtils, Classes, Contnrs, TntClasses;
+uses Windows, SysUtils, Classes, Contnrs;
 
 type
 
@@ -82,11 +84,11 @@ type
      // Clears the entry list
     procedure ClearEntries;
      // Loads .res file contents from the file
-    procedure LoadFromFile(const wsFileName: WideString);
+    procedure LoadFromFile(const wsFileName: UnicodeString);
      // Saves .res file contents into the file
-    procedure SaveToFile(const wsFileName: WideString);
+    procedure SaveToFile(const wsFileName: UnicodeString);
      // Tries to find an entry by its type and name. Returns nil if not found
-    function  FindEntry(const wsType, wsName: WideString): TDKLang_ResEntry;
+    function  FindEntry(const wsType, wsName: UnicodeString): TDKLang_ResEntry;
      // Props
      // -- Entry count
     property EntryCount: Integer read GetEntryCount;
@@ -105,9 +107,9 @@ type
     FDataVersion: Cardinal;
     FLanguage: LANGID;
     FMemoryFlags: Word;
-    FName: WideString;
-    FRawData: String;
-    FResType: WideString;
+    FName: UnicodeString;
+    FRawData: RawByteString;
+    FResType: UnicodeString;
     FVersion: Cardinal;
   public
      // Stores resource entry into the stream
@@ -124,17 +126,17 @@ type
      // -- Memory flags
     property MemoryFlags: Word read FMemoryFlags write FMemoryFlags;
      // -- Entry name
-    property Name: WideString read FName write FName;
+    property Name: UnicodeString read FName write FName;
      // -- Raw (unparsed) entry data
-    property RawData: String read FRawData write FRawData;
+    property RawData: RawByteString read FRawData write FRawData;
      // -- Entry resource type
-    property ResType: WideString read FResType write FResType;
+    property ResType: UnicodeString read FResType write FResType;
      // -- Version
     property Version: Cardinal read FVersion write FVersion;
   end;
 
 implementation //=======================================================================================================
-uses TntDialogs;
+uses Dialogs;
 
    //===================================================================================================================
    // TDKLang_ResFile
@@ -167,12 +169,12 @@ uses TntDialogs;
     inherited Destroy;
   end;
 
-  function TDKLang_ResFile.FindEntry(const wsType, wsName: WideString): TDKLang_ResEntry;
+  function TDKLang_ResFile.FindEntry(const wsType, wsName: UnicodeString): TDKLang_ResEntry;
   var i: Integer;
   begin
     for i := 0 to EntryCount-1 do begin
       Result := Entries[i];
-      if WideSameText(Result.ResType, wsType) and WideSameText(Result.Name, wsName) then Exit;
+      if SameText(Result.ResType, wsType) and SameText(Result.Name, wsName) then Exit;
     end;
     Result := nil;
   end;
@@ -187,10 +189,10 @@ uses TntDialogs;
     Result := FEntries.Count;
   end;
 
-  procedure TDKLang_ResFile.LoadFromFile(const wsFileName: WideString);
+  procedure TDKLang_ResFile.LoadFromFile(const wsFileName: UnicodeString);
   var Stream: TStream;
   begin
-    Stream := TTntFileStream.Create(wsFileName, fmOpenRead or fmShareDenyWrite);
+    Stream := TFileStream.Create(wsFileName, fmOpenRead or fmShareDenyWrite);
     try
       LoadFromStream(Stream);
     finally
@@ -205,16 +207,16 @@ uses TntDialogs;
     Header: TResResourceEntryHeader;
 
      // Retrieves a string or numeric identifier from the data and shifts the pointer appropriately
-    function RetrieveIdentifier(var p: PByte): WideString;
+    function RetrieveIdentifier(var p: PByte): UnicodeString;
     begin
        // Numeric ID
       if PWord(p)^=$ffff then begin
         Inc(p, SizeOf(Word));
         Result := IntToStr(PWord(p)^);
         Inc(p, SizeOf(Word))
-       // A wide string name
+       // A  string name
       end else begin
-        Result := WideString(PWideChar(p));
+        Result := UnicodeString(PWideChar(p));
         Inc(p, (Length(Result)+1)*SizeOf(WideChar));
       end;
     end;
@@ -223,10 +225,10 @@ uses TntDialogs;
     procedure ProcessResourceEntry;
     var
       p: PByte;
-      wsName, wsType: WideString;
+      sRawData: RawByteString;
+      wsName, wsType: UnicodeString;
       EntryProps: TResResourceEntryProps;
       Entry: TDKLang_ResEntry;
-      sRawData: String;
     begin
       p := pData;
        // Skip the header
@@ -250,8 +252,9 @@ uses TntDialogs;
           Entry.Language        := EntryProps.wLanguage;
           Entry.Version         := EntryProps.cVersion;
           Entry.Characteristics := EntryProps.cCharacteristics;
-          SetString(sRawData, PChar(Integer(pData)+Header.iHeaderSize), Header.iDataSize);
+          SetString(sRawData, PAnsiChar(Integer(pData)+Header.iHeaderSize), Header.iDataSize);  // surprized SetString works, but it does
           Entry.RawData         := sRawData;
+
            // Register the entry in the list
           AddEntry(Entry);
         except
@@ -293,10 +296,10 @@ uses TntDialogs;
     Result := FEntries.Remove(Item);
   end;
 
-  procedure TDKLang_ResFile.SaveToFile(const wsFileName: WideString);
+  procedure TDKLang_ResFile.SaveToFile(const wsFileName: UnicodeString);
   var Stream: TStream;
   begin
-    Stream := TTntFileStream.Create(wsFileName, fmCreate);
+    Stream := TFileStream.Create(wsFileName, fmCreate);
     try
       SaveToStream(Stream);
     finally
@@ -351,13 +354,13 @@ uses TntDialogs;
     Props: TResResourceEntryProps;
 
      // Writes a numeric or string identifier into the stream
-    procedure WriteIdentifier(const wsID: WideString; Stream: TStream);
+    procedure WriteIdentifier(const wsID: UnicodeString; Stream: TStream);
     var
       iNumericID: Integer;
       w: Word;
     begin
       iNumericID := StrToIntDef(wsID, -1);
-       // String ID
+       // string ID
       if iNumericID<0 then
         Stream.WriteBuffer(wsID[1], (Length(wsID)+1)*SizeOf(WideChar))
        // Numeric ID
@@ -396,7 +399,7 @@ uses TntDialogs;
        // Write properties
       msHeaderBlock.WriteBuffer(Props, SizeOf(Props));
        // Fill header record
-      Header.iDataSize   := ((Length(FRawData)+3) div 4)*4;
+      Header.iDataSize   := ((Length(RawData)+3) div 4)*4;
       Header.iHeaderSize := msHeaderBlock.Size+SizeOf(Header);
        // Put the header record
       Stream.WriteBuffer(Header, SizeOf(Header));
