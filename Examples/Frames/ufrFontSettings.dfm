@@ -5,7 +5,7 @@ object frFontSettings: TfrFontSettings
   Height = 57
   AutoScroll = False
   TabOrder = 0
-  object gbMain: TTntGroupBox
+  object gbMain: TGroupBox
     Left = 0
     Top = 0
     Width = 312
@@ -15,7 +15,7 @@ object frFontSettings: TfrFontSettings
     DesignSize = (
       312
       57)
-    object pSample: TTntPanel
+    object pSample: TPanel
       Left = 8
       Top = 16
       Width = 213
@@ -25,7 +25,7 @@ object frFontSettings: TfrFontSettings
       Caption = 'This is a sample text'
       TabOrder = 0
     end
-    object bSelectFont: TTntButton
+    object bSelectFont: TButton
       Left = 228
       Top = 20
       Width = 75
