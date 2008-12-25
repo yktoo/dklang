@@ -2,7 +2,7 @@
 ///  $Id: DKLangReg.pas,v 1.6 2006/06/17 04:19:28 dale Exp $
 ///---------------------------------------------------------------------------------------------------------------------
 ///  DKLang Localization Package
-///  Copyright 2002-2008 DK Software, http://www.dk-soft.org
+///  Copyright 2002-2009 DK Software, http://www.dk-soft.org
 ///*********************************************************************************************************************
 ///
 /// The contents of this package are subject to the Mozilla Public License
