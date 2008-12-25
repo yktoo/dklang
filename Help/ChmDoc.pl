@@ -1,6 +1,6 @@
 #!/usr/bin/perl
 #****************************************************************
-#  $Id: ChmDoc.pl,v 1.2 2006-08-11 06:16:56 dale Exp $
+#  $Id$
 #****************************************************************
 # Requires the following environment variables to be set:
 #   CHM_API_FILE_PREFIX
