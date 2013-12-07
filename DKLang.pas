@@ -1585,6 +1585,10 @@ var
         o: TObject;
         wsFullName, wsTranslation: UnicodeString;
       begin
+        // test for read-only property
+        // FireDAC has string properties (BaseDriverID) that are read-only
+        if not Assigned(pInfo.SetProc) then exit;
+
          // Test whether property is to be ignored (don't use IgnoreTest interface here)
         if ((Instance is TComponent) and (pInfo.Name='Name')) or not (pInfo.PropType^.Kind in [tkClass, tkString, tkLString, tkWString, tkUString]) then Exit;
         wsFullName := wsPrefix+wsSep[wsPrefix<>'']+UnicodeString(pInfo.Name);
@@ -1772,6 +1776,10 @@ var
         o: TObject;
         wsPropInCompName, wsPropFullName: UnicodeString;
       begin
+        // test for read-only property
+        // FireDAC has string properties (BaseDriverID) that are read-only
+        if not Assigned(pInfo.SetProc) then exit;
+
         wsPropInCompName := wsPrefix+wsSep[wsPrefix<>'']+UnicodeString(pInfo.Name);
         wsPropFullName   := wsCompPathPrefix+wsPropInCompName;
          // Test whether property is to be ignored
