@@ -1,0 +1,168 @@
+﻿<Project xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+    <PropertyGroup>
+        <ProjectGuid>{6D5B2442-31F6-463D-B6FA-C6DF6CF28DC5}</ProjectGuid>
+    </PropertyGroup>
+    <ItemGroup>
+        <Projects Include="Simple_VCL\DKLang_Simple_VCL_Demo.dproj">
+            <Dependencies/>
+        </Projects>
+        <Projects Include="Constants_VCL\DKLang_Constants_VCL_Demo.dproj">
+            <Dependencies/>
+        </Projects>
+        <Projects Include="Constants_FireMonkey_Desktop\DKLang_Constants_FMX_Desktop_Demo.dproj">
+            <Dependencies/>
+        </Projects>
+        <Projects Include="Constants_FireMonkey_Mobile\DKLang_Constants_FMX_Mobile_Demo.dproj">
+            <Dependencies/>
+        </Projects>
+        <Projects Include="Resource_VCL\DKLang_Resource_VCL_Demo.dproj">
+            <Dependencies/>
+        </Projects>
+        <Projects Include="Resource_FireMonkey_Mobile\DKLang_Resource_FMX_Mobile_Demo.dproj">
+            <Dependencies/>
+        </Projects>
+        <Projects Include="Frames_VCL\DKLang_Frames_VCL_Demo.dproj">
+            <Dependencies/>
+        </Projects>
+        <Projects Include="MDI_VCL\DKLang_MDI_VCL_Demo.dproj">
+            <Dependencies/>
+        </Projects>
+        <Projects Include="Notepad_VCL\DKLang_Notepad_VCL_Demo.dproj">
+            <Dependencies/>
+        </Projects>
+        <Projects Include="Embedded_VCL\DKLang_Embedded_VCL_Demo.dproj">
+            <Dependencies/>
+        </Projects>
+        <Projects Include="Embedded_FireMonkey_Mobile\DKLang_Embedded_FMX_Mobile_Demo.dproj">
+            <Dependencies/>
+        </Projects>
+        <Projects Include="LocalFileStorage_FireMonkey_Mobile\DKLang_LocalFileStorage_FMX_Mobile_Demo.dproj">
+            <Dependencies/>
+        </Projects>
+    </ItemGroup>
+    <ProjectExtensions>
+        <Borland.Personality>Default.Personality.12</Borland.Personality>
+        <Borland.ProjectType/>
+        <BorlandProject>
+            <Default.Personality/>
+        </BorlandProject>
+    </ProjectExtensions>
+    <Target Name="DKLang_Simple_VCL_Demo">
+        <MSBuild Projects="Simple_VCL\DKLang_Simple_VCL_Demo.dproj"/>
+    </Target>
+    <Target Name="DKLang_Simple_VCL_Demo:Clean">
+        <MSBuild Projects="Simple_VCL\DKLang_Simple_VCL_Demo.dproj" Targets="Clean"/>
+    </Target>
+    <Target Name="DKLang_Simple_VCL_Demo:Make">
+        <MSBuild Projects="Simple_VCL\DKLang_Simple_VCL_Demo.dproj" Targets="Make"/>
+    </Target>
+    <Target Name="DKLang_Constants_VCL_Demo">
+        <MSBuild Projects="Constants_VCL\DKLang_Constants_VCL_Demo.dproj"/>
+    </Target>
+    <Target Name="DKLang_Constants_VCL_Demo:Clean">
+        <MSBuild Projects="Constants_VCL\DKLang_Constants_VCL_Demo.dproj" Targets="Clean"/>
+    </Target>
+    <Target Name="DKLang_Constants_VCL_Demo:Make">
+        <MSBuild Projects="Constants_VCL\DKLang_Constants_VCL_Demo.dproj" Targets="Make"/>
+    </Target>
+    <Target Name="DKLang_Constants_FMX_Desktop_Demo">
+        <MSBuild Projects="Constants_FireMonkey_Desktop\DKLang_Constants_FMX_Desktop_Demo.dproj"/>
+    </Target>
+    <Target Name="DKLang_Constants_FMX_Desktop_Demo:Clean">
+        <MSBuild Projects="Constants_FireMonkey_Desktop\DKLang_Constants_FMX_Desktop_Demo.dproj" Targets="Clean"/>
+    </Target>
+    <Target Name="DKLang_Constants_FMX_Desktop_Demo:Make">
+        <MSBuild Projects="Constants_FireMonkey_Desktop\DKLang_Constants_FMX_Desktop_Demo.dproj" Targets="Make"/>
+    </Target>
+    <Target Name="DKLang_Constants_FMX_Mobile_Demo">
+        <MSBuild Projects="Constants_FireMonkey_Mobile\DKLang_Constants_FMX_Mobile_Demo.dproj"/>
+    </Target>
+    <Target Name="DKLang_Constants_FMX_Mobile_Demo:Clean">
+        <MSBuild Projects="Constants_FireMonkey_Mobile\DKLang_Constants_FMX_Mobile_Demo.dproj" Targets="Clean"/>
+    </Target>
+    <Target Name="DKLang_Constants_FMX_Mobile_Demo:Make">
+        <MSBuild Projects="Constants_FireMonkey_Mobile\DKLang_Constants_FMX_Mobile_Demo.dproj" Targets="Make"/>
+    </Target>
+    <Target Name="DKLang_Resource_VCL_Demo">
+        <MSBuild Projects="Resource_VCL\DKLang_Resource_VCL_Demo.dproj"/>
+    </Target>
+    <Target Name="DKLang_Resource_VCL_Demo:Clean">
+        <MSBuild Projects="Resource_VCL\DKLang_Resource_VCL_Demo.dproj" Targets="Clean"/>
+    </Target>
+    <Target Name="DKLang_Resource_VCL_Demo:Make">
+        <MSBuild Projects="Resource_VCL\DKLang_Resource_VCL_Demo.dproj" Targets="Make"/>
+    </Target>
+    <Target Name="DKLang_Resource_FMX_Mobile_Demo">
+        <MSBuild Projects="Resource_FireMonkey_Mobile\DKLang_Resource_FMX_Mobile_Demo.dproj"/>
+    </Target>
+    <Target Name="DKLang_Resource_FMX_Mobile_Demo:Clean">
+        <MSBuild Projects="Resource_FireMonkey_Mobile\DKLang_Resource_FMX_Mobile_Demo.dproj" Targets="Clean"/>
+    </Target>
+    <Target Name="DKLang_Resource_FMX_Mobile_Demo:Make">
+        <MSBuild Projects="Resource_FireMonkey_Mobile\DKLang_Resource_FMX_Mobile_Demo.dproj" Targets="Make"/>
+    </Target>
+    <Target Name="DKLang_Frames_VCL_Demo">
+        <MSBuild Projects="Frames_VCL\DKLang_Frames_VCL_Demo.dproj"/>
+    </Target>
+    <Target Name="DKLang_Frames_VCL_Demo:Clean">
+        <MSBuild Projects="Frames_VCL\DKLang_Frames_VCL_Demo.dproj" Targets="Clean"/>
+    </Target>
+    <Target Name="DKLang_Frames_VCL_Demo:Make">
+        <MSBuild Projects="Frames_VCL\DKLang_Frames_VCL_Demo.dproj" Targets="Make"/>
+    </Target>
+    <Target Name="DKLang_MDI_VCL_Demo">
+        <MSBuild Projects="MDI_VCL\DKLang_MDI_VCL_Demo.dproj"/>
+    </Target>
+    <Target Name="DKLang_MDI_VCL_Demo:Clean">
+        <MSBuild Projects="MDI_VCL\DKLang_MDI_VCL_Demo.dproj" Targets="Clean"/>
+    </Target>
+    <Target Name="DKLang_MDI_VCL_Demo:Make">
+        <MSBuild Projects="MDI_VCL\DKLang_MDI_VCL_Demo.dproj" Targets="Make"/>
+    </Target>
+    <Target Name="DKLang_Notepad_VCL_Demo">
+        <MSBuild Projects="Notepad_VCL\DKLang_Notepad_VCL_Demo.dproj"/>
+    </Target>
+    <Target Name="DKLang_Notepad_VCL_Demo:Clean">
+        <MSBuild Projects="Notepad_VCL\DKLang_Notepad_VCL_Demo.dproj" Targets="Clean"/>
+    </Target>
+    <Target Name="DKLang_Notepad_VCL_Demo:Make">
+        <MSBuild Projects="Notepad_VCL\DKLang_Notepad_VCL_Demo.dproj" Targets="Make"/>
+    </Target>
+    <Target Name="DKLang_Embedded_VCL_Demo">
+        <MSBuild Projects="Embedded_VCL\DKLang_Embedded_VCL_Demo.dproj"/>
+    </Target>
+    <Target Name="DKLang_Embedded_VCL_Demo:Clean">
+        <MSBuild Projects="Embedded_VCL\DKLang_Embedded_VCL_Demo.dproj" Targets="Clean"/>
+    </Target>
+    <Target Name="DKLang_Embedded_VCL_Demo:Make">
+        <MSBuild Projects="Embedded_VCL\DKLang_Embedded_VCL_Demo.dproj" Targets="Make"/>
+    </Target>
+    <Target Name="DKLang_Embedded_FMX_Mobile_Demo">
+        <MSBuild Projects="Embedded_FireMonkey_Mobile\DKLang_Embedded_FMX_Mobile_Demo.dproj"/>
+    </Target>
+    <Target Name="DKLang_Embedded_FMX_Mobile_Demo:Clean">
+        <MSBuild Projects="Embedded_FireMonkey_Mobile\DKLang_Embedded_FMX_Mobile_Demo.dproj" Targets="Clean"/>
+    </Target>
+    <Target Name="DKLang_Embedded_FMX_Mobile_Demo:Make">
+        <MSBuild Projects="Embedded_FireMonkey_Mobile\DKLang_Embedded_FMX_Mobile_Demo.dproj" Targets="Make"/>
+    </Target>
+    <Target Name="DKLang_LocalFileStorage_FMX_Mobile_Demo">
+        <MSBuild Projects="LocalFileStorage_FireMonkey_Mobile\DKLang_LocalFileStorage_FMX_Mobile_Demo.dproj"/>
+    </Target>
+    <Target Name="DKLang_LocalFileStorage_FMX_Mobile_Demo:Clean">
+        <MSBuild Projects="LocalFileStorage_FireMonkey_Mobile\DKLang_LocalFileStorage_FMX_Mobile_Demo.dproj" Targets="Clean"/>
+    </Target>
+    <Target Name="DKLang_LocalFileStorage_FMX_Mobile_Demo:Make">
+        <MSBuild Projects="LocalFileStorage_FireMonkey_Mobile\DKLang_LocalFileStorage_FMX_Mobile_Demo.dproj" Targets="Make"/>
+    </Target>
+    <Target Name="Build">
+        <CallTarget Targets="DKLang_Simple_VCL_Demo;DKLang_Constants_VCL_Demo;DKLang_Constants_FMX_Desktop_Demo;DKLang_Constants_FMX_Mobile_Demo;DKLang_Resource_VCL_Demo;DKLang_Resource_FMX_Mobile_Demo;DKLang_Frames_VCL_Demo;DKLang_MDI_VCL_Demo;DKLang_Notepad_VCL_Demo;DKLang_Embedded_VCL_Demo;DKLang_Embedded_FMX_Mobile_Demo;DKLang_LocalFileStorage_FMX_Mobile_Demo"/>
+    </Target>
+    <Target Name="Clean">
+        <CallTarget Targets="DKLang_Simple_VCL_Demo:Clean;DKLang_Constants_VCL_Demo:Clean;DKLang_Constants_FMX_Desktop_Demo:Clean;DKLang_Constants_FMX_Mobile_Demo:Clean;DKLang_Resource_VCL_Demo:Clean;DKLang_Resource_FMX_Mobile_Demo:Clean;DKLang_Frames_VCL_Demo:Clean;DKLang_MDI_VCL_Demo:Clean;DKLang_Notepad_VCL_Demo:Clean;DKLang_Embedded_VCL_Demo:Clean;DKLang_Embedded_FMX_Mobile_Demo:Clean;DKLang_LocalFileStorage_FMX_Mobile_Demo:Clean"/>
+    </Target>
+    <Target Name="Make">
+        <CallTarget Targets="DKLang_Simple_VCL_Demo:Make;DKLang_Constants_VCL_Demo:Make;DKLang_Constants_FMX_Desktop_Demo:Make;DKLang_Constants_FMX_Mobile_Demo:Make;DKLang_Resource_VCL_Demo:Make;DKLang_Resource_FMX_Mobile_Demo:Make;DKLang_Frames_VCL_Demo:Make;DKLang_MDI_VCL_Demo:Make;DKLang_Notepad_VCL_Demo:Make;DKLang_Embedded_VCL_Demo:Make;DKLang_Embedded_FMX_Mobile_Demo:Make;DKLang_LocalFileStorage_FMX_Mobile_Demo:Make"/>
+    </Target>
+    <Import Project="$(BDS)\Bin\CodeGear.Group.Targets" Condition="Exists('$(BDS)\Bin\CodeGear.Group.Targets')"/>
+</Project>

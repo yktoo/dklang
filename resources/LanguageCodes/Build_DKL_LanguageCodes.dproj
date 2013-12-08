@@ -1,0 +1,221 @@
+﻿<Project xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+    <PropertyGroup>
+        <ProjectGuid>{4B3ACA16-C68D-4FD7-B166-6844E4F4D0CA}</ProjectGuid>
+        <ProjectVersion>15.2</ProjectVersion>
+        <FrameworkType>None</FrameworkType>
+        <MainSource>Build_DKL_LanguageCodes.dpr</MainSource>
+        <Base>True</Base>
+        <Config Condition="'$(Config)'==''">Debug</Config>
+        <Platform Condition="'$(Platform)'==''">Win32</Platform>
+        <TargetedPlatforms>1</TargetedPlatforms>
+        <AppType>Console</AppType>
+    </PropertyGroup>
+    <PropertyGroup Condition="'$(Config)'=='Base' or '$(Base)'!=''">
+        <Base>true</Base>
+    </PropertyGroup>
+    <PropertyGroup Condition="('$(Platform)'=='Android' and '$(Base)'=='true') or '$(Base_Android)'!=''">
+        <Base_Android>true</Base_Android>
+        <CfgParent>Base</CfgParent>
+        <Base>true</Base>
+    </PropertyGroup>
+    <PropertyGroup Condition="('$(Platform)'=='iOSDevice' and '$(Base)'=='true') or '$(Base_iOSDevice)'!=''">
+        <Base_iOSDevice>true</Base_iOSDevice>
+        <CfgParent>Base</CfgParent>
+        <Base>true</Base>
+    </PropertyGroup>
+    <PropertyGroup Condition="('$(Platform)'=='iOSSimulator' and '$(Base)'=='true') or '$(Base_iOSSimulator)'!=''">
+        <Base_iOSSimulator>true</Base_iOSSimulator>
+        <CfgParent>Base</CfgParent>
+        <Base>true</Base>
+    </PropertyGroup>
+    <PropertyGroup Condition="('$(Platform)'=='OSX32' and '$(Base)'=='true') or '$(Base_OSX32)'!=''">
+        <Base_OSX32>true</Base_OSX32>
+        <CfgParent>Base</CfgParent>
+        <Base>true</Base>
+    </PropertyGroup>
+    <PropertyGroup Condition="('$(Platform)'=='Win32' and '$(Base)'=='true') or '$(Base_Win32)'!=''">
+        <Base_Win32>true</Base_Win32>
+        <CfgParent>Base</CfgParent>
+        <Base>true</Base>
+    </PropertyGroup>
+    <PropertyGroup Condition="('$(Platform)'=='Win64' and '$(Base)'=='true') or '$(Base_Win64)'!=''">
+        <Base_Win64>true</Base_Win64>
+        <CfgParent>Base</CfgParent>
+        <Base>true</Base>
+    </PropertyGroup>
+    <PropertyGroup Condition="'$(Config)'=='Debug' or '$(Cfg_1)'!=''">
+        <Cfg_1>true</Cfg_1>
+        <CfgParent>Base</CfgParent>
+        <Base>true</Base>
+    </PropertyGroup>
+    <PropertyGroup Condition="('$(Platform)'=='Win32' and '$(Cfg_1)'=='true') or '$(Cfg_1_Win32)'!=''">
+        <Cfg_1_Win32>true</Cfg_1_Win32>
+        <CfgParent>Cfg_1</CfgParent>
+        <Cfg_1>true</Cfg_1>
+        <Base>true</Base>
+    </PropertyGroup>
+    <PropertyGroup Condition="'$(Config)'=='Release' or '$(Cfg_2)'!=''">
+        <Cfg_2>true</Cfg_2>
+        <CfgParent>Base</CfgParent>
+        <Base>true</Base>
+    </PropertyGroup>
+    <PropertyGroup Condition="'$(Base)'!=''">
+        <VerInfo_Keys>CompanyName=;FileDescription=;FileVersion=1.0.0.0;InternalName=;LegalCopyright=;LegalTrademarks=;OriginalFilename=;ProductName=;ProductVersion=1.0.0.0;Comments=</VerInfo_Keys>
+        <Manifest_File>$(BDS)\bin\default_app.manifest</Manifest_File>
+        <VerInfo_Locale>1033</VerInfo_Locale>
+        <DCC_Namespace>System;Xml;Data;Datasnap;Web;Soap;$(DCC_Namespace)</DCC_Namespace>
+        <DCC_DcuOutput>.\$(Platform)\$(Config)</DCC_DcuOutput>
+        <DCC_E>false</DCC_E>
+        <DCC_N>false</DCC_N>
+        <DCC_S>false</DCC_S>
+        <DCC_F>false</DCC_F>
+        <DCC_K>false</DCC_K>
+    </PropertyGroup>
+    <PropertyGroup Condition="'$(Base_Android)'!=''">
+        <DCC_UsePackage>IndyIPClient;FireDACSqliteDriver;dd_wdwstateXE5;DBXSqliteDriver;fmx;IndySystem;DBXInterBaseDriver;gtHtmVwExpD17;DataSnapCommon;BeejComponentsXE5;DbxCommonDriver;dbxcds;AutoUpgraderProBDS_XE5;fmxFireDAC;BesenComponents;CustomIPTransport;dsnap;OmniThreadLibraryRuntimeXE5;IndyCore;dclGraphicExXE5;IndyIPCommon;CloudService;FmxTeeUI;FireDACIBDriver;FileStorageBDS_XE5;dklangXE5;FrameViewerXE5;bindcompfmx;rtl;dbrtl;DbxClientDriver;MapWindowXE5;FireDACCommon;bindcomp;xmlrtl;IndyProtocols;FireDACCommonDriver;bindengine;soaprtl;bindcompdbx;FMXTee;ADOX_XE5;RichViewSpellingHunspell_XE5;FireDAC;inet;BeejTmsRvEditLinkXE5;CADSys5_XE5;RESTComponents;dbexpress;$(DCC_UsePackage)</DCC_UsePackage>
+        <Android_LauncherIcon96>$(BDS)\bin\Artwork\Android\FM_LauncherIcon_96x96.png</Android_LauncherIcon96>
+        <Android_LauncherIcon36>$(BDS)\bin\Artwork\Android\FM_LauncherIcon_36x36.png</Android_LauncherIcon36>
+        <Android_LauncherIcon144>$(BDS)\bin\Artwork\Android\FM_LauncherIcon_144x144.png</Android_LauncherIcon144>
+        <Android_LauncherIcon72>$(BDS)\bin\Artwork\Android\FM_LauncherIcon_72x72.png</Android_LauncherIcon72>
+        <Android_LauncherIcon48>$(BDS)\bin\Artwork\Android\FM_LauncherIcon_48x48.png</Android_LauncherIcon48>
+    </PropertyGroup>
+    <PropertyGroup Condition="'$(Base_iOSDevice)'!=''">
+        <DCC_UsePackage>IndyIPClient;FireDACSqliteDriver;DBXSqliteDriver;fmx;IndySystem;DBXInterBaseDriver;DataSnapCommon;DbxCommonDriver;dbxcds;fmxFireDAC;BesenComponents;CustomIPTransport;dsnap;fmxase;IndyCore;IndyIPCommon;CloudService;FmxTeeUI;FireDACIBDriver;dklangXE5;bindcompfmx;rtl;dbrtl;DbxClientDriver;FireDACCommon;bindcomp;xmlrtl;IndyProtocols;FireDACCommonDriver;bindengine;soaprtl;bindcompdbx;FMXTee;FireDAC;inet;RESTComponents;dbexpress;$(DCC_UsePackage)</DCC_UsePackage>
+    </PropertyGroup>
+    <PropertyGroup Condition="'$(Base_iOSSimulator)'!=''">
+        <DCC_UsePackage>IndyIPClient;FireDACSqliteDriver;DBXSqliteDriver;fmx;IndySystem;DBXInterBaseDriver;DataSnapCommon;DbxCommonDriver;dbxcds;fmxFireDAC;BesenComponents;CustomIPTransport;dsnap;fmxase;IndyCore;IndyIPCommon;CloudService;FmxTeeUI;FireDACIBDriver;dklangXE5;bindcompfmx;rtl;dbrtl;DbxClientDriver;FireDACCommon;bindcomp;xmlrtl;IndyProtocols;FireDACCommonDriver;bindengine;soaprtl;bindcompdbx;FMXTee;FireDAC;inet;RESTComponents;dbexpress;$(DCC_UsePackage)</DCC_UsePackage>
+    </PropertyGroup>
+    <PropertyGroup Condition="'$(Base_OSX32)'!=''">
+        <DCC_ConsoleTarget>true</DCC_ConsoleTarget>
+        <DCC_UsePackage>IndyIPClient;FireDACSqliteDriver;DBXSqliteDriver;FireDACPgDriver;fmx;IndySystem;DBXInterBaseDriver;DataSnapCommon;DbxCommonDriver;dbxcds;fmxFireDAC;BesenComponents;CustomIPTransport;dsnap;IndyIPServer;fmxase;IndyCore;IndyIPCommon;CloudService;FmxTeeUI;FireDACIBDriver;inetdbxpress;dklangXE5;FireDACASADriver;bindcompfmx;FireDACODBCDriver;rtl;dbrtl;DbxClientDriver;FireDACCommon;bindcomp;xmlrtl;IndyProtocols;DBXMySQLDriver;FireDACCommonDriver;bindengine;soaprtl;bindcompdbx;FMXTee;FireDACADSDriver;FireDAC;inet;fmxobj;FireDACMySQLDriver;fmxdae;RESTComponents;dbexpress;FireDACMSAccDriver;$(DCC_UsePackage)</DCC_UsePackage>
+    </PropertyGroup>
+    <PropertyGroup Condition="'$(Base_Win32)'!=''">
+        <DCC_ConsoleTarget>true</DCC_ConsoleTarget>
+        <DCC_Namespace>Winapi;System.Win;Data.Win;Datasnap.Win;Web.Win;Soap.Win;Xml.Win;Bde;$(DCC_Namespace)</DCC_Namespace>
+        <VerInfo_Locale>1033</VerInfo_Locale>
+        <VerInfo_Keys>CompanyName=;FileDescription=;FileVersion=1.0.0.0;InternalName=;LegalCopyright=;LegalTrademarks=;OriginalFilename=;ProductName=;ProductVersion=1.0.0.0;Comments=</VerInfo_Keys>
+        <DCC_UsePackage>IndyIPClient;JvGlobus;JvMM;tmsdXE5;JvManagedThreads;FireDACSqliteDriver;dd_wdwstateXE5;DBXSqliteDriver;AbbreviaVCL;FireDACPgDriver;fmx;JvDlgs;IndySystem;JvCrypt;TeeDB;tmswizdXE5;inetdbbde;DBXInterBaseDriver;gtHtmVwExpD17;DataSnapCommon;JvNet;BeejComponentsXE5;JvDotNetCtrls;DbxCommonDriver;tdbf;vclimg;dbxcds;gtAdvGridExpD17;MetropolisUILiveTile;JvXPCtrls;vcldb;vcldsnap;AutoUpgraderProBDS_XE5;fmxFireDAC;BesenComponents;CustomIPTransport;JvCore;vclribbon;dsnap;IndyIPServer;OmniThreadLibraryRuntimeXE5;fmxase;vcl;IndyCore;dclGraphicExXE5;IndyIPCommon;CloudService;CodeSiteExpressPkg;FmxTeeUI;FireDACIBDriver;JvAppFrm;JvDB;JvRuntimeDesign;inetdbxpress;webdsnap;FileStorageBDS_XE5;JclDeveloperTools;dklangXE5;FrameViewerXE5;JvDocking;adortl;JvWizards;madBasic_;gtRichVwExpD17;FireDACASADriver;JvHMI;bindcompfmx;JvBands;FireDACODBCDriver;rtl;dbrtl;DbxClientDriver;MapWindowXE5;FireDACCommon;bindcomp;JvPluginSystem;Tee;JclContainers;JvCmp;vclFireDAC;madDisAsm_;JvSystem;xmlrtl;svnui;JvTimeFramework;JvControls;IndyProtocols;DBXMySQLDriver;FireDACCommonDriver;tmsxlsdXE5;bindengine;vclactnband;soaprtl;bindcompdbx;FMXTee;TeeUI;bindcompvcl;JvStdCtrls;JvCustom;Jcl;vclie;JvJans;JvPageComps;JvPrintPreview;ADOX_XE5;FireDACADSDriver;vcltouch;RichViewSpellingHunspell_XE5;madExcept_;VclSmp;FireDAC;VCLRESTComponents;gtDocEngD19;dsnapcon;inet;fmxobj;JclVcl;JvPascalInterpreter;FireDACMySQLDriver;BeejTmsRvEditLinkXE5;vclx;svn;tmsexdXE5;CADSys5_XE5;fmxdae;RESTComponents;bdertl;VirtualTreesR;dbexpress;FireDACMSAccDriver;JvBDE;$(DCC_UsePackage)</DCC_UsePackage>
+    </PropertyGroup>
+    <PropertyGroup Condition="'$(Base_Win64)'!=''">
+        <DCC_ConsoleTarget>true</DCC_ConsoleTarget>
+        <DCC_UsePackage>IndyIPClient;FireDACSqliteDriver;DBXSqliteDriver;AbbreviaVCL;FireDACPgDriver;fmx;IndySystem;TeeDB;DBXInterBaseDriver;DataSnapCommon;DbxCommonDriver;tdbf;vclimg;dbxcds;MetropolisUILiveTile;vcldb;vcldsnap;fmxFireDAC;BesenComponents;CustomIPTransport;vclribbon;dsnap;IndyIPServer;fmxase;vcl;IndyCore;IndyIPCommon;CloudService;FmxTeeUI;FireDACIBDriver;inetdbxpress;webdsnap;dklangXE5;adortl;FireDACASADriver;bindcompfmx;FireDACODBCDriver;rtl;dbrtl;DbxClientDriver;FireDACCommon;bindcomp;Tee;vclFireDAC;xmlrtl;IndyProtocols;DBXMySQLDriver;FireDACCommonDriver;bindengine;vclactnband;soaprtl;bindcompdbx;FMXTee;TeeUI;bindcompvcl;vclie;FireDACADSDriver;vcltouch;VclSmp;FireDAC;VCLRESTComponents;gtDocEngD19;dsnapcon;inet;fmxobj;FireDACMySQLDriver;vclx;fmxdae;RESTComponents;VirtualTreesR;dbexpress;FireDACMSAccDriver;$(DCC_UsePackage)</DCC_UsePackage>
+    </PropertyGroup>
+    <PropertyGroup Condition="'$(Cfg_1)'!=''">
+        <DCC_Define>DEBUG;$(DCC_Define)</DCC_Define>
+        <DCC_DebugDCUs>true</DCC_DebugDCUs>
+        <DCC_Optimize>false</DCC_Optimize>
+        <DCC_GenerateStackFrames>true</DCC_GenerateStackFrames>
+        <DCC_DebugInfoInExe>true</DCC_DebugInfoInExe>
+        <DCC_RemoteDebug>true</DCC_RemoteDebug>
+    </PropertyGroup>
+    <PropertyGroup Condition="'$(Cfg_1_Win32)'!=''">
+        <DCC_Define>madExcept;$(DCC_Define)</DCC_Define>
+        <DCC_DebugInformation>true</DCC_DebugInformation>
+        <DCC_MapFile>3</DCC_MapFile>
+        <Manifest_File>None</Manifest_File>
+        <VerInfo_Locale>1033</VerInfo_Locale>
+        <DCC_RemoteDebug>false</DCC_RemoteDebug>
+    </PropertyGroup>
+    <PropertyGroup Condition="'$(Cfg_2)'!=''">
+        <DCC_LocalDebugSymbols>false</DCC_LocalDebugSymbols>
+        <DCC_Define>RELEASE;$(DCC_Define)</DCC_Define>
+        <DCC_SymbolReferenceInfo>0</DCC_SymbolReferenceInfo>
+        <DCC_DebugInformation>0</DCC_DebugInformation>
+    </PropertyGroup>
+    <ItemGroup>
+        <DelphiCompile Include="$(MainSource)">
+            <MainSource>MainSource</MainSource>
+        </DelphiCompile>
+        <BuildConfiguration Include="Release">
+            <Key>Cfg_2</Key>
+            <CfgParent>Base</CfgParent>
+        </BuildConfiguration>
+        <BuildConfiguration Include="Base">
+            <Key>Base</Key>
+        </BuildConfiguration>
+        <BuildConfiguration Include="Debug">
+            <Key>Cfg_1</Key>
+            <CfgParent>Base</CfgParent>
+        </BuildConfiguration>
+    </ItemGroup>
+    <ProjectExtensions>
+        <Borland.Personality>Delphi.Personality.12</Borland.Personality>
+        <Borland.ProjectType/>
+        <BorlandProject>
+            <Delphi.Personality>
+                <VersionInfo>
+                    <VersionInfo Name="IncludeVerInfo">False</VersionInfo>
+                    <VersionInfo Name="AutoIncBuild">False</VersionInfo>
+                    <VersionInfo Name="MajorVer">1</VersionInfo>
+                    <VersionInfo Name="MinorVer">0</VersionInfo>
+                    <VersionInfo Name="Release">0</VersionInfo>
+                    <VersionInfo Name="Build">0</VersionInfo>
+                    <VersionInfo Name="Debug">False</VersionInfo>
+                    <VersionInfo Name="PreRelease">False</VersionInfo>
+                    <VersionInfo Name="Special">False</VersionInfo>
+                    <VersionInfo Name="Private">False</VersionInfo>
+                    <VersionInfo Name="DLL">False</VersionInfo>
+                    <VersionInfo Name="Locale">1033</VersionInfo>
+                    <VersionInfo Name="CodePage">1252</VersionInfo>
+                </VersionInfo>
+                <VersionInfoKeys>
+                    <VersionInfoKeys Name="CompanyName"/>
+                    <VersionInfoKeys Name="FileDescription"/>
+                    <VersionInfoKeys Name="FileVersion">1.0.0.0</VersionInfoKeys>
+                    <VersionInfoKeys Name="InternalName"/>
+                    <VersionInfoKeys Name="LegalCopyright"/>
+                    <VersionInfoKeys Name="LegalTrademarks"/>
+                    <VersionInfoKeys Name="OriginalFilename"/>
+                    <VersionInfoKeys Name="ProductName"/>
+                    <VersionInfoKeys Name="ProductVersion">1.0.0.0</VersionInfoKeys>
+                    <VersionInfoKeys Name="Comments"/>
+                    <VersionInfoKeys Name="CFBundleName"/>
+                    <VersionInfoKeys Name="CFBundleDisplayName"/>
+                    <VersionInfoKeys Name="UIDeviceFamily"/>
+                    <VersionInfoKeys Name="CFBundleIdentifier"/>
+                    <VersionInfoKeys Name="CFBundleVersion"/>
+                    <VersionInfoKeys Name="CFBundlePackageType"/>
+                    <VersionInfoKeys Name="CFBundleSignature"/>
+                    <VersionInfoKeys Name="CFBundleAllowMixedLocalizations"/>
+                    <VersionInfoKeys Name="UISupportedInterfaceOrientations"/>
+                    <VersionInfoKeys Name="CFBundleExecutable"/>
+                    <VersionInfoKeys Name="CFBundleResourceSpecification"/>
+                    <VersionInfoKeys Name="LSRequiresIPhoneOS"/>
+                    <VersionInfoKeys Name="CFBundleInfoDictionaryVersion"/>
+                    <VersionInfoKeys Name="CFBundleDevelopmentRegion"/>
+                    <VersionInfoKeys Name="package"/>
+                    <VersionInfoKeys Name="label"/>
+                    <VersionInfoKeys Name="versionCode"/>
+                    <VersionInfoKeys Name="versionName"/>
+                    <VersionInfoKeys Name="persistent"/>
+                    <VersionInfoKeys Name="restoreAnyVersion"/>
+                    <VersionInfoKeys Name="installLocation"/>
+                    <VersionInfoKeys Name="largeHeap"/>
+                    <VersionInfoKeys Name="theme"/>
+                </VersionInfoKeys>
+                <Source>
+                    <Source Name="MainSource">Build_DKL_LanguageCodes.dpr</Source>
+                </Source>
+                <Excluded_Packages>
+                    <Excluded_Packages Name="$(BDSBIN)\bcboffice2k190.bpl">Embarcadero C++Builder Office 2000 Servers Package</Excluded_Packages>
+                    <Excluded_Packages Name="$(BDSBIN)\bcbofficexp190.bpl">Embarcadero C++Builder Office XP Servers Package</Excluded_Packages>
+                    <Excluded_Packages Name="$(BDSBIN)\dcloffice2k190.bpl">Microsoft Office 2000 Sample Automation Server Wrapper Components</Excluded_Packages>
+                    <Excluded_Packages Name="$(BDSBIN)\dclofficexp190.bpl">Microsoft Office XP Sample Automation Server Wrapper Components</Excluded_Packages>
+                    <Excluded_Packages Name="$(BDSBIN)\dclbde190.bpl">Embarcadero BDE DB Components</Excluded_Packages>
+                </Excluded_Packages>
+            </Delphi.Personality>
+            <Deployment/>
+            <Platforms>
+                <Platform value="Android">False</Platform>
+                <Platform value="iOSDevice">False</Platform>
+                <Platform value="iOSSimulator">False</Platform>
+                <Platform value="OSX32">False</Platform>
+                <Platform value="Win32">True</Platform>
+                <Platform value="Win64">False</Platform>
+            </Platforms>
+        </BorlandProject>
+        <ProjectFileVersion>12</ProjectFileVersion>
+    </ProjectExtensions>
+    <Import Project="$(BDS)\Bin\CodeGear.Delphi.Targets" Condition="Exists('$(BDS)\Bin\CodeGear.Delphi.Targets')"/>
+    <Import Project="$(APPDATA)\Embarcadero\$(BDSAPPDATABASEDIR)\$(PRODUCTVERSION)\UserTools.proj" Condition="Exists('$(APPDATA)\Embarcadero\$(BDSAPPDATABASEDIR)\$(PRODUCTVERSION)\UserTools.proj')"/>
+</Project>

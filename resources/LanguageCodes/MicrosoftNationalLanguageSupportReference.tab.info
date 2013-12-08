@@ -1,0 +1,12 @@
+0 LCID
+1 culture name
+2 locale
+3 language name
+4 local language name
+5 ANSI codepage
+6 OEM codepage
+7 country/region abbreviation
+8 language abbreviation
+
+title: National Language Support (NLS) API Reference
+source: http://www.microsoft.com/resources/msdn/goglobal/default.mspx

@@ -1,0 +1,78 @@
+==============================================================================
+Installation notes for DKLang Localization Package
+==============================================================================
+written 2013.12.06 (XE5) - bjm
+
+There are two packages to install:
+  * dklang.dpk - runtime package 
+  * dcldklang.dpk - design time package
+  
+The runtime package contains the code necessary for your application.
+The design package installs the language controller component, and some 
+  utilities into the IDE.
+   
+To update for new versions of Delphi:
+  * edit "LibSuffix.inc" to add the new Delphi version
+  * edit "build_all.bat" to reflect the correct registry key and value for 
+      the new packages
+ 
+==============================================================================
+Installing the packages
+==============================================================================
+  * Go to the "Packages" foler.
+
+  * View and maybe edit two files to reflect the version of Delphi you are
+      installing to:
+    * LibSuffix.inc
+    * build_all.bat
+  
+  * Run "build_all.bat". 
+  * Set the library path to the DKLang "Src" folder (see below).
+
+*** OR ***
+
+Load and install the packages manually.
+    
+The packages need to be installed in the correct order because the design time 
+  package depends on the runtime package. The runtime package is the only one 
+  that needs to be built multiple times to support multiple platforms. The 
+  design time package only needs to be built for the IDE platform (win32).
+  
+  * load dklang.dpk and dcldklang.dpk into the IDE
+  * edit LibSuffix.inc to reflect the version of Delphi you are installing to.
+  * make sure that we can compile for each platform without overwriting the 
+      other platform's output files:
+    for each package do:
+      under Project|Options :
+        Delphi Compiler
+          Choose "Target" of "All configurations"
+          Set "Unit output directory" to "$(Platform)\$(Config)\"
+  
+  * build the runtime package for each platform 
+    for dklang.dpk:
+      Add new platforms (select "Target Platforms" in the outline and right 
+        click to "Add Platform...") for each platform you want to enable 
+        dklang for.
+      for each platform do "Build" (right click on project outline to"Build")
+
+  * build the design time package
+    for dcldklang.dpk:
+      The design time is only win32 because the IDE is still only win32, so 
+        we do not need to add any new platforms.
+      do "Build" (right click on project outline to"Build")
+
+==============================================================================
+Setting library paths
+==============================================================================
+Your code will need to be able to find dklang.pas. This can be done either by
+  adding library paths to the IDE or you can add dklang.pas to each of your
+  projects that use DKLang.
+  
+To add a library path to dklang.pas for each platform:
+  under Tools|Options :
+    Environment Options|Delphi Options|Library
+    for each platform:
+      change "Selected Platform" to the platform
+      add the path to dklang.pas to "Library path"
+      
+      
