@@ -37,7 +37,7 @@
 // Requires Delphi XE5 or higher.
 
 {$IF CompilerVersion < 19.0}
-  {$ERROR 'Requires Delphi XE5 or higher.'}
+  {$WARN 'Not tested on compilers below Delphi XE5.'}
 {$ENDIF}
 
 unit DKLang;
@@ -818,15 +818,15 @@ uses TypInfo, Math, System.Types;
     Stream.WriteBuffer(s[0], w);
   end;
 
-procedure StreamWriteUnicodeStr(Stream: TStream; const ws: UnicodeString);
+  procedure StreamWriteUnicodeStr(Stream: TStream; const ws: UnicodeString);
   var
     w: Word;
-    c: TCharArray;
+    s: TBytes;
   begin
+    s := TEncoding.Unicode.GetBytes(ws);
     w := Length(ws);
-    c := ws.ToCharArray;
     Stream.WriteBuffer(w, 2);
-    Stream.WriteBuffer(c, w*2);
+    Stream.WriteBuffer(s[0], w*2);
   end;
 
   procedure StreamWriteUnicodeLine(Stream: TStream; const ws: UnicodeString); overload;
