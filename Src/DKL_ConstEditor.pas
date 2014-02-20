@@ -113,7 +113,7 @@ const
 
 implementation
 {$R *.dfm}
-uses System.Win.Registry;
+uses System.Win.Registry, System.Generics.Collections;
 
 const
    // gMain's column indexes
@@ -199,6 +199,7 @@ const
       SL := TStringList.Create;
       try
         for i := 0 to EntryCount-1 do SL.Add(EntryNames[i]+'='+EntryValues[i, True]);
+        SL.Sort;
         SL.SaveToFile(wsFileName);
       finally
         SL.Free;
@@ -320,6 +321,7 @@ const
   procedure TdDKL_ConstEditor.InitializeDialog(AConsts: TDKLang_Constants; bEraseAllowed: Boolean);
   var i: Integer;
       key: UnicodeString;
+      keys: TList<UnicodeString>;
   begin
     FConsts                    := AConsts;
     cbSaveToLangSource.Checked := FConsts.AutoSaveLangSource;
@@ -329,12 +331,19 @@ const
     gMain.Cells[IColIdx_Name,  0] := 'Constant name';
     gMain.Cells[IColIdx_Value, 0] := 'Constant value';
      // Copy the constans into the editor
-    EntryCount := FConsts.Count;
-    i :=0;
-    for key in FConsts.Keys do begin
-      EntryNames [i]        := FConsts[key].wsName;
-      EntryValues[i, False] := FConsts[key].wsValue;
-      inc(i);
+     // TDictionary is not sorted, so get keys and sort
+    keys := TList<UnicodeString>.Create(FConsts.Keys);
+    try
+      keys.Sort;
+      EntryCount := FConsts.Count;
+      i :=0;
+      for key in keys do begin
+        EntryNames [i]        := FConsts[key].wsName;
+        EntryValues[i, False] := FConsts[key].wsValue;
+        inc(i);
+      end;
+    finally
+      keys.Free;
     end;
      // Update count info
     UpdateCount;
