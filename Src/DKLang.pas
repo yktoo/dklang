@@ -818,7 +818,7 @@ uses TypInfo, Math, System.Types;
     Stream.WriteBuffer(s[0], w);
   end;
 
-  procedure StreamWriteUnicodeStr(Stream: TStream; const ws: UnicodeString);
+procedure StreamWriteUnicodeStr(Stream: TStream; const ws: UnicodeString);
   var
     w: Word;
     c: TCharArray;
@@ -2010,7 +2010,7 @@ uses TypInfo, Math, System.Types;
       FAutoSaveLangSource := StreamReadBool(Stream);
        // Read item count, then read the constant names and values
       for i := 0 to StreamReadInt(Stream)-1 do begin
-        wsName   := StreamReadUnicodeStr(Stream);
+        wsName  := StreamReadUnicodeStr(Stream);
         wsValue := StreamReadUnicodeStr(Stream);
         Add(wsName, wsValue, []);
       end;
