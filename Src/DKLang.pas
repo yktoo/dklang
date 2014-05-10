@@ -2558,7 +2558,11 @@ uses TypInfo, Math, System.Types;
             dklrkResName: Result.Text_LoadFromResource(plr.Instance, plr.wsName);
             dklrkResID:   Result.Text_LoadFromResource(plr.Instance, plr.iResID);
             dklrkFile:    Result.Text_LoadFromFile(plr.wsName);
-            dklrkStream:  Result.Text_LoadFromStream(plr.Stream);
+            dklrkStream:  
+              begin
+                plr.Stream.Position := 0;
+                Result.Text_LoadFromStream(plr.Stream);
+              end;
           end;
         except
           Result.Free;
