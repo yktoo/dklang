@@ -29,6 +29,9 @@ package dcldklang;
 {$DESIGNONLY}
 {$IMPLICITBUILD ON}
 
+{$I LibSuffix.inc}
+
+
 requires
   designide,
   dklang;
