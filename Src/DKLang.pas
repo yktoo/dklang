@@ -630,7 +630,7 @@ resourcestring
   SDKLangErrMsg_StreamVersionTooLow    = 'Stream version (%d) is obsolete. The current vesrion is %d';
 
 implementation
-uses TypInfo, Math, System.Types;
+uses TypInfo, Math, System.Types, System.Character;
 
   function EncodeControlChars(const ws: UnicodeString): UnicodeString;
   var
@@ -1600,11 +1600,9 @@ uses TypInfo, Math, System.Types;
       if bIgnoreNonAlphaProps then begin
         Result := False;
         for i := 0 to Length(wsPropVal)-1 do
-          case wsPropVal.Chars[i] of
-            'A'..'Z', 'a'..'z', #161..High(Char): begin
-              Result := True;
-              Break;
-            end;
+          if wsPropVal.Chars[i].IsLetter then begin
+            Result := True;
+            Break;
           end;
        // Check for emptiness (no need if bIgnoreNonAlphaProps was True)
       end else if bIgnoreEmptyProps then
@@ -2429,6 +2427,7 @@ uses TypInfo, Math, System.Types;
   begin
      // class constructors get called on first use
      // check that it's a runtime call
+     // LangManager not a component, so checking csDesigning in ComponentState will not work.
     if DKLang_IsDesignTime then raise EDKLangError.Create(SDKLangErrMsg_LangManagerCalledAtDT);
 
     FSynchronizer      := TMultiReadExclusiveWriteSynchronizer.Create;
@@ -2558,11 +2557,7 @@ uses TypInfo, Math, System.Types;
             dklrkResName: Result.Text_LoadFromResource(plr.Instance, plr.wsName);
             dklrkResID:   Result.Text_LoadFromResource(plr.Instance, plr.iResID);
             dklrkFile:    Result.Text_LoadFromFile(plr.wsName);
-            dklrkStream:  
-              begin
-                plr.Stream.Position := 0;
-                Result.Text_LoadFromStream(plr.Stream);
-              end;
+            dklrkStream:  Result.Text_LoadFromStream(plr.Stream);
           end;
         except
           Result.Free;
