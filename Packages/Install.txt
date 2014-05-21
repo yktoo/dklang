@@ -2,6 +2,7 @@
 Installation notes for DKLang Localization Package
 ==============================================================================
 written 2013.12.06 (XE5) - bjm
+updated 2014.05.21 (XE5) - bjm
 
 There are two packages to install:
   * dklang.dpk - runtime package 
@@ -12,18 +13,20 @@ The design package installs the language controller component, and some
   utilities into the IDE.
    
 To update for new versions of Delphi:
-  * edit "LibSuffix.inc" to add the new Delphi version
-  * edit "build_all.bat" to reflect the correct registry key and value for 
-      the new packages
+  * edit "dklang.dpk" and "dcldkalng.dpk" to add the new Delphi version using
+      the "{$LIBSUFFIX '...'} compiler directive
+  * edit "build_all.bat" to reflect the correct parameters for 
+      the version of Delphi you are installing to
  
 ==============================================================================
 Installing the packages
 ==============================================================================
   * Go to the "Packages" foler.
 
-  * View and maybe edit two files to reflect the version of Delphi you are
+  * View and maybe edit three files to reflect the version of Delphi you are
       installing to:
-    * LibSuffix.inc
+    * dklang.dpk
+	* dcldkalng.dpk
     * build_all.bat
   
   * Run "build_all.bat". 
@@ -39,7 +42,7 @@ The packages need to be installed in the correct order because the design time
   design time package only needs to be built for the IDE platform (win32).
   
   * load dklang.dpk and dcldklang.dpk into the IDE
-  * edit LibSuffix.inc to reflect the version of Delphi you are installing to.
+  * edit the project source to reflect the version of Delphi you are installing to.
   * make sure that we can compile for each platform without overwriting the 
       other platform's output files:
     for each package do:
