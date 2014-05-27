@@ -45,7 +45,7 @@ unit DKLang;
 interface
 uses
   System.SysUtils, System.Classes, System.Masks, System.Generics.Collections,
-  DKL_LanguageCodes;
+  System.Generics.Defaults, DKL_LanguageCodes;
 
 const
   { Each Unicode stream should begin with the code U+FEFF,  }   // from TntSystem
@@ -316,6 +316,12 @@ type
    //-------------------------------------------------------------------------------------------------------------------
    // List of constants (sorted by name, case-insensitively)
    //-------------------------------------------------------------------------------------------------------------------
+
+  TCaseInsensitiveComparer = class(TEqualityComparer<String>)
+  public
+    function Equals(const Left, Right: String): Boolean; override;
+    function GetHashCode(const Value: String): Integer; override;
+  end;
 
   TDKLang_Constants = class(TDictionary<string,PDKLang_Constant>, IInterface, IDKLang_LanguageSourceObject)
   private
@@ -1894,6 +1900,19 @@ uses TypInfo, Math, System.Types, System.Character;
    // TDKLang_Constants
    //===================================================================================================================
 
+  function TCaseInsensitiveComparer.Equals(const Left, Right: String): Boolean;
+  begin
+    { Make a case-insensitive comparison }
+    Result := CompareText(Left, Right) = 0;
+  end;
+
+  function TCaseInsensitiveComparer.GetHashCode(const Value: String): Integer;
+  begin
+    { Generate a hash code. Simply return the length of the string
+      as its hash code. }
+    Result := Length(Value);
+  end;
+
   procedure TDKLang_Constants.Add(const wsName: UnicodeString; const wsValue: UnicodeString; TranStates: TDKLang_TranslationStates);
   var p: PDKLang_Constant;
   begin
@@ -1912,7 +1931,7 @@ uses TypInfo, Math, System.Types, System.Character;
 
   constructor TDKLang_Constants.Create;
   begin
-    inherited Create;
+    inherited Create(TCaseInsensitiveComparer.Create);
     FAutoSaveLangSource := True;
   end;
 
