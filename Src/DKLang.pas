@@ -1020,10 +1020,26 @@ uses TypInfo, Math, System.Types, System.Character;
   end;
 
   function TDKLang_CompTranslations.FindComponentName(const wsComponentName: UnicodeString): TDKLang_CompTranslation;
-  var idx: Integer;
+  var idx,iSuffix,pSuffix: Integer;
   begin
+    result := nil;
     idx := IndexOfComponentName(wsComponentName);
-    if idx<0 then Result := nil else Result := Items[idx];
+    if idx>=0 then Result := Items[idx]
+    else
+    begin
+      // component name not found. Now consider that it may be an auto-generated name
+      // of the form: originalName_xxx where _xxx is a numeric tie breaker suffix
+      pSuffix := wsComponentName.LastIndexOf('_');
+      // if no suffix then leave
+      if pSuffix = -1 then Exit;
+      // test each char in suffix for digit-ness
+      for iSuffix:=wsComponentName.Length-1 downto pSuffix+1 do
+        if not wsComponentName.Chars[iSuffix].IsDigit then Exit;
+
+      // if we got this far, then the pattern fits
+      idx := IndexOfComponentName(wsComponentName.Substring(0,pSuffix));
+      if idx>=0 then Result := Items[idx];
+    end;
   end;
 
   function TDKLang_CompTranslations.IndexOfComponentName(const wsComponentName: UnicodeString): Integer;
