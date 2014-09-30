@@ -12,3 +12,6 @@
 *.~*~
 __history
 bin/*.zip
+/Packages/dklangXXX.dpk
+/Packages/dcldklangXXX.dpk
+/Packages/__oldpackages
