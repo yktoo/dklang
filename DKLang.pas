@@ -1188,7 +1188,8 @@ var
        // Remember the original stream position
       i64Pos := Stream.Position;
        // Determine whether this is an Unicode source (BEFORE any reading is done)
-      FIsStreamUnicode := AutoDetectCharacterSet(Stream)=csUnicode;
+
+      FIsStreamUnicode := AutoDetectCharacterSet(Stream)<>csAnsi;
       Stream.Position := i64Pos;
        // Load the stream contents into the list
       List.LoadFromStream(Stream);
