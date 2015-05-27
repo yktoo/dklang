@@ -4,8 +4,8 @@ DKLang Localization Package
 DKLang Localization Package is a set of classes intended to simplify the
 localization of applications written in Delphi.
 
-At Version 5.0 DKLang Localization Package has been rewritten to work on 
-all current (XE5) platforms: VCL (win32 & win64) & FireMonkey (win32, 
-win64, OSX, Android, & iOS).
+At Version 5.0 DKLang Localization Package has been rewritten to work on
+all current (XE5) platforms: VCL (win32 & win64) & FireMonkey (win32,
+win64, OSX, Android & iOS).
 
 For details see http://yktoo.com/software/dklang and read the wiki.
