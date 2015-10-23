@@ -15,3 +15,9 @@ bin/*.zip
 /Packages/dklangXXX.dpk
 /Packages/dcldklangXXX.dpk
 /Packages/__oldpackages
+dklang220.res
+dklang220.stat
+dcldklang220.stat
+dklang220.dproj
+dcldklang220.otares
+dcldklang220.res

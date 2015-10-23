@@ -34,6 +34,7 @@ function GetCultureNameFromLangId(aLANGID: UInt32): string;
 function GetCultureNativeNameFromLangId(aLANGID: UInt32): string;
 function GetLanguageNameFromLangId(aLANGID: UInt32): string;
 function GetLanguageNativeNameFromLangId(aLANGID: UInt32): string;
+function IsRightToLeftLanguage(aLangID: UInt32): Boolean;
 
 // works with either 'en' or 'en-US' types
 function GetLangIdFromCultureCode(cultureCode: string): UInt32;
@@ -189,6 +190,12 @@ begin
 
   // not in list, so return zero
   result := 0;
+end;
+
+// source:  https://meta.wikimedia.org/wiki/Template:List_of_language_names_ordered_by_code
+function IsRightToLeftLanguage(aLangID: UInt32): Boolean;
+begin
+  result := '|ar|arc|dv|ha|he|khw|ks|ku|ps|ur|yi|'.Contains('|' + GetLanguageCodeFromLangId(aLangID) + '|');
 end;
 
 end.

@@ -1,4 +1,4 @@
-package dcldklang220;
+package dcldklang230;
 
 {$R *.res}
 {$R *.otares}
@@ -32,7 +32,7 @@ package dcldklang220;
 
 requires
   designide,
-  dklang220;
+  dklang230;
 
 contains
   DKL_ResFile in '..\src\DKL_ResFile.pas',
