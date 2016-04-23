@@ -1,7 +1,6 @@
-package dklang230;
+package dcldklang240;
 
 {$R *.res}
-{$R *.otares}
 {$IFDEF IMPLICITBUILDING This IFDEF should not be used by users}
 {$ALIGN 8}
 {$ASSERTIONS ON}
@@ -26,16 +25,20 @@ package dklang230;
 {$IMAGEBASE $400000}
 {$DEFINE DEBUG}
 {$ENDIF IMPLICITBUILDING}
-{$DESCRIPTION 'DKLang Localization Package'}
-{$RUNONLY}
+{$DESCRIPTION 'DKLang Localization Package - IDE Tools'}
+{$DESIGNONLY}
 {$IMPLICITBUILD ON}
 
+
 requires
-  rtl;
+  designide,
+  dklang240;
 
 contains
-  DKLang in '..\src\DKLang.pas',
-  DKLangStorage in '..\src\DKLangStorage.pas',
-  DKL_LanguageCodes in '..\src\DKL_LanguageCodes.pas';
+  DKL_ResFile in '..\src\DKL_ResFile.pas',
+  DKL_Expt in '..\src\DKL_Expt.pas',
+  DKL_ConstEditor in '..\src\DKL_ConstEditor.pas' {dDKL_ConstEditor},
+  DKLangReg in '..\src\DKLangReg.pas',
+  DKL_StorageEditor in '..\src\DKL_StorageEditor.pas' {DKLangTranslationStorageEditor};
 
 end.

@@ -4,6 +4,7 @@ Installation notes for DKLang Localization Package
 written 2013.12.06 (XE5) - bjm
 updated 2014.05.21 (XE6) - bjm
 updated 2014.09.30 (XE7) - bjm
+updated 2016.04.23 (10.1 Berlin) - bjm
 
 There are two packages to install (where XXX represents the lib suffix for the 
   version you are installing):
