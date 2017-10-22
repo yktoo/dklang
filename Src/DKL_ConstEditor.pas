@@ -36,7 +36,8 @@ interface
 uses
   WinApi.Windows, System.SysUtils, System.Classes,
   VCL.Controls, VCL.Forms, VCL.Dialogs,VCL.StdCtrls, VCL.Grids,
-  DKLang;
+  DKLang, {Edwin_Searchability}Vcl.Graphics{Edwin_Searchability end},
+  System.Generics.Collections;
 
 type
   TdDKL_ConstEditor = class(TForm)
@@ -49,18 +50,34 @@ type
     gMain: TStringGrid;
     lCount: TLabel;
     lDeleteHint: TLabel;
+    edtSearch: TEdit;
+    btnGotoFirstMatch: TButton;
+    btnGotoNextMatch: TButton;
+    lblSearchPos: TLabel;
+    procedure FormCreate(Sender: TObject);
     procedure bEraseClick(Sender: TObject);
     procedure bLoadClick(Sender: TObject);
     procedure bOKClick(Sender: TObject);
     procedure bSaveClick(Sender: TObject);
+    procedure btnGotoFirstMatchClick(Sender: TObject);
+    procedure btnGotoNextMatchClick(Sender: TObject);
+    procedure edtSearchChange(Sender: TObject);
+    procedure gMainDrawCell(Sender: TObject; ACol, ARow: Integer; Rect: TRect; State: TGridDrawState);
     procedure gMainKeyDown(Sender: TObject; var Key: Word; Shift: TShiftState);
     procedure gMainMouseUp(Sender: TObject; Button: TMouseButton; Shift: TShiftState; X, Y: Integer);
     procedure gMainSelectCell(Sender: TObject; ACol, ARow: Integer; var CanSelect: Boolean);
+  strict private
+    function IsRowMatch(aRow: Integer; aSearchStr: string): Boolean;
   private
      // The constants being edited
     FConsts: TDKLang_Constants;
      // True if the constants are to be erased from the project resources
     FErase: Boolean;
+    // Edwin_Searchability
+    // Stores all the matching row numbers.
+    FMatchingRows: TList<Integer>;
+    FCurrentMatchingIndex: Integer;
+    // Edwin_Searchability end.
      // Initializes the dialog
     procedure InitializeDialog(AConsts: TDKLang_Constants; bEraseAllowed: Boolean);
      // Updates the count info
@@ -87,6 +104,11 @@ type
     procedure SetEntryCount(iCount: Integer);
     procedure SetEntryNames(Index: Integer; const wsValue: UnicodeString);
     procedure SetEntryValues(Index: Integer; bEncoded: Boolean; const wsValue: UnicodeString);
+    procedure PerformSearch;
+    function GotoFirstMatchingRow: Boolean;
+    procedure SetCurrentMatchingIndex(const Value: Integer);
+    procedure ShowCurrentSearchLocation;
+    procedure GotoNextMatchingRow(const aStep: Integer = 1);
   protected
     procedure DoClose(var Action: TCloseAction); override;
     procedure DoShow; override;
@@ -100,6 +122,8 @@ type
      // -- Constant names by index. If bEncoded=True, the constant value is represented 'encoded', with no literal
      //    control chars; if bEncoded=False, the value is represented 'as is', with linebreaks, tabs, etc. in it
     property EntryValues[Index: Integer; bEncoded: Boolean]: UnicodeString read GetEntryValues write SetEntryValues;
+    // Pointer to FMatchingRows.
+    property CurrentMatchingIndex: Integer read FCurrentMatchingIndex write SetCurrentMatchingIndex;
   end;
 
 const
@@ -113,7 +137,7 @@ const
 
 implementation
 {$R *.dfm}
-uses System.Win.Registry, System.Generics.Collections;
+uses System.Win.Registry, System.StrUtils;
 
 const
    // gMain's column indexes
@@ -131,6 +155,18 @@ const
         Free;
       end;
   end;
+
+procedure TdDKL_ConstEditor.FormCreate(Sender: TObject);
+begin
+  // Edwin_Searchability
+  FMatchingRows := TList<Integer>.Create;
+  FCurrentMatchingIndex := -1;
+  lblSearchPos.Caption := '';
+
+  // Allow pressing TAB to jump between columns.
+  gMain.Options := gMain.Options + [goTabs];
+  // Edwin_Searchability end.
+end;
 
    //===================================================================================================================
    // TdDKL_ConstEditor
@@ -219,6 +255,16 @@ const
       end;
   end;
 
+procedure TdDKL_ConstEditor.btnGotoFirstMatchClick(Sender: TObject);
+begin
+  GotoNextMatchingRow(-1);
+end;
+
+procedure TdDKL_ConstEditor.btnGotoNextMatchClick(Sender: TObject);
+begin
+  GotoNextMatchingRow(1);
+end;
+
   procedure TdDKL_ConstEditor.CheckEntryIndexValidity(iIndex: Integer);
   begin
     if (iIndex<0) or (iIndex>=EntryCount) then raise EDKLangError.CreateFmt('Invalid entry index (%d)', [iIndex]);
@@ -297,12 +343,24 @@ const
     if not bEncoded then Result := DecodeControlChars(Result);
   end;
 
+
   procedure TdDKL_ConstEditor.gMainKeyDown(Sender: TObject; var Key: Word; Shift: TShiftState);
   begin
-    if (Key=VK_DELETE) and (Shift=[ssCtrl]) and (gMain.Row<gMain.RowCount-1) then begin      
+    if (Key=VK_DELETE) and (Shift=[ssCtrl]) and (gMain.Row<gMain.RowCount-1) then begin
       DeleteEntry(gMain.Row-1);
       Key := 0;
+    end
+    // Edwin_Searchability
+    else if (Key = VK_ESCAPE) and (Shift = []) then
+    begin
+      Key := 0;
+      ModalResult := mrCancel;
+    end
+    else if (Key = Ord('F')) and (Shift = [ssCtrl]) then
+    begin
+     edtSearch.SetFocus;
     end;
+    // Edwin_Searchability end.
   end;
 
   procedure TdDKL_ConstEditor.gMainMouseUp(Sender: TObject; Button: TMouseButton; Shift: TShiftState; X, Y: Integer);
@@ -444,5 +502,135 @@ const
     gMain.ColWidths[IColIdx_Name]  := iwName;
     gMain.ColWidths[IColIdx_Value] := iwClient-iwName-2;
   end;
+
+procedure TdDKL_ConstEditor.gMainDrawCell(Sender: TObject; ACol, ARow: Integer; Rect: TRect; State:
+    TGridDrawState);
+var
+  mySearch: string;
+  myStr: string;
+begin
+  //Edwin_Searchability
+  if (EntryCount < 1) or (ARow < 1) then
+    Exit;
+
+  //  if ACol = IColIdx_Name then
+  //    myStr := gMain.Cells[IColIdx_Name, ARow]
+  //  else
+  //    myStr := gMain.Cells[IColIdx_Value, ARow];
+  myStr := gMain.Cells[ACol, ARow];
+
+  mySearch := Trim(edtSearch.Text);
+
+  //highlight the matching items with red
+  //if SameText(myStr, mySearch) or ContainsText(myStr, mySearch) then
+  if FMatchingRows.Contains(ARow) then
+  begin
+    gMain.Canvas.Font.Color := clRed;
+    gMain.Canvas.Font.Style := [fsBold];
+    gMain.Canvas.TextRect(Rect, Rect.Left + 2, Rect.Top + 2, myStr);
+  end;
+  // Edwin_Searchability end.
+end;
+
+procedure TdDKL_ConstEditor.edtSearchChange(Sender: TObject);
+begin
+  // Edwin_Searchability
+  PerformSearch;
+  // Edwin_Searchability end.
+end;
+
+// Edwin_Searchability end.
+
+// Edwin_Searchability
+function TdDKL_ConstEditor.IsRowMatch(aRow: Integer; aSearchStr: string): Boolean;
+begin
+  Result :=  ContainsText(gMain.Cells[IColIdx_Name, ARow], aSearchStr)
+    or ContainsText(gMain.Cells[IColIdx_Value, ARow], aSearchStr);
+end;
+// Edwin_Searchability END.
+
+// Edwin_Searchability
+procedure TdDKL_ConstEditor.PerformSearch;
+var
+  i: Integer;
+  searchStr: string;
+begin
+  CurrentMatchingIndex := -1;
+  FMatchingRows.Clear;
+
+  searchStr := Trim(edtSearch.Text);
+  for i := 1 to gMain.RowCount do
+  begin
+    if IsRowMatch(i, searchStr) then
+    begin
+      FMatchingRows.Add(i);
+    end;
+  end;
+
+  // Locate the first matching row if any.
+  if not GotoFirstMatchingRow then
+  begin
+    gMain.Invalidate;
+    ShowCurrentSearchLocation;
+  end;
+end;
+// Edwin_Searchability end.
+
+// Edwin_Searchability
+function TdDKL_ConstEditor.GotoFirstMatchingRow: Boolean;
+begin
+  Result := False;
+  if FMatchingRows.Count < 1 then
+    Exit;
+
+  CurrentMatchingIndex := 0;
+  Result := True;
+end;
+// Edwin_Searchability end.
+
+// Edwin_Searchability
+procedure TdDKL_ConstEditor.SetCurrentMatchingIndex(const Value: Integer);
+begin
+  FCurrentMatchingIndex := Value;
+
+  if (FCurrentMatchingIndex >= 0) and (FCurrentMatchingIndex < FMatchingRows.Count) then
+  begin
+    gMain.Row := FMatchingRows[FCurrentMatchingIndex];
+    gMain.Invalidate;
+  end;
+
+
+  ShowCurrentSearchLocation;
+end;
+// Edwin_Searchability end.
+
+
+procedure TdDKL_ConstEditor.ShowCurrentSearchLocation;
+const
+  // Something like '1 of 5 matches'.
+  cSearchLocationString = '%d of %d matches';
+begin
+  lblSearchPos.Caption := Format(cSearchLocationString, [FCurrentMatchingIndex + 1, self.FMatchingRows.Count]);
+end;
+// Edwin_Searchability end.
+
+// Edwin_Searchability
+procedure TdDKL_ConstEditor.GotoNextMatchingRow(const aStep: Integer = 1);
+var
+  newIdx: Integer;
+begin
+  if FMatchingRows.Count < 1 then
+    Exit;
+
+  newIdx := CurrentMatchingIndex + aStep;
+  if newIdx > (FMatchingRows.Count - 1) then
+    newIdx := FMatchingRows.Count - 1;
+  if newIdx < 0 then
+    newIdx := 0;
+
+  CurrentMatchingIndex := newIdx;
+  gMain.SetFocus;
+end;
+// Edwin_Searchability end.
 
 end.
