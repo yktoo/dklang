@@ -426,7 +426,8 @@ implementation
        // Put the header block
       Stream.CopyFrom(msHeaderBlock, 0);
        // Put entry data
-      Stream.WriteBuffer(RawData[0], Length(RawData));
+      if (Length(RawData) > 0) then // 2024.12.24 bjm: empty RawData throws Range Check error in later compilers
+        Stream.WriteBuffer(RawData[0], Length(RawData));
        // Align the stream pointer
       AlignStream4(Stream);
     finally
